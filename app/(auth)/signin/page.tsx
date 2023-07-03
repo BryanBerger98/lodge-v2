@@ -1,17 +1,17 @@
 import { Card } from '@/components/ui/card';
 
-import SignUpForm from './_components/SignUpForm';
+import SignInForm from './_components/SignInForm';
 
-const SignUpPage = () => {
+const SignInPage = () => {
 	
 
 	return (
 		<div className="min-h-screen flex justify-center items-center">
 			<Card className="min-w-[420px]">
-				<SignUpForm />
+				<SignInForm />
 			</Card>
 		</div>
 	);
 };
 
-export default SignUpPage;
+export default SignInPage;

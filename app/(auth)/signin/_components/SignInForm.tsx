@@ -5,43 +5,37 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { LogIn } from 'lucide-react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
-import { boolean, object, string, z } from 'zod';
+import { object, string, z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 
-const SignUpForm = () => {
+const SignInForm = () => {
 
-	const signUpFormSchema = object({
+	const signInFormSchema = object({
 		email: string().email('Please, provide a valid email address.').min(1, 'Required.'),
-		password: string().min(8, 'At least 8 characters.'),
-		passwordConfirm: string().min(1, 'Required'),
-		termsCheck: boolean({ required_error: 'Required.' }),
-	}).refine((data) => data.password === data.passwordConfirm, {
-		path: [ 'passwordConfirm' ],
-		message: 'Must be the same as password.',
+		password: string().min(1, 'Required.'),
 	});
 
-	const form = useForm<z.infer<typeof signUpFormSchema>>({
-		resolver: zodResolver(signUpFormSchema),
+	const form = useForm<z.infer<typeof signInFormSchema>>({
+		resolver: zodResolver(signInFormSchema),
 		mode: 'onTouched',
 	});
 
-	const handleSubmitSignUpForm = (values: z.infer<typeof signUpFormSchema>) => {
+	const handleSubmitSignInForm = (values: z.infer<typeof signInFormSchema>) => {
 		console.log(values);
 	};
 
 	return (
 		<Form { ...form }>
-			<form onSubmit={ form.handleSubmit(handleSubmitSignUpForm) }>
+			<form onSubmit={ form.handleSubmit(handleSubmitSignInForm) }>
 				<CardHeader>
-					<CardTitle>Sign Up</CardTitle>
+					<CardTitle>Sign In</CardTitle>
 					<CardDescription>
-						Create an account to sign into the app.
+						Sign in to your account.
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
@@ -65,7 +59,7 @@ const SignUpForm = () => {
 						control={ form.control }
 						name="password"
 						render={ ({ field }) => (
-							<FormItem className="mb-4">
+							<FormItem>
 								<FormLabel>Password</FormLabel>
 								<FormControl>
 									<Input
@@ -77,46 +71,12 @@ const SignUpForm = () => {
 							</FormItem>
 						) }
 					/>
-					<FormField
-						control={ form.control }
-						name="passwordConfirm"
-						render={ ({ field }) => (
-							<FormItem className="mb-4">
-								<FormLabel>Confirm password</FormLabel>
-								<FormControl>
-									<Input
-										type="password"
-										{ ...field }
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						) }
-					/>
-					<FormField
-						control={ form.control }
-						name="termsCheck"
-						render={ ({ field }) => (
-							<FormItem>
-								<div className="flex flex-row items-start space-x-3 space-y-0">
-									<FormControl>
-										<Checkbox
-											checked={ field.value }
-											onCheckedChange={ (state) => field.onChange(typeof state === 'boolean' ? state : false) }
-										/>
-									</FormControl>
-									<FormLabel>Accept terms and conditions</FormLabel>
-								</div>
-								<FormMessage />
-							</FormItem>
-						) }
-					/>
 				</CardContent>
 				<CardFooter className="flex-col gap-4">
 					<Button
 						className="gap-2 items-center"
 						type="submit"
-					><LogIn /> Sign Up
+					><LogIn /> Sign In
 					</Button>
 					<Separator orientation="horizontal" />
 					<Button
@@ -124,8 +84,8 @@ const SignUpForm = () => {
 						variant="link"
 						asChild
 					>
-						<Link href="/signin">
-							<LogIn /> Sign In
+						<Link href="/signup">
+							<LogIn /> Sign Up
 						</Link>
 					</Button>
 				</CardFooter>
@@ -134,4 +94,4 @@ const SignUpForm = () => {
 	);
 };
 
-export default SignUpForm;
+export default SignInForm;
