@@ -17,7 +17,6 @@
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.6.1",
     "clsx": "^1.2.1",
-    "csurf": "^1.11.0",
     "edge-csrf": "^1.0.4",
     "lucide-react": "^0.258.0",
     "mongoose": "^7.3.1",
@@ -35,7 +34,6 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
-    "@types/csurf": "^1.11.2",
     "@types/node": "^20.3.3",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
