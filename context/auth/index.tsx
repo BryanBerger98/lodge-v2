@@ -1,7 +1,7 @@
 'use client';
 
-import { node } from 'prop-types';
-import { createContext, FC, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { createContext, FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { getCurrentLoggedInUser } from '@/services/auth.service';
 import { IUser } from '@/types/user.type';
@@ -17,26 +17,25 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 export { AuthContext };
 
-export const useAuthContext = () => {
-	const context = useContext(AuthContext);
-	if (context === null) {
-		throw new Error('useAuthContext is null');
-	}
-	if (context === undefined) {
-		throw new Error('useAuthContext was used outside of its Provider');
-	}
-	return context;
-};
-
-type AuthContextProviderProperties = {
+type AuthProviderProps = {
 	children: ReactNode;
 }
 
-const AuthContextProvider: FC<AuthContextProviderProperties> = ({ children }) => {
+const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
 	const [ currentUser, setCurrentUser ] = useState<IUser | null>(null);
 
 	const [ csrfToken, setCsrfToken ] = useState<string | null>(null);
+
+	const { status } = useSession();
+
+	useEffect(() => {
+		if (status === 'authenticated') {
+			getCurrentLoggedInUser()
+				.then(user => setCurrentUser(user))
+				.catch(console.error);
+		}
+	}, [ status ]);
 
 	const getCurrentUser = useCallback(async () => {
 		try {
@@ -81,6 +80,4 @@ const AuthContextProvider: FC<AuthContextProviderProperties> = ({ children }) =>
 
 };
 
-export default AuthContextProvider;
-
-AuthContextProvider.propTypes = { children: node.isRequired };
+export default AuthProvider;

@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth';
+import NextAuth, { NextAuthOptions } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 
 import { connectToDatabase } from '@/config/database.config';
@@ -7,8 +7,7 @@ import { IUserWithPassword } from '@/types/user.type';
 import { Optional } from '@/types/utils.type';
 import { verifyPassword } from '@/utils/password.util';
 
-
-const authHandler = NextAuth({
+export const authOptions: NextAuthOptions = {
 	providers: [
 		Credentials({
 			credentials: {
@@ -79,7 +78,10 @@ const authHandler = NextAuth({
 		},
 	},
 	secret: process.env.JWT_SECRET,
-});
+};
+
+
+const authHandler = NextAuth(authOptions);
 
 export { authHandler as GET, authHandler as POST };
 

@@ -15,8 +15,3 @@ const SignUpPage = async () => {
 };
 
 export default SignUpPage;
-
-// export const getServerSideProps: GetServerSideProps = async ({ res }) => {
-// 	const csrfToken = await getCsrfToken(res);
-// 	return { props: { csrfToken } };
-// };
