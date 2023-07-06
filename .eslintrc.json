@@ -75,7 +75,7 @@
 							"multiline": true,
 							"minProperties": 2
 						},
-						"ObjectPattern": { "multiline": true, "minProperties": 4 },
+						"ObjectPattern": "never",
 						"ImportDeclaration": "never",
 						"ExportDeclaration": {
 							"multiline": true,

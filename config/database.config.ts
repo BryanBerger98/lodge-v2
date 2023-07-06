@@ -17,7 +17,6 @@ const getMongoDBURI = () => {
 		if (!DB_NAME) {
 			throw new Error('Please define the DB_NAME environment variable inside .env.local');
 		}
-		console.log('No DB_CLUSTER, DB_USER and DB_PASSWORD provided. Connecting to MongoDB using localhost...');
 		return `mongodb://localhost:${ DB_PORT || '27017' }/${ DB_NAME }?retryWrites=true&w=majority`;
 	}
 	console.log('Connecting to MongoDB server...');

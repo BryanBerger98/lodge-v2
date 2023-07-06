@@ -87,9 +87,7 @@ export const authOptions: NextAuthOptions = {
 		}),
 	],
 	callbacks: {
-		async jwt ({
-			user, token, session, trigger,
-		}) {
+		async jwt ({ user, token, session, trigger }) {
 			if (trigger === 'update' && session) {
 				token.id = session.user.id;
 				token.role = session.user.role;
@@ -117,13 +115,3 @@ export const authOptions: NextAuthOptions = {
 const authHandler = NextAuth(authOptions);
 
 export { authHandler as GET, authHandler as POST };
-
-// import type { NextApiRequest, NextApiResponse } from "next"
-// import NextAuth from "next-auth"
-
-// export default async function auth(req: NextApiRequest, res: NextApiResponse) {
-//   // Do whatever you want here, before the request is passed down to `NextAuth`
-//   return await NextAuth(req, res, {
-//     ...
-//   })
-// }
