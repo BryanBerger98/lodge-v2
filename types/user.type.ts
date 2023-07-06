@@ -15,6 +15,7 @@ export interface IUser {
 	created_at: Date;
 	updated_at: Date | null;
 	created_by: Id | string | null;
+	updated_by: Id | string | null;
 	last_login_date: Date | null;
 }
 

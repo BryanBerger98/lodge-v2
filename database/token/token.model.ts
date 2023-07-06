@@ -12,21 +12,24 @@ const tokenSchema = new Schema<IToken>({
 	action: {
 		type: String,
 		required: true,
-		enum: [ 'reset_password', 'account_verification' ],
+		enum: [ 'reset_password', 'email_verification' ],
 	},
 	expiration_date: {
 		type: Date,
 		required: true,
 	},
-	created_at: {
-		type: Date,
-		default: new Date(),
-	},
 	created_by: {
 		type: Types.ObjectId,
 		default: null,
 	},
+}, {
+	timestamps: {
+		createdAt: 'created_at',
+		updatedAt: false,
+	},
 });
+
+tokenSchema.set('toObject', { virtuals: true });
 
 const TokenModel: Model<IToken> = models.Token || model<IToken>('Token', tokenSchema);
 

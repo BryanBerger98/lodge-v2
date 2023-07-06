@@ -1,4 +1,4 @@
-import { Schema, model, models, Model } from 'mongoose';
+import { Schema, model, models, Model, Types } from 'mongoose';
 
 import { IUserWithPassword } from '@/types/user.type';
 
@@ -32,19 +32,26 @@ const userSchema = new Schema<IUserWithPassword>({
 		default: false,
 	},
 	provider_data: { type: String },
-	created_at: {
-		type: Date,
-		default: new Date(),
+	updated_by: {
+		type: Types.ObjectId,
+		default: null,
 	},
-	updated_at: {
-		type: Date,
+	created_by: {
+		type: Types.ObjectId,
 		default: null,
 	},
 	last_login_date: {
 		type: Date,
 		default: null,
 	},
+}, {
+	timestamps: {
+		createdAt: 'created_at',
+		updatedAt: 'updated_at',
+	},
 });
+
+userSchema.set('toObject', { virtuals: true });
 
 const UserModel: Model<IUserWithPassword> = models.User || model<IUserWithPassword>('User', userSchema);
 

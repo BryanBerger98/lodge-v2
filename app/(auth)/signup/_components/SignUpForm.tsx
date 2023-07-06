@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { boolean, object, string, z } from 'zod';
+import { ZodError, boolean, object, string, z } from 'zod';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { signUpUser } from '@/services/auth.service';
+import { ApiError, getErrorMessage } from '@/utils/error';
 
 type SignUpFormProperties = {
 	csrfToken: string,
@@ -55,19 +56,7 @@ const SignUpForm = ({ csrfToken }: SignUpFormProperties) => {
 		const { email, password } = values;
 		setIsLoading(true);
 		try {
-			const { error } = await signUpUser(email, password, csrfToken);
-			if (error) {
-				if (typeof error === 'string') {
-					setError(error);
-					return;
-				}
-				error.issues.forEach(issue => {
-					type IssueName = keyof z.infer<typeof signUpFormSchema>;
-					const [ inputName ] = issue.path;
-					form.setError(inputName.toString() as IssueName, { message: issue.message });
-				});
-				return;
-			}
+			await signUpUser(email, password, csrfToken);
 			const signInData = await signIn('credentials', {
 				redirect: false,
 				email,
@@ -76,11 +65,23 @@ const SignUpForm = ({ csrfToken }: SignUpFormProperties) => {
 			if (signInData?.error) {
 				setError('Incorrect credentials.');
 			} else {
-				router.replace('/');
+				router.replace('/verify-email');
 			}
 		} catch (error) {
-			console.error(error);
-			setError('An error occured.');
+			const apiError = error as ApiError<unknown>;
+			if (apiError.code === 'invalid-input') {
+				const { data } = apiError as ApiError<ZodError>;
+				if (data) {
+					data.issues.forEach(issue => {
+						type IssueName = keyof z.infer<typeof signUpFormSchema>;
+						const [ inputName ] = issue.path;
+						form.setError(inputName.toString() as IssueName, { message: issue.message });
+					});
+				} else {
+					setError(getErrorMessage(apiError));
+				}
+			}
+			setError(getErrorMessage(apiError));
 		} finally {
 			setIsLoading(false);
 		}

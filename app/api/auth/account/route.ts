@@ -3,7 +3,8 @@ import { getServerSession } from 'next-auth';
 
 import { connectToDatabase } from '@/config/database.config';
 import { findUserById } from '@/database/user/user.repository';
-import { buildError, sendError } from '@/utils/error.util';
+import { buildError, sendError } from '@/utils/error';
+import { INTERNAL_ERROR, UNAUTHORIZED_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
 
 import { authOptions } from '../[...nextauth]/route';
 
@@ -17,6 +18,7 @@ export const GET = async () => {
 
 		if (!currentUser?.id) {
 			return sendError(buildError({
+				code: UNAUTHORIZED_ERROR,
 				message: 'Unauthorized.',
 				status: 401,
 			}));
@@ -26,6 +28,7 @@ export const GET = async () => {
 
 		if (!userData) {
 			return sendError(buildError({
+				code: USER_NOT_FOUND_ERROR,
 				message: 'User not found.',
 				status: 404,
 			}));
@@ -40,7 +43,13 @@ export const GET = async () => {
 
 
 		return NextResponse.json(userData);
-	} catch (error) {
-		sendError(error);
+	} catch (error: any) {
+		console.error(error);
+		return sendError(buildError({
+			code: INTERNAL_ERROR,
+			message: error.message || 'An error occured.',
+			status: 500,
+			data: error,
+		}));
 	}
 };
