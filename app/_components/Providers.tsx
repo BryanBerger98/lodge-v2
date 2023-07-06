@@ -3,8 +3,8 @@
 import { SessionProvider } from 'next-auth/react';
 import { ReactNode } from 'react';
 
-import AuthContextProvider from '@/context/auth';
-import CsrfContextProvider from '@/context/csrf';
+import AuthProvider from '@/context/auth';
+import CsrfProvider from '@/context/csrf';
 
 type ProvidersProps = {
 	children: ReactNode;
@@ -13,11 +13,11 @@ type ProvidersProps = {
 const Providers = ({ children }: ProvidersProps) => {
 	return (
 		<SessionProvider>
-			<AuthContextProvider>
-				<CsrfContextProvider>
+			<AuthProvider>
+				<CsrfProvider>
 					{ children }
-				</CsrfContextProvider>
-			</AuthContextProvider>
+				</CsrfProvider>
+			</AuthProvider>
 		</SessionProvider>
 	);
 };

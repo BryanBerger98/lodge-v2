@@ -3,6 +3,7 @@
 import mongoose, { Types } from 'mongoose';
 
 export type Id = Types.ObjectId;
+export const newId = (idString?: string | Id) => new Types.ObjectId(idString);
 
 /**
 Source :

@@ -1,13 +1,14 @@
 import csrf from 'edge-csrf';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { buildError, sendError } from './utils/error.util';
+import { buildError, sendError } from './utils/error';
 
 // initalize protection function
 const csrfProtect = csrf({ cookie: { secure: process.env.NODE_ENV === 'production' } });
 
 const WHITELIST_PATHNAMES = [
 	'/api/auth/callback/credentials',
+	'/api/auth/session',
 ];
 
 export async function middleware(request: NextRequest) {
@@ -19,13 +20,13 @@ export async function middleware(request: NextRequest) {
 
 		// check result
 		if (csrfError) {
-		// return new NextResponse('invalid csrf token', { status: 403 });
 			return sendError(buildError({
 				message: 'Invalid CSRF token.',
 				status: 403,
+				code: 'invalid-csrf-token',
 			}));
 		}
-    
+
 		return response;
 	}
 }

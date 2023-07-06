@@ -82,10 +82,9 @@ type UpdateUserOptions = {
 	newDocument?: boolean;
 }
 
-export const updateUser = async (userToUpdate: UpdateUserDTO, { newDocument = false }: UpdateUserOptions): Promise<IUser | null> => {
+export const updateUser = async (userToUpdate: UpdateUserDTO, options?: UpdateUserOptions): Promise<IUser | null> => {
 	try {
-		userToUpdate.updated_at = new Date();
-		const updatedUser: Optional<IUserWithPassword, 'password'> | null = await UserModel.findByIdAndUpdate(userToUpdate.id, { $set: { ...userToUpdate } }, { new: newDocument });
+		const updatedUser: Optional<IUserWithPassword, 'password'> | null = await UserModel.findByIdAndUpdate(userToUpdate.id, { $set: { ...userToUpdate } }, { new: options?.newDocument || false });
 		if (updatedUser) {
 			delete updatedUser.password;
 		}

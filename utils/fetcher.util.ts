@@ -1,11 +1,31 @@
 import { CSRF_TOKEN_HEADER } from './csrf.util';
 
-const fetcher = (csrfToken?: string | null) => (input: RequestInfo | URL, init?: RequestInit) => fetch(input, {
-	...init,
-	headers: {
-		...init?.headers,
-		[ CSRF_TOKEN_HEADER ]: csrfToken || '',
-	},
-}).then(res => res.json());
+type FetcherOptions = RequestInit & {
+	csrfToken?: string | null;
+}
+
+const fetcher = async (input: RequestInfo | URL, options?: FetcherOptions) => {
+
+	try {
+
+		const response = await fetch(input, {
+			...options,
+			headers: {
+				...options?.headers,
+				[ CSRF_TOKEN_HEADER ]: options?.csrfToken || '',
+			},
+		});
+
+		const data = await response.json();
+
+		if (!response.ok) {
+			throw data;
+		}
+
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
 
 export default fetcher;

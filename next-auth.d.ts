@@ -20,6 +20,7 @@ declare module 'next-auth' {
 		email: string;
 		action: 'reset_password' | 'account_verification';
 		role: 'admin' | 'user';
+		has_email_verified: boolean;
 	}
   }
 }
@@ -31,5 +32,6 @@ declare module 'next-auth/jwt' {
 		email: string;
 		action: 'reset_password' | 'account_verification';
 		role: 'admin' | 'user';
+		has_email_verified: boolean;
 	}
 }

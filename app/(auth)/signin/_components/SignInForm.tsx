@@ -47,7 +47,7 @@ const SignInForm = () => {
 				if (data?.error) {
 					setError('Incorrect credentials.');
 				} else {
-					router.replace('/');
+					router.replace('/verify-email');
 				}
 			})
 			.catch((error) => {

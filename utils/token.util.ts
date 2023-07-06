@@ -1,0 +1,24 @@
+import jwt from 'jsonwebtoken';
+
+import { IUser } from '@/types/user.type';
+
+export const generateToken = (user: IUser, expirationDate: Date | number, action: 'reset_password' | 'account_verification') => {
+	const { JWT_SECRET } = process.env;
+	if (!JWT_SECRET) {
+		throw new Error('No secret provided for JWT.');
+	}
+	const token = jwt.sign({
+		email: user.email,
+		exp: expirationDate ? expirationDate : Math.floor(Date.now() / 1000) + (60 * 60),
+		action,
+	}, JWT_SECRET);
+	return token;
+};
+
+export const verifyToken = (token: string) => {
+	const { JWT_SECRET } = process.env;
+	if (!JWT_SECRET) {
+		throw new Error('No secret provided for JWT.');
+	}
+	return jwt.verify(token, JWT_SECRET);
+};

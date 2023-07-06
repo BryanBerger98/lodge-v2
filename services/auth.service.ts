@@ -1,44 +1,52 @@
-// import fetcher from '../../lib/fetcher';
 // import { ILodgeFile } from '../../types/file.type';
-import { ZodError } from 'zod';
 
+import { SafeTokenData } from '@/types/token.type';
 import fetcher from '@/utils/fetcher.util';
 
 import { IUser } from '../types/user.type';
 
 export const getCurrentLoggedInUser = async (): Promise<IUser> => {
 	try {
-		const response = await fetch('/api/auth/account');
-		const data = await response.json();
+		const data = await fetcher('/api/auth/account');
 		return data;
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const signUpUser = async (email: string, password: string, csrfToken?: string | null): Promise<{ data: IUser | null, error?: ZodError | string }> => {
+export const signUpUser = async (email: string, password: string, csrfToken?: string | null): Promise<IUser> => {
 	try {
-		const data = await fetcher(csrfToken)('/api/auth/signup', {
+		const data = await fetcher('/api/auth/signup', {
 			method: 'POST',
 			body: JSON.stringify({
 				email,
 				password, 
 			}),
 			headers: { 'Content-Type': 'application/json' },
+			csrfToken,
 		});
-		if (data.name === 'zodError') {
-			return {
-				error: data as ZodError,
-				data: null, 
-			};
-		}
-		if (data.status !== 201) {
-			return {
-				error: data.message,
-				data: null,
-			};
-		}
-		return { data };
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const getSentEmailVerificationToken = async (): Promise<SafeTokenData> => {
+	try {
+		const data = await fetcher('/api/auth/verify-email');
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const sendEmailVerificationToken = async (csrfToken: string): Promise<SafeTokenData> => {
+	try {
+		const data = await fetcher('/api/auth/verify-email', {
+			method: 'POST',
+			csrfToken, 
+		});
+		return data;
 	} catch (error) {
 		throw error;
 	}
@@ -81,17 +89,19 @@ export const signUpUser = async (email: string, password: string, csrfToken?: st
 // 	}
 // };
 
-// export const verifyEmail = async (token: string) => {
-// 	try {
-// 		const response = await fetcher().put(`${ baseUrl }/verify-email`, { token }, {
-// 			headers: { 'Content-Type': 'application/json' },
-// 			withCredentials: true,
-// 		});
-// 		return response.data;
-// 	} catch (error) {
-// 		throw error;
-// 	}
-// };
+export const verifyUserEmail = async (token: string, csrfToken: string) => {
+	try {
+		const data = await fetcher('/api/auth/verify-email', {
+			method: 'PUT',
+			body: JSON.stringify({ token }), 
+			headers: { 'Content-Type': 'application/json' },
+			csrfToken,
+		});
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
 
 // export const updatePassword = async (oldPassword: string, newPassword: string, csrfToken: string | null): Promise<IUser> => {
 // 	try {

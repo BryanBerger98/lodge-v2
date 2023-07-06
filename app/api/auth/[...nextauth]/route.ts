@@ -1,21 +1,23 @@
-import NextAuth from 'next-auth';
+/* eslint-disable require-await */
+import NextAuth, { NextAuthOptions } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 
 import { connectToDatabase } from '@/config/database.config';
 import { findUserWithPasswordByEmail, updateUser } from '@/database/user/user.repository';
 import { IUserWithPassword } from '@/types/user.type';
 import { Optional } from '@/types/utils.type';
+import { buildError } from '@/utils/error';
+import { ACCOUNT_DISABLED_ERROR, INTERNAL_ERROR, MISSING_CREDENTIALS_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
 import { verifyPassword } from '@/utils/password.util';
 
-
-const authHandler = NextAuth({
+export const authOptions: NextAuthOptions = {
 	providers: [
 		Credentials({
 			credentials: {
 				email: {
 					label: 'Email',
 					type: 'email',
-					placeholder: 'example@example.com', 
+					placeholder: 'example@example.com',
 				},
 				password: {
 					label: 'Password',
@@ -27,23 +29,39 @@ const authHandler = NextAuth({
 					await connectToDatabase();
 
 					if (!credentials) {
-						return null;
+						throw buildError({
+							code: MISSING_CREDENTIALS_ERROR,
+							message: 'Credentials are missing.',
+							status: 422,
+						});
 					}
 
 					const user = await findUserWithPasswordByEmail(credentials.email.toLowerCase().trim());
 
 					if (!user) {
-						throw new Error('No user registered.');
+						throw buildError({
+							code: USER_NOT_FOUND_ERROR,
+							message: 'User not found.',
+							status: 404,
+						});
 					}
 
 					if (user.is_disabled) {
-						throw new Error('User disabled');
+						throw buildError({
+							message: ACCOUNT_DISABLED_ERROR,
+							code: 'account-disabled',
+							status: 403,
+						});
 					}
 
 					const isPasswordValid = await verifyPassword(credentials.password, user.password);
 
 					if (!isPasswordValid) {
-						throw new Error('Wrong password.');
+						throw buildError({
+							message: WRONG_PASSWORD_ERROR,
+							code: 'wrong-password.',
+							status: 422,
+						});
 					}
 
 					const updatedUser = await updateUser({
@@ -56,30 +74,47 @@ const authHandler = NextAuth({
 					delete sanitizedUser.password;
 
 					return sanitizedUser;
-				} catch (error) {
-					throw error;
+				} catch (error: any) {
+					console.error(error);
+					throw buildError({
+						code: INTERNAL_ERROR,
+						message: error.message || 'An error occured.',
+						status: 500,
+						data: error,
+					});
 				}
 			},
 		}),
 	],
 	callbacks: {
-		session ({ session, token }) {
-			if (session?.user) {
-				session.user.id = token.id;
-				session.user.role = token.role;
+		async jwt ({
+			user, token, session, trigger,
+		}) {
+			if (trigger === 'update' && session) {
+				token.id = session.user.id;
+				token.role = session.user.role;
+				token.has_email_verified = session.user.has_email_verified;
 			}
-			return session;
-		},
-		jwt ({ user, token }) {
 			if (user) {
 				token.id = user.id;
 				token.role = user.role;
+				token.has_email_verified = user.has_email_verified;
 			}
 			return token;
 		},
+		session ({ session, token }) {
+			session.user = {
+				...session.user,
+				...token, 
+			};
+			return session;
+		},
 	},
 	secret: process.env.JWT_SECRET,
-});
+};
+
+
+const authHandler = NextAuth(authOptions);
 
 export { authHandler as GET, authHandler as POST };
 
