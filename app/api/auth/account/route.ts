@@ -61,6 +61,8 @@ export const PUT = async (request: NextRequest) => {
 
 	try {
 
+		await connectToDatabase();
+
 		const body = await request.json();
 
 		const { username, phone_number } = UpdateUserAccountSchema.parse(body);

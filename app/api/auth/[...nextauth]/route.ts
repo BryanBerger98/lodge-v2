@@ -48,8 +48,8 @@ export const authOptions: NextAuthOptions = {
 
 					if (user.is_disabled) {
 						throw buildError({
-							message: ACCOUNT_DISABLED_ERROR,
-							code: 'account-disabled',
+							code: ACCOUNT_DISABLED_ERROR,
+							message: 'Account disabled.',
 							status: 403,
 						});
 					}
@@ -58,9 +58,9 @@ export const authOptions: NextAuthOptions = {
 
 					if (!isPasswordValid) {
 						throw buildError({
-							message: WRONG_PASSWORD_ERROR,
-							code: 'wrong-password.',
-							status: 422,
+							code: WRONG_PASSWORD_ERROR,
+							message: 'Wrong Password',
+							status: 401,
 						});
 					}
 
@@ -95,6 +95,7 @@ export const authOptions: NextAuthOptions = {
 				token.photo_url = session.user.photo_url;
 				token.phone_number = session.user.phone_number;
 				token.username = session.user.username;
+				token.email = session.user.email;
 			}
 			if (user) {
 				token.id = user.id;
@@ -103,6 +104,7 @@ export const authOptions: NextAuthOptions = {
 				token.photo_url = user.photo_url;
 				token.phone_number = user.phone_number;
 				token.username = user.username;
+				token.email = user.email;
 			}
 			return token;
 		},
