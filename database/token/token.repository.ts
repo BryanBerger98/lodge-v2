@@ -22,7 +22,7 @@ type GetTokenFromCreatedByFilter = {
 export const getTokenFromCreatedBy = async (created_by: Id | string, filter?: GetTokenFromCreatedByFilter): Promise<IToken | null> => {
 	try {
 		const foundToken = await TokenModel.findOne({
-			created_by,
+			created_by: newId(created_by),
 			...filter,
 		});
 		return foundToken?.toObject() || null;

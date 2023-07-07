@@ -13,9 +13,9 @@ import { generateToken } from '@/utils/token.util';
 
 export const POST = async (request: NextRequest) => {
 
-	await connectToDatabase();
-
 	try {
+		await connectToDatabase();
+
 		const body = await request.json();
 		const { email, password } = SignUpUserSchema.parse(body);
 

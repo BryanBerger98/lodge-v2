@@ -41,7 +41,7 @@ export const sendAccountVerificationEmail = (user: IUser, token: IToken) => {
 
 export const sendResetPasswordEmail = (user: IUser, token: IToken) => {
 	return new Promise((resolve, reject) => {
-		const tokenLink = `${ process.env.FRONT_URL }/reset-password/${ token.token }`;
+		const tokenLink = `${ process.env.FRONT_URL }/forgot-password/${ token.token }`;
 		const htmlBody = getResetPasswordTemplate(user, tokenLink);
 		const emailSubject = `${ appName } - Réinitialisation de votre mot de passe`;
 		const emailPlainText = `${ appName } - Réinitialisation de votre mot de passe`;
