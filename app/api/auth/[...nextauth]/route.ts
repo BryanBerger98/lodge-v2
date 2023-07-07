@@ -93,12 +93,15 @@ export const authOptions: NextAuthOptions = {
 				token.role = session.user.role;
 				token.has_email_verified = session.user.has_email_verified;
 				token.photo_url = session.user.photo_url;
+				token.phone_number = session.user.phone_number;
+				token.username = session.user.username;
 			}
 			if (user) {
 				token.id = user.id;
 				token.role = user.role;
 				token.has_email_verified = user.has_email_verified;
 				token.photo_url = user.photo_url;
+				token.phone_number = user.phone_number;
 				token.username = user.username;
 			}
 			return token;

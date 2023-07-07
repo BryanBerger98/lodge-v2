@@ -1,13 +1,23 @@
-import { getServerSession } from 'next-auth';
+import { User } from 'lucide-react';
+import { headers } from 'next/headers';
 
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { getCsrfToken } from '@/utils/csrf.util';
+
+import UpdateUsernameForm from './_components/UpdateUsernameForm';
 
 const AccountPage = async () => {
 
-	const session = await getServerSession(authOptions);
+	const csrfToken = await getCsrfToken(headers());
 
 	return (
-		<h1>Welcome { session?.user.email || 'User' } !</h1>
+		<>
+			<h1 className="text-2xl font-semibold flex gap-2 items-center mb-16"><User /> Account</h1>
+			<div className="grid grid-cols-3">
+				<div className="col-span-2">
+					<UpdateUsernameForm csrfToken={ csrfToken } />
+				</div>
+			</div>
+		</>
 	);
 };
 

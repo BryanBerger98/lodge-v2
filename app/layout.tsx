@@ -1,5 +1,7 @@
 import './globals.css';
 
+import { Toaster } from '@/components/ui/toaster';
+
 import Providers from './_components/Providers';
 
 export const metadata = {
@@ -16,6 +18,7 @@ const RootLayout = ({ children }: {
 				<Providers>
 					{ children }
 				</Providers>
+				<Toaster />
 			</body>
 		</html>
 	);
