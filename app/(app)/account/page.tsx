@@ -6,6 +6,7 @@ import { getCsrfToken } from '@/utils/csrf.util';
 
 const DynamicSignOutButton = dynamic(() => import('./_components/SignOutButton'), { ssr: false });
 const DynamicUpdateUsernameForm = dynamic(() => import('./_components/UpdateUsernameForm'), { ssr: false });
+const DynamicUpdatePhoneNumberForm = dynamic(() => import('./_components/UpdatePhoneNumberForm'), { ssr: false });
 const DynamicUpdateAvatarForm = dynamic(() => import('./_components/UpdateAvatarForm'), { ssr: false });
 const DynamicUpdateEmailForm = dynamic(() => import('./_components/UpdateEmailForm'), { ssr: false });
 const DynamicUpdatePasswordForm = dynamic(() => import('./_components/UpdatePasswordForm'), { ssr: false });
@@ -21,6 +22,7 @@ const AccountPage = async () => {
 				<div className="col-span-2 flex flex-col gap-8">
 					<DynamicUpdateAvatarForm csrfToken={ csrfToken } />
 					<DynamicUpdateUsernameForm csrfToken={ csrfToken } />
+					<DynamicUpdatePhoneNumberForm csrfToken={ csrfToken } />
 					<DynamicUpdateEmailForm csrfToken={ csrfToken } />
 					<DynamicUpdatePasswordForm csrfToken={ csrfToken } />
 					<DynamicSignOutButton className="mr-auto" />
