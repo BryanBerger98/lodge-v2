@@ -1,11 +1,12 @@
-import SignInForm from './_components/SignInForm';
+import dynamic from 'next/dynamic';
+
+const DynamicSignInForm = dynamic(() => import('./_components/SignInForm'));
 
 const SignInPage = () => {
-	
 
 	return (
 		<div className="min-h-screen flex justify-center items-center">
-			<SignInForm />
+			<DynamicSignInForm />
 		</div>
 	);
 };

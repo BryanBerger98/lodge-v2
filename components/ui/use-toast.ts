@@ -1,3 +1,5 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable default-case */
 'use client';
 
 // Inspired by react-hot-toast library
