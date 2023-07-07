@@ -3,6 +3,7 @@ import { JWT } from 'next-auth/jwt';
 import { IUser } from '@/types/user.type';
 
 import { Id } from './config/database.config';
+import { TokenAction } from './types/token.type';
 
 declare module 'next-auth' {
   /**
@@ -15,23 +16,17 @@ declare module 'next-auth' {
 
   interface Session {
     user: User
-	token: JWT & {
+	token: JWT & IUser & {
 		id?: string | Id;
-		email: string;
-		action: 'reset_password' | 'account_verification';
-		role: 'admin' | 'user';
-		has_email_verified: boolean;
+		action?: TokenAction;
 	}
   }
 }
 
 declare module 'next-auth/jwt' {
 	/** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
-	interface JWT {
+	interface JWT extends IUser {
 		id?: string | Id;
-		email: string;
-		action: 'reset_password' | 'account_verification';
-		role: 'admin' | 'user';
-		has_email_verified: boolean;
+		action?: TokenAction;
 	}
 }
