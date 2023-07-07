@@ -4,14 +4,15 @@ import { getToken } from 'next-auth/jwt';
 import { MiddlewareFactory } from './middleware.type';
 
 
-const PATHNAMES = [
+const BLACKLIST_PATHNAMES = [
 	'/',
+	'/account',
 ];
 
 export const emailVerifiedMiddleware: MiddlewareFactory = (next) => {
 	return async (request: NextRequest, _next: NextFetchEvent) => {
 
-		if (PATHNAMES.includes(request.nextUrl.pathname)) {
+		if (BLACKLIST_PATHNAMES.includes(request.nextUrl.pathname)) {
 			const tokenData = await getToken({
 				req: request,
 				secret: process.env.JWT_SECRET, 
