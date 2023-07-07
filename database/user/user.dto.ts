@@ -19,6 +19,17 @@ export type CreateUserDTO = {
 	created_by?: Id | string | null;
 };
 
+export const UpdateUserAccountSchema = object({
+	username: string(),
+	phone_number: string(),
+})
+	.partial()
+	.refine(
+		({ username, phone_number }) =>
+			username !== undefined || phone_number !== undefined,
+		{ message: 'Nothing to update' }
+	);
+
 export type UpdateUserDTO = Partial<IUser> & {
 	id: string | Id;
 };
