@@ -1,11 +1,12 @@
-import { Home, Layers, MessagesSquare, User, Users } from 'lucide-react';
+import { Home, Layers, MessagesSquare, Users } from 'lucide-react';
 import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import CurrentUserAvatar from '@/components/features/users/CurrentUserAvatar';
 
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Button } from '../ui/button';
+import { Button } from '../../ui/button';
+
 
 type SidebarProps = {
 	className?: string;
@@ -52,15 +53,7 @@ const Sidebar = async ({ className }: SidebarProps) => {
 					asChild
 				>
 					<Link href="/account">
-						<Avatar>
-							<AvatarImage
-								alt="Profile"
-								height="40"
-								src={ session?.user?.photo_url || undefined }
-								width="40"
-							/>
-							<AvatarFallback><User /></AvatarFallback>
-						</Avatar>
+						<CurrentUserAvatar />
 						<div className="flex flex-col gap-1 text-left">
 							<p className="text-xs font-semibold">{ session?.user?.username || <span className="italic">User</span> }</p>
 						</div>

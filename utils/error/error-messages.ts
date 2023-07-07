@@ -1,4 +1,4 @@
-import { ACCOUNT_DISABLED_ERROR, DEFAULT_ERROR, EMAIL_ALREADY_VERIFIED_ERROR, INVALID_INPUT_ERROR, INVALID_TOKEN_ERROR, MISSING_CREDENTIALS_ERROR, TOKEN_ALREADY_SENT_ERROR, TOKEN_EXPIRED_ERROR, TOKEN_NOT_FOUND_ERROR, UNAUTHORIZED_ERROR, USER_ALREADY_EXISTS_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from './error-codes';
+import { ACCOUNT_DISABLED_ERROR, DEFAULT_ERROR, EMAIL_ALREADY_VERIFIED_ERROR, FILE_NOT_FOUND_ERROR, FILE_TOO_LARGE_ERROR, INVALID_INPUT_ERROR, INVALID_TOKEN_ERROR, MISSING_CREDENTIALS_ERROR, TOKEN_ALREADY_SENT_ERROR, TOKEN_EXPIRED_ERROR, TOKEN_NOT_FOUND_ERROR, UNAUTHORIZED_ERROR, USER_ALREADY_EXISTS_ERROR, USER_NOT_FOUND_ERROR, WRONG_FILE_FORMAT_ERROR, WRONG_PASSWORD_ERROR } from './error-codes';
 
 export const errorMessages: Record<string, { en: string, fr: string }> = {
 	[ USER_NOT_FOUND_ERROR ]: {
@@ -48,6 +48,18 @@ export const errorMessages: Record<string, { en: string, fr: string }> = {
 	[ TOKEN_EXPIRED_ERROR ]: {
 		en: 'Token expired.',
 		fr: 'Le jeton a expiré.',
+	},
+	[ FILE_NOT_FOUND_ERROR ]: {
+		en: 'File not found.',
+		fr: 'Fichier introuvable.',
+	},
+	[ WRONG_FILE_FORMAT_ERROR ]: {
+		en: 'Wrong file format.',
+		fr: 'Mauvais format de fichier.',
+	},
+	[ FILE_TOO_LARGE_ERROR ]: {
+		en: 'The file is too large.',
+		fr: 'Le fichier est trop lourd.',
 	},
 	[ DEFAULT_ERROR ]: {
 		en: 'An error occured.',

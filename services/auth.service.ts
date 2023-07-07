@@ -1,5 +1,3 @@
-// import { ILodgeFile } from '../../types/file.type';
-
 import { SafeTokenData } from '@/types/token.type';
 import fetcher from '@/utils/fetcher.util';
 
@@ -145,24 +143,26 @@ export const updateUserEmail = async (email: string, password: string, csrfToken
 	}
 };
 
-// export const updateAvatar = async (file: File, csrfToken?: string | null): Promise<{ file: ILodgeFile, photoUrl: string }> => {
-// 	try {
-// 		const formData = new FormData();
-// 		formData.append('avatar', file);
-// 		const response = await fetcher(csrfToken).put(`${ baseUrl }/account/avatar`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-// 		const { data: fileData } = response;
-// 		return fileData;
-// 	} catch (error) {
-// 		throw error;
-// 	}
-// };
+export const updateUserAvatar = async (file: File, csrfToken: string): Promise<IUser | null> => {
+	try {
+		const formData = new FormData();
+		formData.append('avatar', file);
+		const data = await fetcher('/api/auth/account/avatar', {
+			method: 'PUT',
+			body: formData,
+			csrfToken,
+		});
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
 
-// export const getAvatar = async (): Promise<{ photoUrl: string }> => {
-// 	try {
-// 		const response = await fetcher().get(`${ baseUrl }/account/avatar`);
-// 		const { data } = response;
-// 		return data;
-// 	} catch (error) {
-// 		throw error;
-// 	}
-// };
+export const getAvatar = async (): Promise<{ photoUrl: string }> => {
+	try {
+		const data = await fetcher('/api/auth/account/avatar');
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
