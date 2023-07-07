@@ -7,6 +7,7 @@ import SignOutButton from './_components/SignOutButton';
 import UpdateAvatarForm from './_components/UpdateAvatarForm';
 import UpdateEmailForm from './_components/UpdateEmailForm';
 import UpdatePasswordForm from './_components/UpdatePasswordForm';
+import UpdatePhoneNumberForm from './_components/UpdatePhoneNumberForm';
 import UpdateUsernameForm from './_components/UpdateUsernameForm';
 
 const AccountPage = async () => {
@@ -20,6 +21,7 @@ const AccountPage = async () => {
 				<div className="col-span-2 flex flex-col gap-8">
 					<UpdateAvatarForm csrfToken={ csrfToken } />
 					<UpdateUsernameForm csrfToken={ csrfToken } />
+					<UpdatePhoneNumberForm csrfToken={ csrfToken } />
 					<UpdateEmailForm csrfToken={ csrfToken } />
 					<UpdatePasswordForm csrfToken={ csrfToken } />
 					<SignOutButton className="mr-auto" />
