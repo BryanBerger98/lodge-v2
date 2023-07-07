@@ -111,22 +111,24 @@ export const updateAccount = async (valuesToUpdate: { phone_number?: string, use
 	}
 };
 
-// export const updatePassword = async (oldPassword: string, newPassword: string, csrfToken: string | null): Promise<IUser> => {
-// 	try {
-// 		const response = await fetcher(csrfToken).put(`${ baseUrl }/update-password`, {
-// 			newPassword,
-// 			oldPassword,
-// 		}, {
-// 			headers: { 'Content-Type': 'application/json' },
-// 			withCredentials: true,
-// 		});
-// 		return response.data;
-// 	} catch (error) {
-// 		throw error;
-// 	}
-// };
+export const updateUserPassword = async (password: string, newPassword: string, csrfToken: string | null): Promise<IUser> => {
+	try {
+		const data = await fetcher('/api/auth/account/password', {
+			method: 'PUT',
+			body: JSON.stringify({
+				password,
+				newPassword, 
+			}),
+			headers: { 'Content-Type': 'application/json' },
+			csrfToken,
+		});
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
 
-export const updateEmail = async (email: string, password: string, csrfToken: string | null): Promise<IUser> => {
+export const updateUserEmail = async (email: string, password: string, csrfToken: string | null): Promise<IUser> => {
 	try {
 		const data = await fetcher('/api/auth/account/email', {
 			method: 'PUT',

@@ -5,6 +5,7 @@ import { getCsrfToken } from '@/utils/csrf.util';
 
 import SignOutButton from './_components/SignOutButton';
 import UpdateEmailForm from './_components/UpdateEmailForm';
+import UpdatePasswordForm from './_components/UpdatePasswordForm';
 import UpdateUsernameForm from './_components/UpdateUsernameForm';
 
 const AccountPage = async () => {
@@ -18,6 +19,7 @@ const AccountPage = async () => {
 				<div className="col-span-2 flex flex-col gap-8">
 					<UpdateUsernameForm csrfToken={ csrfToken } />
 					<UpdateEmailForm csrfToken={ csrfToken } />
+					<UpdatePasswordForm csrfToken={ csrfToken } />
 					<SignOutButton className="mr-auto" />
 				</div>
 			</div>

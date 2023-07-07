@@ -35,6 +35,11 @@ export const UpdateUserEmailSchema = object({
 	password: string().min(1, 'Required.'),
 });
 
+export const UpdateUserPasswordSchema = object({
+	password: string().min(1, 'Required.'),
+	newPassword: string().min(1, 'Required.'),
+});
+
 export type UpdateUserDTO = Partial<IUser> & {
 	id: string | Id;
 };

@@ -51,7 +51,7 @@ export const POST = async (request: NextRequest) => {
 		}
 
 		const expirationDate = Math.floor(Date.now() / 1000) + (60 * 60 * 24);
-		const token = generateToken(createdUser, expirationDate, 'account_verification');
+		const token = generateToken(createdUser, expirationDate, 'email_verification');
 		const savedToken = await createToken({
 			token,
 			expiration_date: new Date(expirationDate),

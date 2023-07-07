@@ -3,8 +3,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Save } from 'lucide-react';
-import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ZodError, object, string, z } from 'zod';
 
@@ -14,45 +13,43 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
-import { updateUserEmail } from '@/services/auth.service';
+import { updateUserPassword } from '@/services/auth.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
-type UpdateEmailFormProps = {
+type UpdatePasswordFormProps = {
 	csrfToken: string;
 };
 
-const UpdateEmailForm = ({ csrfToken }: UpdateEmailFormProps) => {
-
-	const { data: session, update: updateSession } = useSession();
+const UpdatePasswordForm = ({ csrfToken }: UpdatePasswordFormProps) => {
 
 	const { toast } = useToast();
 
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 	const [ isPasswordModalOpen, setIsPasswordModalOpen ] = useState<boolean>(false);
 
-	const emailFormSchema = object({ email: string().email().min(1, 'Required.') });
+	const passwordFormSchema = object({ 
+		password: string().min(8, 'At least 8 characters.'),
+		passwordConfirm: string().min(1, 'Required'),
+	}).refine((data) => data.password === data.passwordConfirm, {
+		path: [ 'passwordConfirm' ],
+		message: 'Must be the same as password.',
+	});
 
-	const form = useForm<z.infer<typeof emailFormSchema>>({
-		resolver: zodResolver(emailFormSchema),
-		defaultValues: { email: session?.user?.email || '' },
+	const form = useForm<z.infer<typeof passwordFormSchema>>({
+		resolver: zodResolver(passwordFormSchema),
+		defaultValues: {
+			password: '',
+			passwordConfirm: '',
+		},
 		mode: 'onTouched',
 	});
 
-	useEffect(() => {
-		if (session) {
-			form.setValue('email', session.user.email || '');
-		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ session?.user?.id ]);
-
-	const handleSubmitEmailForm = ({ email }: z.infer<typeof emailFormSchema>) => {
-		if (email !== session?.user?.email) {
-			setIsPasswordModalOpen(true);
-		}
+	const handleSubmitEmailForm = () => {
+		setIsPasswordModalOpen(true);
 	};
 
 	const handlePasswordModalOpenChange: PasswordModalOpenChangeEvent = async ({ openState, password }) => {
-		const { email } = form.getValues();
+		const { password: newPassword } = form.getValues();
 
 		if (!password) {
 			setIsPasswordModalOpen(false);
@@ -62,21 +59,14 @@ const UpdateEmailForm = ({ csrfToken }: UpdateEmailFormProps) => {
 		try {
 			setIsPasswordModalOpen(openState);
 			setIsLoading(true);
-			const updatedUser = await updateUserEmail(email, password, csrfToken);
-			await updateSession({
-				...session,
-				user: {
-					...session?.user,
-					email: updatedUser.email,
-				},
-			});
+			await updateUserPassword(password, newPassword, csrfToken);
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
 			if (apiError.code === 'invalid-input') {
 				const { data } = apiError as ApiError<ZodError>;
 				if (data) {
 					data.issues.forEach(issue => {
-						type IssueName = keyof z.infer<typeof emailFormSchema>;
+						type IssueName = keyof z.infer<typeof passwordFormSchema>;
 						const [ inputName ] = issue.path;
 						if (inputName) {
 							form.setError(inputName.toString() as IssueName, { message: issue.message });
@@ -91,6 +81,7 @@ const UpdateEmailForm = ({ csrfToken }: UpdateEmailFormProps) => {
 			});
 		} finally {
 			setIsLoading(false);
+			form.reset();
 		}
 	};
 
@@ -103,22 +94,38 @@ const UpdateEmailForm = ({ csrfToken }: UpdateEmailFormProps) => {
 						onSubmit={ form.handleSubmit(handleSubmitEmailForm) }
 					>
 						<CardHeader className="w-1/3">
-							<CardTitle>Email address</CardTitle>
+							<CardTitle>Password</CardTitle>
 							<CardDescription>
-								Update your email address.
+								Update your password.
 							</CardDescription>
 						</CardHeader>
 						<div className="w-2/3">
 							<CardContent className="pt-6">
 								<FormField
 									control={ form.control }
-									name="email"
+									name="password"
 									render={ ({ field }) => (
-										<FormItem>
-											<FormLabel>Email address</FormLabel>
+										<FormItem className="mb-4">
+											<FormLabel>New password</FormLabel>
 											<FormControl>
 												<Input
-													placeholder="john@doe.com"
+													type="password"
+													{ ...field }
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									) }
+								/>
+								<FormField
+									control={ form.control }
+									name="passwordConfirm"
+									render={ ({ field }) => (
+										<FormItem>
+											<FormLabel>Confirm new password</FormLabel>
+											<FormControl>
+												<Input
+													type="password"
 													{ ...field }
 												/>
 											</FormControl>
@@ -149,4 +156,4 @@ const UpdateEmailForm = ({ csrfToken }: UpdateEmailFormProps) => {
 	);
 };
 
-export default UpdateEmailForm;
+export default UpdatePasswordForm;
