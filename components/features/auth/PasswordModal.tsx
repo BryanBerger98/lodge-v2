@@ -31,6 +31,7 @@ const PasswordModal = ({ isOpen, onOpenChange }: PasswordModalProps) => {
 			openState: false,
 			password, 
 		});
+		form.reset();
 	};
 
 	const handleOpenChange = (openState: boolean) => {
@@ -38,6 +39,7 @@ const PasswordModal = ({ isOpen, onOpenChange }: PasswordModalProps) => {
 			openState,
 			password: '', 
 		});
+		form.reset();
 	};
 
 	return (
