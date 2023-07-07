@@ -52,48 +52,42 @@ export const sendEmailVerificationToken = async (csrfToken: string): Promise<Saf
 	}
 };
 
-// export const resetPassword = async (token: string, password: string, csrfToken: string | null) => {
-// 	try {
-// 		const response = await fetcher(csrfToken).put(`${ baseUrl }/reset-password`, {
-// 			token,
-// 			password,
-// 		}, {
-// 			withCredentials: true,
-// 			headers: { 'Content-Type': 'application/json' },
-// 		});
-// 		return response.data;
-// 	} catch (error) {
-// 		throw error;
-// 	}
-// };
-
-
-// export const sendResetPasswordEmailToUserByEmail = async (email: string, csrfToken: string | null) => {
-// 	try {
-// 		const response = await fetcher(csrfToken).post(`${ baseUrl }/reset-password`, { email }, {
-// 			withCredentials: true,
-// 			headers: { 'Content-Type': 'application/json' },
-// 		});
-// 		return response.data;
-// 	} catch (error) {
-// 		throw error;
-// 	}
-// };
-
-// export const sendVerifyAccountEmailToUser = async () => {
-// 	try {
-// 		const response = await fetcher().get(`${ baseUrl }/verify-email`, { withCredentials: true });
-// 		return response.data;
-// 	} catch (error) {
-// 		throw error;
-// 	}
-// };
-
 export const verifyUserEmail = async (token: string, csrfToken: string) => {
 	try {
 		const data = await fetcher('/api/auth/verify-email', {
 			method: 'PUT',
 			body: JSON.stringify({ token }), 
+			headers: { 'Content-Type': 'application/json' },
+			csrfToken,
+		});
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const resetUserPassword = async (token: string, password: string, csrfToken: string) => {
+	try {
+		const data = await fetcher('/api/auth/reset-password', {
+			method: 'PUT',
+			body: JSON.stringify({
+				token,
+				password, 
+			}),
+			headers: { 'Content-Type': 'application/json' },
+			csrfToken,
+		});
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const sendResetPasswordToken = async (email: string, csrfToken: string) => {
+	try {
+		const data = await fetcher('/api/auth/reset-password', {
+			method: 'POST',
+			body: JSON.stringify({ email }),
 			headers: { 'Content-Type': 'application/json' },
 			csrfToken,
 		});

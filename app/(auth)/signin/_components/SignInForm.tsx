@@ -114,15 +114,26 @@ const SignInForm = () => {
 								Sign in
 							</Button>
 							<Separator orientation="horizontal" />
-							<Button
-								className="gap-2 items-center"
-								variant="link"
-								asChild
-							>
-								<Link href="/signup">
-									<LogIn /> Sign Up
-								</Link>
-							</Button>
+							<div className="flex justify-between w-full">
+								<Button
+									className="gap-2 items-center"
+									variant="link"
+									asChild
+								>
+									<Link href="/signup">
+										<LogIn /> Sign Up
+									</Link>
+								</Button>
+								<Button
+									className="gap-2 items-center"
+									variant="link"
+									asChild
+								>
+									<Link href="/forgot-password">
+										Forgot password ?
+									</Link>
+								</Button>
+							</div>
 						</CardFooter>
 					</form>
 				</Form>

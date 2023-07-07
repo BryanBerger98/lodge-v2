@@ -124,7 +124,7 @@ export const POST = async () => {
 		}
 
 		const expirationDate = Math.floor(Date.now() / 1000) + (60 * 60 * 24);
-		const token = generateToken(userData, expirationDate, 'account_verification');
+		const token = generateToken(userData, expirationDate, 'email_verification');
 		const savedToken = await createToken({
 			token,
 			expiration_date: new Date(expirationDate),
@@ -152,6 +152,8 @@ export const POST = async () => {
 export const PUT = async (request: NextRequest) => {
 
 	try {
+		await connectToDatabase();
+
 		const { token } = await request.json();
 
 		if (!token) {

@@ -1,6 +1,6 @@
 import { Id } from '@/config/database.config';
 
-export type TokenAction = 'reset_password' | 'email_verification'
+export type TokenAction = 'reset_password' | 'email_verification';
 
 export interface IToken {
 	id: Id | string;
