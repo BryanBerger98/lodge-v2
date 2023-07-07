@@ -126,20 +126,22 @@ export const updateAccount = async (valuesToUpdate: { phone_number?: string, use
 // 	}
 // };
 
-// export const updateEmail = async (email: string, password: string, csrfToken: string | null): Promise<IUser> => {
-// 	try {
-// 		const response = await fetcher(csrfToken).put(`${ baseUrl }/update-email`, {
-// 			email,
-// 			password,
-// 		}, {
-// 			headers: { 'Content-Type': 'application/json' },
-// 			withCredentials: true,
-// 		});
-// 		return response.data;
-// 	} catch (error) {
-// 		throw error;
-// 	}
-// };
+export const updateEmail = async (email: string, password: string, csrfToken: string | null): Promise<IUser> => {
+	try {
+		const data = await fetcher('/api/auth/account/email', {
+			method: 'PUT',
+			body: JSON.stringify({
+				email,
+				password, 
+			}),
+			headers: { 'Content-Type': 'application/json' },
+			csrfToken,
+		});
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
 
 // export const updateAvatar = async (file: File, csrfToken?: string | null): Promise<{ file: ILodgeFile, photoUrl: string }> => {
 // 	try {

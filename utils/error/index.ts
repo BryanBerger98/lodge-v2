@@ -29,5 +29,5 @@ export const sendError = (error: any) => {
 };
 
 export const getErrorMessage = <D>(apiError: ApiError<D>, options?: { locale: 'fr' | 'en' }) => {
-	return errorMessages[ apiError.code ][ options?.locale || 'en' ] || errorMessages[ DEFAULT_ERROR ][ options?.locale || 'en' ];
+	return errorMessages[ apiError.code || DEFAULT_ERROR ][ options?.locale || 'en' ] || errorMessages[ DEFAULT_ERROR ][ options?.locale || 'en' ];
 };

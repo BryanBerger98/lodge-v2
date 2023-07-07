@@ -30,6 +30,11 @@ export const UpdateUserAccountSchema = object({
 		{ message: 'Nothing to update' }
 	);
 
+export const UpdateUserEmailSchema = object({
+	email: string().email('Please, provide a valid email address.').min(1, 'Required.'),
+	password: string().min(1, 'Required.'),
+});
+
 export type UpdateUserDTO = Partial<IUser> & {
 	id: string | Id;
 };
