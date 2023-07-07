@@ -14,6 +14,7 @@ import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
 import { updateUserAvatar } from '@/services/auth.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
+import { optimizeImage } from '@/utils/file.util';
 
 type UpdateAvatarFormProps = {
 	csrfToken: string;
@@ -43,7 +44,8 @@ const UpdateAvatarForm = ({ csrfToken }: UpdateAvatarFormProps) => {
 		if (fileToUpload) {
 			setIsLoading(true);
 			try {
-				const updatedUser = await updateUserAvatar(fileToUpload, csrfToken);
+				const optimizedFile = await optimizeImage(fileToUpload);
+				const updatedUser = await updateUserAvatar(optimizedFile, csrfToken);
 				if (updatedUser) {
 					await updateSession({
 						...session,

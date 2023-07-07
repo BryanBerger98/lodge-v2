@@ -20,6 +20,7 @@
     "@radix-ui/react-toast": "^1.1.4",
     "aws-sdk": "^2.1412.0",
     "bcryptjs": "^2.4.3",
+    "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.6.1",
     "clsx": "^1.2.1",
     "edge-csrf": "^1.0.4",

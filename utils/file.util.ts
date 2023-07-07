@@ -1,12 +1,14 @@
 import crypto from 'crypto';
 import path from 'path';
 
+import imageCompression from 'browser-image-compression';
+
 import { IFile, ImageMimetype } from '../types/file.type';
 
 const imageMimetypes: string[] = [ 'image/gif', 'image/jpeg', 'image/png', 'image/webp' ] as ImageMimetype[];
 
 export const AUTHORIZED_IMAGE_MIME_TYPES = [ 'image/jpeg', 'image/png', 'image/gif', 'image/webp' ];
-export const AUTHORIZED_IMAGE_SIZE = 1024 * 1024 * 2; // 2 MB
+export const AUTHORIZED_IMAGE_SIZE = 1024 * 1024 * 1; // 1 MB
 
 export const getFileExtension = (fileName: string) => fileName.split('.').pop();
 
@@ -37,4 +39,22 @@ export const convertFileRequestObjetToModel = (fileObj: File | Blob, fileKey: st
 
 export const checkIfFileIsAnImage = (fileType: string): fileType is ImageMimetype => {
 	return typeof fileType === 'string' && imageMimetypes.includes(fileType);
+};
+
+type ImageOptimizationOptions = {
+	maxSizeMB?: number;
+	maxWidthOrHeight?: number;
+}
+
+export const optimizeImage = async (fileImage: File, options?: ImageOptimizationOptions): Promise<File> => {
+	try {
+		const compressedFile = await imageCompression(fileImage, {
+			maxSizeMB: options?.maxSizeMB || 0.512,
+			maxWidthOrHeight: options?.maxWidthOrHeight || 500,
+		});
+
+		return compressedFile;
+	} catch (error) {
+		throw error;
+	}
 };
