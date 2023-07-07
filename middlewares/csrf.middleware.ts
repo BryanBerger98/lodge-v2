@@ -9,6 +9,7 @@ import { MiddlewareFactory } from './middleware.type';
 const WHITELIST_PATHNAMES = [
 	'/api/auth/callback/credentials',
 	'/api/auth/session',
+	'/api/auth/signout',
 ];
 
 const csrfProtect = csrf({ cookie: { secure: process.env.NODE_ENV === 'production' } });

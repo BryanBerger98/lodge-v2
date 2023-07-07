@@ -88,8 +88,7 @@ const UpdateEmailForm = ({ csrfToken }: UpdateEmailFormProps) => {
 				title: 'Error',
 				description: getErrorMessage(apiError),
 				variant: 'destructive',
-				
-			  });
+			});
 		} finally {
 			setIsLoading(false);
 		}
