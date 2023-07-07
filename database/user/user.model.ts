@@ -26,7 +26,14 @@ const userSchema = new Schema<IUserWithPassword>({
 	},
 	username: { type: String },
 	phone_number: { type: String },
-	photo_url: { type: String },
+	photo_url: {
+		type: String,
+		default: null, 
+	},
+	photo_key: {
+		type: String,
+		default: null, 
+	},
 	is_disabled: {
 		type: Boolean,
 		default: false,

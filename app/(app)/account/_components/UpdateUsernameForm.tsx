@@ -105,6 +105,7 @@ const UpdateUsernameForm = ({ csrfToken }: UpdateUsernameFormProps) => {
 										<FormControl>
 											<Input
 												placeholder="John Doe"
+												type="text"
 												{ ...field }
 											/>
 										</FormControl>

@@ -9,7 +9,8 @@ export interface IUser {
 	role: UserRole;
 	username: string;
 	phone_number: string;
-	photo_url: string;
+	photo_url: string | null;
+	photo_key: string | null;
 	is_disabled: boolean;
 	provider_data: 'email';
 	created_at: Date;

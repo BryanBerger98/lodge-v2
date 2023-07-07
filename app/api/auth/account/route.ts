@@ -3,8 +3,10 @@ import { getServerSession } from 'next-auth';
 import { ZodError } from 'zod';
 
 import { connectToDatabase } from '@/config/database.config';
+import { findFileByKey } from '@/database/file/file.repository';
 import { UpdateUserAccountSchema } from '@/database/user/user.dto';
 import { findUserById, updateUser } from '@/database/user/user.repository';
+import { getFileFromKey } from '@/lib/bucket';
 import { IUser } from '@/types/user.type';
 import { buildError, sendError } from '@/utils/error';
 import { INTERNAL_ERROR, INVALID_INPUT_ERROR, UNAUTHORIZED_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
@@ -37,13 +39,12 @@ export const GET = async () => {
 			}));
 		}
 
-		// const photoFileObject = await findFileByUrl(currentUserData.photo_url);
+		const photoFileObject = userData.photo_key ? await findFileByKey(userData.photo_key) : null;
 
-		// if (photoFileObject) {
-		// 	const photoUrl = await getFileFromKey(photoFileObject);
-		// 	currentUserData.photo_url = photoUrl ? photoUrl : '';
-		// }
-
+		if (photoFileObject) {
+			const photoUrl = await getFileFromKey(photoFileObject);
+			userData.photo_url = photoUrl ? photoUrl : '';
+		}
 
 		return NextResponse.json(userData);
 	} catch (error: any) {

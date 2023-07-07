@@ -10,6 +10,7 @@ const WHITELIST_PATHNAMES = [
 	'/api/auth/callback/credentials',
 	'/api/auth/session',
 	'/api/auth/signout',
+	'/api/auth/_log',
 ];
 
 const csrfProtect = csrf({ cookie: { secure: process.env.NODE_ENV === 'production' } });
