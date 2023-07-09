@@ -1,6 +1,7 @@
 import { Schema, model, models, Model, Types } from 'mongoose';
+import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 
-import { IUserWithPassword } from '@/types/user.type';
+import { AuthProviders, IUserWithPassword, UserRoles } from '@/types/user.type';
 
 const userSchema = new Schema<IUserWithPassword>({
 	email: {
@@ -21,7 +22,7 @@ const userSchema = new Schema<IUserWithPassword>({
 	},
 	role: {
 		type: String,
-		enum: [ 'admin', 'user' ],
+		enum: UserRoles,
 		default: 'user',
 	},
 	username: { type: String },
@@ -38,7 +39,11 @@ const userSchema = new Schema<IUserWithPassword>({
 		type: Boolean,
 		default: false,
 	},
-	provider_data: { type: String },
+	provider_data: {
+		type: String,
+		enum: AuthProviders,
+		default: 'email',
+	},
 	updated_by: {
 		type: Types.ObjectId,
 		default: null,
@@ -56,9 +61,16 @@ const userSchema = new Schema<IUserWithPassword>({
 		createdAt: 'created_at',
 		updatedAt: 'updated_at',
 	},
+	id: false,
+});
+
+userSchema.virtual('id').get(function () {
+	return this._id.toHexString();
 });
 
 userSchema.set('toObject', { virtuals: true });
+
+userSchema.plugin(mongooseLeanVirtuals);
 
 const UserModel: Model<IUserWithPassword> = models.User || model<IUserWithPassword>('User', userSchema);
 

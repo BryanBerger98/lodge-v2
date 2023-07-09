@@ -1,6 +1,6 @@
 import { JWT } from 'next-auth/jwt';
 
-import { IUser } from '@/types/user.type';
+import { AuthProvider, IUser } from '@/types/user.type';
 
 import { Id } from './config/database.config';
 import { TokenAction } from './types/token.type';
@@ -11,14 +11,18 @@ declare module 'next-auth' {
    */
 
 	interface User extends IUser {
-		id?: string | Id;
+		id: string | Id;
+		provider_data: AuthProvider;
+		email: string;
 	}
 
   interface Session {
     user: User
 	token: JWT & IUser & {
-		id?: string | Id;
+		id: string | Id;
 		action?: TokenAction;
+		provider_data: AuthProvider;
+		email: string;
 	}
   }
 }
@@ -26,7 +30,9 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
 	/** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
 	interface JWT extends IUser {
-		id?: string | Id;
+		id: string | Id;
 		action?: TokenAction;
+		provider_data: AuthProvider;
+		email: string;
 	}
 }

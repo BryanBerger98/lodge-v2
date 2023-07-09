@@ -20,7 +20,8 @@ export const findUsers = async (searchRequest: FilterQuery<IUser>, options?: Que
 		const users = await UserModel.find(searchRequest, { password: 0 })
 			.skip(options?.skip || 0)
 			.limit(options?.limit || 1000)
-			.sort(options?.sort || {});
+			.sort(options?.sort || {})
+			.lean({ virtuals: true });
 		return users;
 	} catch (error) {
 		throw error;
@@ -39,11 +40,12 @@ export const findUsersCount = async (searchRequest: FilterQuery<IUser>): Promise
 export const findUserByEmail = async (email: string): Promise<IUser | null> => {
 	try {
 		const serializedEmail = email.toLowerCase().trim();
-		const user: Optional<IUserWithPassword, 'password'> | null = await UserModel.findOne({ email: serializedEmail }, { password: 0 });
-		if (user) {
-			delete user.password;
+		const user = await UserModel.findOne({ email: serializedEmail }, { password: 0 });
+		const userObject: Optional<IUserWithPassword, 'password'> | null = user?.toObject() || null;
+		if (userObject) {
+			delete userObject.password;
 		}
-		return user;
+		return userObject;
 	} catch (error) {
 		throw error;
 	}
@@ -53,7 +55,7 @@ export const findUserWithPasswordByEmail = async (email: string): Promise<IUserW
 	try {
 		const serializedEmail = email.toLowerCase().trim();
 		const user = await UserModel.findOne({ email: serializedEmail });
-		return user;
+		return user?.toObject() || null;
 	} catch (error) {
 		throw error;
 	}
@@ -62,7 +64,7 @@ export const findUserWithPasswordByEmail = async (email: string): Promise<IUserW
 export const findUserById = async (userId: string | Id): Promise<IUser | null> => {
 	try {
 		const user = await UserModel.findById(userId, { password: 0 });
-		return user;
+		return user?.toObject() || null;
 	} catch (error) {
 		throw error;
 	}
@@ -71,7 +73,7 @@ export const findUserById = async (userId: string | Id): Promise<IUser | null> =
 export const findUserWithPasswordById = async (userId: string | Id): Promise<IUserWithPassword | null> => {
 	try {
 		const user = await UserModel.findById(userId);
-		return user;
+		return user?.toObject() || null;
 	} catch (error) {
 		throw error;
 	}

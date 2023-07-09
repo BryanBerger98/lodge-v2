@@ -1,12 +1,16 @@
 import { ChevronLeft, UserPlus } from 'lucide-react';
+import { headers } from 'next/headers';
 import Link from 'next/link';
 
 import PageTitle from '@/components/layout/PageTitle';
 import { Button } from '@/components/ui/button';
+import { getCsrfToken } from '@/utils/csrf.util';
 
 import EditUserForm from '../_components/EditUserForm';
 
-const CreateUserPage = () => {
+const CreateUserPage = async () => {
+
+	const csrfToken = await getCsrfToken(headers());
 
 	return (
 		<>
@@ -22,7 +26,7 @@ const CreateUserPage = () => {
 			</Button>
 			<div className="grid grid-cols-3">
 				<div className="col-span-2 flex flex-col gap-8">
-					<EditUserForm />
+					<EditUserForm csrfToken={ csrfToken } />
 				</div>
 			</div>
 		</>
