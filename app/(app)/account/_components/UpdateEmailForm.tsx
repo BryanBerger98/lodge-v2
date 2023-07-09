@@ -30,7 +30,7 @@ const UpdateEmailForm = ({ csrfToken }: UpdateEmailFormProps) => {
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 	const [ isPasswordModalOpen, setIsPasswordModalOpen ] = useState<boolean>(false);
 
-	const emailFormSchema = object({ email: string().email().min(1, 'Required.') });
+	const emailFormSchema = object({ email: string().email('Please, provide a valid email address.').min(1, 'Required.') });
 
 	const form = useForm<z.infer<typeof emailFormSchema>>({
 		resolver: zodResolver(emailFormSchema),

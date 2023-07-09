@@ -1,7 +1,7 @@
 import { object, string, z } from 'zod';
 
 import { Id } from '@/config/database.config';
-import { IUser, UserRole } from '@/types/user.type';
+import { AuthProvider, IUser, UserRoles } from '@/types/user.type';
 
 export const SignUpUserSchema = object({
 	email: string().email('Please, provide a valid email address.').min(1, 'Required.'),
@@ -10,13 +10,18 @@ export const SignUpUserSchema = object({
 
 export type SignupUserDTO = z.infer<typeof SignUpUserSchema>;
 
-export type CreateUserDTO = {
-	username: string;
-	email: string;
-	phone_number: string;
-	role: UserRole;
-	provider_data: 'email';
-	created_by?: Id | string | null;
+export const CreateUserSchema = object({
+	username: string().min(1, 'Required.'),
+	email: string().email('Please, provide a valid email address.').min(1, 'Required.'),
+	phone_number: string(),
+	role: z.enum(UserRoles).default('user'),
+	is_disabled: z.enum([ 'true', 'false' ]).transform(value => value === 'true').default('false'),
+});
+
+export type CreateUserDTO = z.infer<typeof CreateUserSchema> & {
+	provider_data: AuthProvider,
+	created_by: Id | string;
+	photo_key: string | null;
 };
 
 export const UpdateUserAccountSchema = object({

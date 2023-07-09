@@ -2,6 +2,7 @@ import { User } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 
+import PageTitle from '@/components/layout/PageTitle';
 import { getCsrfToken } from '@/utils/csrf.util';
 
 const DynamicSignOutButton = dynamic(() => import('./_components/SignOutButton'), { ssr: false });
@@ -17,7 +18,7 @@ const AccountPage = async () => {
 
 	return (
 		<>
-			<h1 className="text-2xl font-semibold flex gap-2 items-center mb-16"><User /> Account</h1>
+			<PageTitle><User /> Account</PageTitle>
 			<div className="grid grid-cols-3">
 				<div className="col-span-2 flex flex-col gap-8">
 					<DynamicUpdateAvatarForm csrfToken={ csrfToken } />
