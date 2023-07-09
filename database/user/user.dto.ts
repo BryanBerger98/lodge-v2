@@ -3,6 +3,14 @@ import { object, string, z } from 'zod';
 import { Id } from '@/config/database.config';
 import { AuthProvider, IUser, UserRoles } from '@/types/user.type';
 
+export const FetchUsersSchema = object({
+	sort_fields: z.coerce.string().transform(value => value.split(',')).optional().default('created_at'),
+	sort_directions: z.coerce.string().transform(value => value.split(',').map(v => Number(v))).refine(value => value.every(v => v === 1 || v === -1)).optional().default('-1'),
+	limit: z.coerce.number().optional().default(10),
+	skip: z.coerce.number().optional().default(0),
+	search: z.coerce.string().optional(),
+});
+
 export const SignUpUserSchema = object({
 	email: string().email('Please, provide a valid email address.').min(1, 'Required.'),
 	password: string().min(8, 'At least 8 characters.'),

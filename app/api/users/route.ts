@@ -1,11 +1,13 @@
+import { parse } from 'url';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { ZodError } from 'zod';
 
 import { connectToDatabase } from '@/config/database.config';
 import { createFile, deleteFileById, findFileByKey } from '@/database/file/file.repository';
-import { CreateUserSchema } from '@/database/user/user.dto';
-import { createUser, findUserByEmail } from '@/database/user/user.repository';
+import { CreateUserSchema, FetchUsersSchema } from '@/database/user/user.dto';
+import { createUser, findUserByEmail, findUsers, findUsersCount } from '@/database/user/user.repository';
 import { deleteFileFromKey, getFileFromKey, uploadImageToS3 } from '@/lib/bucket';
 import { IUser } from '@/types/user.type';
 import { buildError, sendError } from '@/utils/error';
@@ -123,6 +125,63 @@ export const POST = async (request: NextRequest) => {
 		}
 		
 		return NextResponse.json(createdUser);
+	} catch (error: any) {
+		console.error(error);
+		if (error.name && error.name === 'ZodError') {
+			return sendError(buildError({
+				code: INVALID_INPUT_ERROR,
+				message: 'Invalid input.',
+				status: 422,
+				data: error as ZodError,
+			}));
+		}
+		return sendError(buildError({
+			code: INTERNAL_ERROR,
+			message: error.message || 'An error occured.',
+			status: 500,
+			data: error,
+		}));
+	}
+};
+
+export const GET = async (request: NextRequest) => {
+	try {
+
+		await connectToDatabase();
+
+		const session = await getServerSession(authOptions);
+		const currentUser = session?.user;
+
+		if (!currentUser?.id) {
+			return sendError(buildError({
+				code: UNAUTHORIZED_ERROR,
+				message: 'Unauthorized.',
+				status: 401,
+			}));
+		}
+
+
+		const queryParams = parse(request.url, true).query;
+		const { sort_fields, sort_directions, skip, limit, search } = FetchUsersSchema.parse(queryParams);
+
+		const searchArray = search ? search.trim().split(' ') : [];
+		const searchRegexArray = searchArray.map(string => new RegExp(string, 'i'));
+		const searchRequest = searchRegexArray.length > 0 ? { $or: [ { username: { $in: searchRegexArray } }, { email: { $in: searchRegexArray } } ] } : {};
+
+		const users = await findUsers(searchRequest, {
+			sort: Object.fromEntries(sort_fields.map((field, index) => [ field, sort_directions[ index ] as 1 | -1 ])),
+			skip,
+			limit,
+		});
+		const count = users.length;
+		const total = await findUsersCount(searchRequest);
+
+		return NextResponse.json({
+			users,
+			count,
+			total,
+		});
+
 	} catch (error: any) {
 		console.error(error);
 		if (error.name && error.name === 'ZodError') {
