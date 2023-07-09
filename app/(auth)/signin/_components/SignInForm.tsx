@@ -31,6 +31,10 @@ const SignInForm = () => {
 
 	const form = useForm<z.infer<typeof signInFormSchema>>({
 		resolver: zodResolver(signInFormSchema),
+		defaultValues: {
+			email: '',
+			password: '',
+		},
 		mode: 'onTouched',
 	});
 
