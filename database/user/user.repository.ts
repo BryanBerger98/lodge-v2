@@ -9,9 +9,18 @@ import UserModel from './user.model';
 
 export type SortParams = Record<string, -1 | 1>;
 
-export const findUsers = async (searchRequest: FilterQuery<IUser>, sortParams: SortParams, skip?: number, limit?: number): Promise<IUser[]> => {
+export type QueryOptions = {
+	sort?: SortParams,
+	skip?: number,
+	limit?: number,
+};
+
+export const findUsers = async (searchRequest: FilterQuery<IUser>, options?: QueryOptions): Promise<IUser[]> => {
 	try {
-		const users = await UserModel.find(searchRequest, { password: 0 }).skip(skip ? skip : 0).limit(limit ? limit : 1000).sort(sortParams);
+		const users = await UserModel.find(searchRequest, { password: 0 })
+			.skip(options?.skip || 0)
+			.limit(options?.limit || 1000)
+			.sort(options?.sort || {});
 		return users;
 	} catch (error) {
 		throw error;

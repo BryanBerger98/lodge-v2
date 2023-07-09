@@ -1,4 +1,4 @@
-import { Home, Layers, MessagesSquare, Users } from 'lucide-react';
+import { Layers, MessagesSquare, Users } from 'lucide-react';
 import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 
@@ -28,14 +28,22 @@ const Sidebar = async ({ className }: SidebarProps) => {
 							<Button
 								className="w-full gap-2 justify-start"
 								variant="ghost"
-							><Home size="16" /> Dashboard
+								asChild
+							>
+								<Link href="/">
+									<Users size="16" /> Dashboard
+								</Link>
 							</Button>
 						</li>
 						<li>
 							<Button
 								className="w-full gap-2 justify-start"
 								variant="ghost"
-							><Users size="16" /> Users
+								asChild
+							>
+								<Link href="/users">
+									<Users size="16" /> Users
+								</Link>
 							</Button>
 						</li>
 						<li>
