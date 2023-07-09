@@ -166,3 +166,17 @@ export const getAvatar = async (): Promise<{ photoUrl: string }> => {
 		throw error;
 	}
 };
+
+export const deleteUserAccount = async (csrfToken: string, password: string) => {
+	try {
+		await fetcher('/api/auth/account/delete', {
+			method: 'POST',
+			body: JSON.stringify({ password }),
+			headers: { 'Content-Type': 'application/json' },
+			csrfToken,
+		});
+		return;
+	} catch (error) {
+		throw error;
+	}
+};

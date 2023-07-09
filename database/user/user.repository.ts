@@ -1,6 +1,6 @@
 import { FilterQuery } from 'mongoose';
 
-import { Id } from '@/config/database.config';
+import { Id, newId } from '@/config/database.config';
 import { IUser, IUserWithPassword } from '@/types/user.type';
 import { Optional } from '@/types/utils.type';
 
@@ -120,7 +120,7 @@ export const updateUserPassword = async (userId: string | Id, newHashedPassword:
 
 export const deleteUserById = async (userId: string | Id): Promise<IUser | null> => {
 	try {
-		const deletedUser = await UserModel.findByIdAndDelete(userId);
+		const deletedUser = await UserModel.findByIdAndDelete(newId(userId));
 		return deletedUser;
 	} catch (error) {
 		throw error;

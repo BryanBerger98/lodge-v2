@@ -9,6 +9,7 @@ export const INVALID_TOKEN_ERROR = 'invalid-token';
 export const UNAUTHORIZED_ERROR = 'unauthorized';
 export const EMAIL_ALREADY_VERIFIED_ERROR = 'email-already-verified';
 export const INVALID_INPUT_ERROR = 'invalid-input';
+export const PASSWORD_REQUIRED_ERROR = 'password-required';
 export const DEFAULT_ERROR = 'default';
 export const INTERNAL_ERROR = 'internal-error';
 export const TOKEN_EXPIRED_ERROR = 'token-expired';
