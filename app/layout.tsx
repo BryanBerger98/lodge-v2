@@ -1,5 +1,6 @@
 import './globals.css';
 
+import PageProgressBar from '@/components/layout/PageProgressBar';
 import { Toaster } from '@/components/ui/toaster';
 
 import Providers from './_components/Providers';
@@ -15,6 +16,7 @@ const RootLayout = ({ children }: {
 	return (
 		<html lang="en">
 			<body className="min-h-screen">
+				<PageProgressBar />
 				<Providers>
 					{ children }
 				</Providers>

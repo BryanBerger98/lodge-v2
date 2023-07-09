@@ -37,8 +37,6 @@ export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: 
 	const skipQuery = options?.skip ? `skip=${ options.skip }` : '';
 	const limitQuery = options?.limit ? `limit=${ options.limit }` : '';
 	const searchQuery = options?.search ? `search=${ options.search }` : '';
-	console.log('SKIP', options?.skip, skipQuery);
-	console.log('LIMIT', options?.limit, limitQuery);
 	let query = '';
 	if (sortQuery || skipQuery || limitQuery || searchQuery) {
 		query = `?${ sortQuery }${ sortQuery && skipQuery ? `&${ skipQuery }` : skipQuery }${ (sortQuery || skipQuery) && limitQuery ? `&${ limitQuery }` : limitQuery }${ (sortQuery || skipQuery || limitQuery) && searchQuery ? `&${ searchQuery }` : searchQuery }`;

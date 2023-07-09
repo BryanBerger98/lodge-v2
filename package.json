@@ -38,6 +38,7 @@
     "next": "^13.4.8",
     "next-auth": "^4.22.1",
     "next-connect": "^1.0.0",
+    "next-nprogress-bar": "^2.0.2",
     "nodemailer": "^6.9.3",
     "npm": "^9.8.0",
     "react": "18.2.0",
