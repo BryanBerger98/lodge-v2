@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-handler-names */
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check } from 'lucide-react';
+import { ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 import { object, string, z } from 'zod';
 
@@ -14,9 +15,11 @@ export type PasswordModalOpenChangeEvent = ({ openState, password }: { openState
 type PasswordModalProps = {
 	isOpen: boolean;
 	onOpenChange: PasswordModalOpenChangeEvent;
+	title?: ReactNode;
+	description?: ReactNode;
 }
 
-const PasswordModal = ({ isOpen, onOpenChange }: PasswordModalProps) => {
+const PasswordModal = ({ isOpen, onOpenChange, title, description }: PasswordModalProps) => {
 
 	const passwordFormSchema = object({ password: string().min(1, 'Required.') });
 
@@ -53,9 +56,9 @@ const PasswordModal = ({ isOpen, onOpenChange }: PasswordModalProps) => {
 				<Form { ...form }>
 					<form onSubmit={ form.handleSubmit(handleSubmitPasswordForm) }>
 						<DialogHeader className="mb-4">
-							<DialogTitle>We keep your account safe.</DialogTitle>
+							<DialogTitle>{ title || 'We keep your account safe.' }</DialogTitle>
 							<DialogDescription>
-								We need you to enter your password to confirm this action.
+								{ description || 'We need you to enter your password to confirm this action.' }
 							</DialogDescription>
 						</DialogHeader>
 						<FormField

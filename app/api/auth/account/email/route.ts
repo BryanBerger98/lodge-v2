@@ -35,21 +35,21 @@ export const PUT = async (request: NextRequest) => {
 		const user = await findUserWithPasswordById(currentUser.id);
 
 		if (!user) {
-			throw buildError({
+			return sendError(buildError({
 				code: USER_NOT_FOUND_ERROR,
-				message: 'User not found.',
+				message: 'USer not password.',
 				status: 404,
-			});
+			}));
 		}
 
 		const isPasswordValid = await verifyPassword(password, user.password);
 
 		if (!isPasswordValid) {
-			throw buildError({
+			return sendError(buildError({
 				message: 'Wrong password.',
 				code: WRONG_PASSWORD_ERROR,
 				status: 401,
-			});
+			}));
 		}
 
 		const updatedUser = await updateUser({
