@@ -1,5 +1,6 @@
 import { UserPlus, Users } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 
 import PageTitle from '@/components/layout/PageTitle';
 import { Button } from '@/components/ui/button';
@@ -28,9 +29,14 @@ const UsersPage = async () => {
 								Manage users accounts, permissions and roles.
 							</CardDescription>
 						</div>
-						<Button className="gap-2 items-center">
-							<UserPlus />
-							Create user
+						<Button
+							className="gap-2 items-center"
+							asChild
+						>
+							<Link href="/users/create">
+								<UserPlus />
+								Create user
+							</Link>
 						</Button>
 					</CardHeader>
 					<CardContent>
