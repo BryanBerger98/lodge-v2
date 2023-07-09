@@ -6,7 +6,7 @@ import PageTitle from '@/components/layout/PageTitle';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { connectToDatabase } from '@/config/database.config';
-import { findUsers } from '@/database/user/user.repository';
+import { findUsers, findUsersCount } from '@/database/user/user.repository';
 
 
 const DynamicUsersDataTable = dynamic(() => import('./_components/UsersDataTable'));
@@ -19,6 +19,7 @@ const UsersPage = async () => {
 		sort: { 'created_at': -1 },
 		limit: 10, 
 	});
+	const totalUsers = await findUsersCount({});
 
 	return (
 		<>
@@ -37,13 +38,16 @@ const UsersPage = async () => {
 							asChild
 						>
 							<Link href="/users/create">
-								<UserPlus />
+								<UserPlus size="16" />
 								Create user
 							</Link>
 						</Button>
 					</CardHeader>
 					<CardContent>
-						<DynamicUsersDataTable users={ users } />
+						<DynamicUsersDataTable
+							total={ totalUsers }
+							users={ users }
+						/>
 					</CardContent>
 				</Card>
 			</div>

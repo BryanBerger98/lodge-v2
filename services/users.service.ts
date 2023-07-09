@@ -1,3 +1,5 @@
+import { SortingState } from '@tanstack/react-table';
+
 import { CreateUserDTO, IUser } from '@/types/user.type';
 import fetcher from '@/utils/fetcher.util';
 
@@ -17,6 +19,32 @@ export const createUser = async (userToCreate: CreateUserDTO, csrfToken?: string
 			body: formData,
 			csrfToken,
 		});
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export type FetchUsersOptions = {
+	sort?: SortingState,
+	skip?: number;
+	limit?: number;
+	search?: string;
+}
+
+export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: IUser[], total: number, count: number }> => {
+	const sortQuery = options?.sort && options.sort.length > 0 ? `sort_fields=${ options.sort.map(el => el.id).join(',') }&sort_directions=${ options.sort.map(el => el.desc ? -1 : 1).join(',') }` : '';
+	const skipQuery = options?.skip ? `skip=${ options.skip }` : '';
+	const limitQuery = options?.limit ? `limit=${ options.limit }` : '';
+	const searchQuery = options?.search ? `search=${ options.search }` : '';
+	console.log('SKIP', options?.skip, skipQuery);
+	console.log('LIMIT', options?.limit, limitQuery);
+	let query = '';
+	if (sortQuery || skipQuery || limitQuery || searchQuery) {
+		query = `?${ sortQuery }${ sortQuery && skipQuery ? `&${ skipQuery }` : skipQuery }${ (sortQuery || skipQuery) && limitQuery ? `&${ limitQuery }` : limitQuery }${ (sortQuery || skipQuery || limitQuery) && searchQuery ? `&${ searchQuery }` : searchQuery }`;
+	}
+	try {
+		const data = await fetcher(`/api/users/${ query }`);
 		return data;
 	} catch (error) {
 		throw error;
