@@ -36,6 +36,7 @@ const UsersDataTable = ({ users, total }: UsersDataTableProps) => {
 			limit: pagination.pageSize,
 			skip: Math.round(pagination.pageIndex * pagination.pageSize),
 			search: searchValue,
+			cache: 'no-store',
 		})
 			.then(({ total, users }) => {
 				setUsersTotal(total);

@@ -40,12 +40,12 @@ export const findUsersCount = async (searchRequest: FilterQuery<IUser>): Promise
 export const findUserByEmail = async (email: string): Promise<IUser | null> => {
 	try {
 		const serializedEmail = email.toLowerCase().trim();
-		const user = await UserModel.findOne({ email: serializedEmail }, { password: 0 });
-		const userObject: Optional<IUserWithPassword, 'password'> | null = user?.toObject() || null;
-		if (userObject) {
-			delete userObject.password;
+		const userDoc = await UserModel.findOne({ email: serializedEmail }, { password: 0 });
+		const user: Optional<IUserWithPassword, 'password'> | null = userDoc?.toObject() || null;
+		if (user) {
+			delete user.password;
 		}
-		return userObject;
+		return user;
 	} catch (error) {
 		throw error;
 	}
@@ -81,7 +81,8 @@ export const findUserWithPasswordById = async (userId: string | Id): Promise<IUs
 
 export const createUser = async (userToCreate: CreateUserDTO | SignupUserDTO): Promise<IUser | null> => {
 	try {
-		const createdUser: Optional<IUserWithPassword, 'password'> = await UserModel.create({ ...userToCreate });
+		const createdUserDoc = await UserModel.create({ ...userToCreate });
+		const createdUser: Optional<IUserWithPassword, 'password'> = createdUserDoc.toObject();
 		delete createdUser.password;
 		return createdUser;
 	} catch (error) {
@@ -95,7 +96,8 @@ type UpdateUserOptions = {
 
 export const updateUser = async (userToUpdate: UpdateUserDTO, options?: UpdateUserOptions): Promise<IUser | null> => {
 	try {
-		const updatedUser: Optional<IUserWithPassword, 'password'> | null = await UserModel.findByIdAndUpdate(userToUpdate.id, { $set: { ...userToUpdate } }, { new: options?.newDocument || false });
+		const updatedUserDoc = await UserModel.findByIdAndUpdate(userToUpdate.id, { $set: { ...userToUpdate } }, { new: options?.newDocument || false });
+		const updatedUser: Optional<IUserWithPassword, 'password'> | null = updatedUserDoc?.toObject() || null;
 		if (updatedUser) {
 			delete updatedUser.password;
 		}
@@ -105,12 +107,13 @@ export const updateUser = async (userToUpdate: UpdateUserDTO, options?: UpdateUs
 	}
 };
 
-export const updateUserPassword = async (userId: string | Id, newHashedPassword: string): Promise<void> => {
+export const updateUserPassword = async (userId: string | Id, newHashedPassword: string, updated_by: Id | string): Promise<void> => {
 	try {
 		await UserModel.findByIdAndUpdate(userId, {
 			$set: {
 				password: newHashedPassword,
 				updated_on: new Date(),
+				updated_by,
 			},
 		});
 	} catch (error) {
@@ -120,7 +123,11 @@ export const updateUserPassword = async (userId: string | Id, newHashedPassword:
 
 export const deleteUserById = async (userId: string | Id): Promise<IUser | null> => {
 	try {
-		const deletedUser = await UserModel.findByIdAndDelete(newId(userId));
+		const deletedUserDoc = await UserModel.findByIdAndDelete(newId(userId));
+		const deletedUser: Optional<IUserWithPassword, 'password'> | null = deletedUserDoc?.toObject() || null;
+		if (deletedUser) {
+			delete deletedUser.password;
+		}
 		return deletedUser;
 	} catch (error) {
 		throw error;

@@ -1,6 +1,6 @@
 import { CSRF_TOKEN_HEADER } from './csrf.util';
 
-type FetcherOptions = RequestInit & {
+export type FetcherOptions = RequestInit & {
 	csrfToken?: string | null;
 }
 

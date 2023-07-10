@@ -55,6 +55,7 @@ export const PUT = async (request: NextRequest) => {
 		const updatedUser = await updateUser({
 			id: currentUser.id,
 			email,
+			updated_by: currentUser.id,
 		}, { newDocument: true });
 
 		return NextResponse.json(updatedUser);

@@ -129,7 +129,7 @@ export const PUT = async (request: NextRequest) => {
 		await deleteTokenById(savedToken.id);
 
 		const hashedPassword = await hashPassword(password);
-		await updateUserPassword(userData.id, hashedPassword);
+		await updateUserPassword(userData.id, hashedPassword, userData.id);
 		
 		return NextResponse.json({ message: 'Updated.' });
 	} catch (error: any) {
