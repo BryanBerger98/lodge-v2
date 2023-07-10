@@ -1,5 +1,6 @@
 import { SortingState } from '@tanstack/react-table';
 
+import { Id } from '@/config/database.config';
 import { CreateUserDTO, IUser, UpdateUserDTO } from '@/types/user.type';
 import fetcher, { FetcherOptions } from '@/utils/fetcher.util';
 import { objectToFormData } from '@/utils/object.utils';
@@ -70,6 +71,19 @@ export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: 
 	try {
 		const data = await fetcher(`/api/users/${ query }`, restOptions);
 		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const deleteUser = async (userId: string | Id, csrfToken: string, options?: FetcherOptions): Promise<void> => {
+	try {
+		await fetcher(`/api/users/${ userId }`, {
+			method: 'DELETE',
+			...options,
+			csrfToken,
+		});
+		return;
 	} catch (error) {
 		throw error;
 	}

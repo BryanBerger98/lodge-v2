@@ -64,7 +64,7 @@ const DeleteAccountButton = ({ className, csrfToken }: DeleteAccountButtonProps)
 				Delete account
 			</Button>
 			<PasswordModal
-				description="This action cannot be reverted. Please enter your password to confirm the deletion of your account."
+				description="This action is irreversible. Please enter your password to confirm the deletion of your account."
 				isOpen={ isPasswordModalOpen }
 				title={ <span className="text-red-500">Delete your account</span> }
 				onOpenChange={ handlePasswordModalOpenChange }

@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Id } from '@/config/database.config';
+import { UserRole } from '@/types/user.type';
 
 import Menu from './Menu';
 
@@ -14,6 +15,7 @@ export type UserColumn = {
   email: string
   is_disabled: boolean,
   has_email_verified: boolean,
+  role: UserRole;
 }
 
 export const columns: ColumnDef<UserColumn>[] = [
@@ -75,6 +77,29 @@ export const columns: ColumnDef<UserColumn>[] = [
 					</TooltipContent>
 				</Tooltip>
 			</TooltipProvider>
+		),
+	},
+	{
+		id: 'role',
+		accessorKey: 'role',
+		header: ({ column }) => {
+			const handleSort = () => column.toggleSorting(column.getIsSorted() === 'asc');
+			return (
+				<Button
+					variant="ghost"
+					onClick={ handleSort }
+				>
+					Role
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			);
+		},
+		cell: ({ row }) => (
+			<Badge
+				className="capitalize"
+				variant={ row.original.role === 'admin' ? 'default' : 'secondary' }
+			>{ row.original.role }
+			</Badge>
 		),
 	},
 	{
