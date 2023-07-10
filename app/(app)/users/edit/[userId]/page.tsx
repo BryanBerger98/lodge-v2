@@ -35,10 +35,6 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
 		redirect('/users');
 	}
 
-	console.log('========== EDIT USER ==========');
-	console.log(userData);
-	console.log('========== EDIT USER ==========');
-
 	if (userData.photo_key) {
 		const photoFileObject = await findFileByKey(userData.photo_key);
 		userData.photo_url = photoFileObject ? await getFileFromKey(photoFileObject) : null;

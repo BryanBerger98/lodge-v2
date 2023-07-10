@@ -19,7 +19,7 @@ export const emailVerifiedMiddleware: MiddlewareFactory = (next) => {
 				secret: process.env.JWT_SECRET, 
 			});
 			
-			if (!tokenData || !tokenData.has_email_verified) {
+			if (tokenData && !tokenData.has_email_verified) {
 				return NextResponse.redirect(new URL('/verify-email', request.url));
 			}
 

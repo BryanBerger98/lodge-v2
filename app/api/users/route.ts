@@ -242,7 +242,6 @@ export const GET = async (request: NextRequest) => {
 			}));
 		}
 
-
 		const queryParams = parse(request.url, true).query;
 		const { sort_fields, sort_directions, skip, limit, search } = FetchUsersSchema.parse(queryParams);
 
@@ -282,3 +281,4 @@ export const GET = async (request: NextRequest) => {
 		}));
 	}
 };
+

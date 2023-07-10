@@ -1,9 +1,10 @@
 'use client';
 
 import { OnChangeFn, PaginationState, SortingState } from '@tanstack/react-table';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import DataTable from '@/components/ui/data-table';
+import useCsrf from '@/context/csrf/useCsrf';
 import useUpdateEffect from '@/hooks/utils/useUpdateEffect';
 import { fetchUsers } from '@/services/users.service';
 import { IUser } from '@/types/user.type';
@@ -13,9 +14,12 @@ import { columns } from './columns';
 type UsersDataTableProps = {
 	users: IUser[];
 	total: number;
+	csrfToken: string;
 };
 
-const UsersDataTable = ({ users, total }: UsersDataTableProps) => {
+const UsersDataTable = ({ users, total, csrfToken }: UsersDataTableProps) => {
+
+	const { dispatchCsrfToken } = useCsrf();
 
 	const [ usersList, setUsersList ] = useState<IUser[]>(users);
 	const [ usersTotal, setUsersTotal ] = useState<number>(total);
@@ -29,6 +33,11 @@ const UsersDataTable = ({ users, total }: UsersDataTableProps) => {
 
 	const handleChangeSorting: OnChangeFn<SortingState> = setSorting;
 	const handleChangePagination: OnChangeFn<PaginationState> = setPagination;
+
+	useEffect(() => {
+		dispatchCsrfToken(csrfToken);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ csrfToken ]);
 
 	useUpdateEffect(() => {
 		fetchUsers({

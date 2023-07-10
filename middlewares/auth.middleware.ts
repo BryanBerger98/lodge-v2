@@ -20,10 +20,9 @@ export const authMiddleware: MiddlewareFactory = (next) => {
 				secret: process.env.JWT_SECRET, 
 			});
 			
-			if (!tokenData || !tokenData.has_email_verified) {
+			if (!tokenData) {
 				return NextResponse.redirect(new URL('/signin', request.url));
 			}
-
 		}
 		return next(request, _next);
 
