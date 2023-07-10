@@ -1,4 +1,5 @@
-import { MoreHorizontal } from 'lucide-react';
+import { ArrowRightLeft, BadgeCheck, CircleOff, Edit, KeyRound, MoreHorizontal, Trash } from 'lucide-react';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -10,10 +11,6 @@ type MenuProps = {
 }
 
 const Menu = ({ rowData }: MenuProps) => {
-
-	const handleClick = () => {
-		navigator.clipboard.writeText(rowData.id.toString());
-	};
 
 	return (
 		<DropdownMenu>
@@ -29,13 +26,40 @@ const Menu = ({ rowData }: MenuProps) => {
 			<DropdownMenuContent align="end">
 				<DropdownMenuLabel>Actions</DropdownMenuLabel>
 				<DropdownMenuItem
-					onClick={ handleClick }
+					className="gap-2 hover:cursor-pointer"
+					asChild
 				>
-					Copy payment ID
+					<Link href={ `/users/edit/${ rowData.id }` }>
+						<Edit size="16" />
+						Edit
+					</Link>
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					className="gap-2 hover:cursor-pointer"
+					disabled
+				><KeyRound size="16" /> Send reset password
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					className="gap-2 hover:cursor-pointer"
+					disabled
+				><BadgeCheck size="16" /> Send email verification
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					className="gap-2 hover:cursor-pointer"
+					disabled
+				><ArrowRightLeft size="16" /> Impersonate
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
-				<DropdownMenuItem>View customer</DropdownMenuItem>
-				<DropdownMenuItem>View payment details</DropdownMenuItem>
+				<DropdownMenuItem
+					className="gap-2 text-red-500 hover:cursor-pointer"
+					disabled
+				><CircleOff size="16" /> Suspend
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					className="gap-2 text-red-500 hover:cursor-pointer"
+					disabled
+				><Trash size="16" /> Delete
+				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);

@@ -53,7 +53,7 @@ export const PUT = async (request: NextRequest) => {
 		}
 
 		const hashedPassword = await hashPassword(newPassword);
-		await updateUserPassword(userData.id, hashedPassword);
+		await updateUserPassword(userData.id, hashedPassword, currentUser.id);
 
 		return NextResponse.json({ message: 'Updated.' });
 	} catch (error: any) {

@@ -6,12 +6,12 @@ import { ZodError } from 'zod';
 
 import { connectToDatabase } from '@/config/database.config';
 import { createFile, deleteFileById, findFileByKey } from '@/database/file/file.repository';
-import { CreateUserSchema, FetchUsersSchema } from '@/database/user/user.dto';
-import { createUser, findUserByEmail, findUsers, findUsersCount } from '@/database/user/user.repository';
+import { CreateUserSchema, FetchUsersSchema, UpdateUserSchema } from '@/database/user/user.dto';
+import { createUser, findUserByEmail, findUserById, findUsers, findUsersCount, updateUser } from '@/database/user/user.repository';
 import { deleteFileFromKey, getFileFromKey, uploadImageToS3 } from '@/lib/bucket';
 import { IUser } from '@/types/user.type';
 import { buildError, sendError } from '@/utils/error';
-import { FILE_TOO_LARGE_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, UNAUTHORIZED_ERROR, USER_ALREADY_EXISTS_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
+import { FILE_TOO_LARGE_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, UNAUTHORIZED_ERROR, USER_ALREADY_EXISTS_ERROR, USER_NOT_FOUND_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
 import { AUTHORIZED_IMAGE_MIME_TYPES, AUTHORIZED_IMAGE_SIZE, convertFileRequestObjetToModel } from '@/utils/file.util';
 import { generatePassword, hashPassword } from '@/utils/password.util';
 
@@ -125,6 +125,88 @@ export const POST = async (request: NextRequest) => {
 		}
 		
 		return NextResponse.json(createdUser);
+	} catch (error: any) {
+		console.error(error);
+		if (error.name && error.name === 'ZodError') {
+			return sendError(buildError({
+				code: INVALID_INPUT_ERROR,
+				message: 'Invalid input.',
+				status: 422,
+				data: error as ZodError,
+			}));
+		}
+		return sendError(buildError({
+			code: INTERNAL_ERROR,
+			message: error.message || 'An error occured.',
+			status: 500,
+			data: error,
+		}));
+	}
+};
+
+export const PUT = async (request: NextRequest) => {
+
+	try {
+
+		await connectToDatabase();
+
+		const session = await getServerSession(authOptions);
+		const currentUser = session?.user;
+
+		if (!currentUser?.id) {
+			return sendError(buildError({
+				code: UNAUTHORIZED_ERROR,
+				message: 'Unauthorized.',
+				status: 401,
+			}));
+		}
+
+		const formData = await request.formData();
+
+		const file = formData.get('avatar') as Blob | null;
+		formData.delete('avatar');
+		const body = Object.fromEntries(formData.entries());
+
+		const { email, username, phone_number, is_disabled, role, id } = UpdateUserSchema.parse(body);
+
+		const existingUser = email ? await findUserByEmail(email) : null;
+	
+		if (existingUser && existingUser.id.toString() !== id) {
+			return sendError(buildError({
+				code: USER_ALREADY_EXISTS_ERROR,
+				message: 'User already exists.',
+				status: 422,
+			}));
+		}
+
+		const userData = await findUserById(id);
+
+		if (!userData) {
+			return sendError(buildError({
+				code: USER_NOT_FOUND_ERROR,
+				message: 'User not found.',
+				status: 404,
+			}));
+		}
+
+		const photoFileData = await uploadPhotoFile(currentUser, file, userData);
+	
+		const updatedUser = await updateUser({
+			id,
+			email: email || userData.email,
+			username: username || userData.username,
+			role: role || userData.role,
+			phone_number: phone_number || userData.phone_number,
+			is_disabled: is_disabled || userData.is_disabled,
+			photo_key: photoFileData.photo_key || userData.photo_key,
+			updated_by: currentUser.id,
+		});
+
+		if (updatedUser) {
+			updatedUser.photo_url = photoFileData.photo_url;
+		}
+		
+		return NextResponse.json(updatedUser);
 	} catch (error: any) {
 		console.error(error);
 		if (error.name && error.name === 'ZodError') {

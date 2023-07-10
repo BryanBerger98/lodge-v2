@@ -4,7 +4,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Save, User, X } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ChangeEventHandler, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { isValidPhoneNumber } from 'react-phone-number-input';
@@ -20,8 +20,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
-import { createUser } from '@/services/users.service';
-import { IUser } from '@/types/user.type';
+import { createUser, updateUser } from '@/services/users.service';
+import { IUser, UserRole } from '@/types/user.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
 type EditUserFormProps = {
@@ -37,6 +37,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 
 	const router = useRouter();
+	const pathname = usePathname();
 
 	const editUserFormSchema = object({
 		username: string().min(1, 'Required.'),
@@ -69,11 +70,20 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 	const handleSubmitEditUserForm = async (values: z.infer<typeof editUserFormSchema>) => {
 		try {
 			setIsLoading(true);
-			await createUser({
+			if (pathname.includes('/users/edit') && user) {
+				await updateUser({
+					...values,
+					id: user.id,
+					avatar: fileToUpload,
+				}, csrfToken);
+				router.refresh();
+				return;
+			}
+			const createdUser = await createUser({
 				...values,
 				avatar: fileToUpload, 
 			}, csrfToken);
-			router.replace('/users');
+			router.replace(`/users/edit/${ createdUser.id }`);
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
 			if (apiError.code === 'invalid-input') {
@@ -109,7 +119,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 					<CardHeader className="w-1/3">
 						<CardTitle>User informations</CardTitle>
 						<CardDescription>
-							Add user informations.
+							Manage user informations.
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
@@ -214,26 +224,33 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 						<FormField
 							control={ form.control }
 							name="role"
-							render={ ({ field }) => (
-								<FormItem>
-									<FormLabel>Role</FormLabel>
-									<Select
-										defaultValue={ field.value }
-										onValueChange={ field.onChange }
-									>
-										<FormControl>
-											<SelectTrigger>
-												<SelectValue placeholder="Select a verified email to display" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											<SelectItem value="user">User</SelectItem>
-											<SelectItem value="admin">Admin</SelectItem>
-										</SelectContent>
-									</Select>
-									<FormMessage />
-								</FormItem>
-							) }
+							render={ ({ field }) => {
+
+								const handleChange = (value: string) => {
+									field.onChange(value as UserRole);
+								};
+
+								return (
+									<FormItem>
+										<FormLabel>Role</FormLabel>
+										<Select
+											defaultValue={ field.value }
+											onValueChange={ handleChange }
+										>
+											<FormControl>
+												<SelectTrigger>
+													<SelectValue placeholder="Select a verified email to display" />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												<SelectItem value="user">User</SelectItem>
+												<SelectItem value="admin">Admin</SelectItem>
+											</SelectContent>
+										</Select>
+										<FormMessage />
+									</FormItem>
+								);
+							} }
 						/>
 					</CardContent>
 				</Card>

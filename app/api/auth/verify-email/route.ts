@@ -228,6 +228,7 @@ export const PUT = async (request: NextRequest) => {
 		const updatedUser = await updateUser({
 			id: userData.id,
 			has_email_verified: true,
+			updated_by: currentUser.id,
 		}, { newDocument: true });
 
 		return NextResponse.json(updatedUser);

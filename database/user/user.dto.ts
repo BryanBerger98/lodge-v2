@@ -26,6 +26,15 @@ export const CreateUserSchema = object({
 	is_disabled: z.enum([ 'true', 'false' ]).transform(value => value === 'true').default('false'),
 });
 
+export const UpdateUserSchema = object({
+	username: string().optional(),
+	email: string().email('Please, provide a valid email address.').optional(),
+	phone_number: string().optional(),
+	role: z.enum(UserRoles).optional(),
+	is_disabled: z.enum([ 'true', 'false' ]).transform(value => value === 'true').optional(),
+	id: string().min(1, 'Required.'),
+});
+
 export type CreateUserDTO = z.infer<typeof CreateUserSchema> & {
 	provider_data: AuthProvider,
 	created_by: Id | string;
@@ -55,4 +64,5 @@ export const UpdateUserPasswordSchema = object({
 
 export type UpdateUserDTO = Partial<IUser> & {
 	id: string | Id;
+	updated_by: Id | string;
 };

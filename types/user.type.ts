@@ -37,3 +37,7 @@ export type CreateUserDTO = {
 	is_disabled: boolean;
 	avatar?: File | Blob | null;
 };
+
+export type UpdateUserDTO = Partial<CreateUserDTO> & {
+	id: Id | string;
+}

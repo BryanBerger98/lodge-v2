@@ -132,6 +132,7 @@ export const PUT = async (request: NextRequest) => {
 		const updatedCurrentUser = await updateUser({
 			id: currentUser.id,
 			photo_key: parsedFile.key,
+			updated_by: currentUser.id,
 		}, { newDocument: true });
 
 		const photoUrl = savedFile ? await getFileFromKey(savedFile) : null;
