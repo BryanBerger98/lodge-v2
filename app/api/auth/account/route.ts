@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { ZodError } from 'zod';
 
 import { connectToDatabase } from '@/config/database.config';
@@ -8,26 +7,16 @@ import { UpdateUserAccountSchema } from '@/database/user/user.dto';
 import { findUserById, updateUser } from '@/database/user/user.repository';
 import { getFileFromKey } from '@/lib/bucket';
 import { IUser } from '@/types/user.type';
+import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
-import { INTERNAL_ERROR, INVALID_INPUT_ERROR, UNAUTHORIZED_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
-
-import { authOptions } from '../[...nextauth]/route';
+import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
 
 export const GET = async () => {
 
 	try {
 		await connectToDatabase();
 
-		const session = await getServerSession(authOptions);
-		const currentUser = session?.user;
-
-		if (!currentUser?.id) {
-			return sendError(buildError({
-				code: UNAUTHORIZED_ERROR,
-				message: 'Unauthorized.',
-				status: 401,
-			}));
-		}
+		const { user: currentUser } = await setServerAuthGuard();
 
 		const userData = await findUserById(currentUser.id);
 
@@ -78,19 +67,13 @@ export const PUT = async (request: NextRequest) => {
 			updateObject.phone_number = phone_number;
 		}
 
-		const session = await getServerSession(authOptions);
-		const currentUser = session?.user;
+		const { user: currentUser } = await setServerAuthGuard();
 
-		if (!currentUser?.id) {
-			return sendError(buildError({
-				code: UNAUTHORIZED_ERROR,
-				message: 'Unauthorized.',
-				status: 401,
-			}));
-		}
+		currentUser.id;
 
 		const updatedUser = await updateUser({
 			id: currentUser.id,
+			updated_by: currentUser.id,
 			...updateObject,
 		}, { newDocument: true });
 

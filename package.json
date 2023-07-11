@@ -46,7 +46,6 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.45.1",
     "react-phone-number-input": "^3.3.0",
-    "sharp": "^0.32.1",
     "swr": "^2.2.0",
     "tailwind-merge": "^1.13.2",
     "tailwindcss-animate": "^1.0.6",
@@ -54,6 +53,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@aws-sdk/signature-v4-crt": "^3.369.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^20.3.3",
@@ -63,6 +63,7 @@
     "@typescript-eslint/eslint-plugin": "^5.60.1",
     "@typescript-eslint/parser": "^5.60.1",
     "autoprefixer": "^10.4.14",
+    "aws-crt": "^1.15.20",
     "eslint": "^8.44.0",
     "eslint-config-next": "^13.4.7",
     "eslint-import-resolver-typescript": "^3.5.5",

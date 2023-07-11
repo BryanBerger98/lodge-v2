@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { ZodError } from 'zod';
 
 import { connectToDatabase } from '@/config/database.config';
 import { UpdateUserEmailSchema } from '@/database/user/user.dto';
 import { findUserWithPasswordById, updateUser } from '@/database/user/user.repository';
+import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
-import { INTERNAL_ERROR, INVALID_INPUT_ERROR, UNAUTHORIZED_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
+import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
 import { verifyPassword } from '@/utils/password.util';
 
-import { authOptions } from '../../[...nextauth]/route';
 
 export const PUT = async (request: NextRequest) => {
 
@@ -21,16 +20,7 @@ export const PUT = async (request: NextRequest) => {
 
 		const { email, password } = UpdateUserEmailSchema.parse(body);
 
-		const session = await getServerSession(authOptions);
-		const currentUser = session?.user;
-
-		if (!currentUser?.id) {
-			return sendError(buildError({
-				code: UNAUTHORIZED_ERROR,
-				message: 'Unauthorized.',
-				status: 401,
-			}));
-		}
+		const { user: currentUser } = await setServerAuthGuard();
 
 		const user = await findUserWithPasswordById(currentUser.id);
 

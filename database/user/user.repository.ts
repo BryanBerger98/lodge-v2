@@ -21,7 +21,7 @@ export const findUsers = async (searchRequest: FilterQuery<IUser>, options?: Que
 			.skip(options?.skip || 0)
 			.limit(options?.limit || 1000)
 			.sort(options?.sort || {})
-			.lean({ virtuals: true });
+			.lean({ virtuals: [ 'id' ] });
 		return users;
 	} catch (error) {
 		throw error;

@@ -1,29 +1,17 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { getServerSession } from 'next-auth';
 
 import { createFile, deleteFileById, findFileByKey } from '@/database/file/file.repository';
 import { findUserById, updateUser } from '@/database/user/user.repository';
 import { deleteFileFromKey, getFileFromKey, uploadImageToS3 } from '@/lib/bucket';
+import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
-import { FILE_NOT_FOUND_ERROR, FILE_TOO_LARGE_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, UNAUTHORIZED_ERROR, USER_NOT_FOUND_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
+import { FILE_NOT_FOUND_ERROR, FILE_TOO_LARGE_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
 import { AUTHORIZED_IMAGE_MIME_TYPES, AUTHORIZED_IMAGE_SIZE, convertFileRequestObjetToModel } from '@/utils/file.util';
-
-import { authOptions } from '../../[...nextauth]/route';
-
 
 export const GET = async () => {
 
 	try {
-		const session = await getServerSession(authOptions);
-		const currentUser = session?.user;
-	
-		if (!currentUser?.id) {
-			return sendError(buildError({
-				code: UNAUTHORIZED_ERROR,
-				message: 'Unauthorized.',
-				status: 401,
-			}));
-		}
+		const { user: currentUser } = await setServerAuthGuard();
 
 		const currentUserData = await findUserById(currentUser.id);
 
@@ -90,16 +78,7 @@ export const PUT = async (request: NextRequest) => {
 			}));
 		}
 
-		const session = await getServerSession(authOptions);
-		const currentUser = session?.user;
-	
-		if (!currentUser?.id) {
-			return sendError(buildError({
-				code: UNAUTHORIZED_ERROR,
-				message: 'Unauthorized.',
-				status: 401,
-			}));
-		}
+		const { user: currentUser } = await setServerAuthGuard();
 
 		const currentUserData = await findUserById(currentUser.id);
 

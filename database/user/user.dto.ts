@@ -62,7 +62,12 @@ export const UpdateUserPasswordSchema = object({
 	newPassword: string().min(1, 'Required.'),
 });
 
-export type UpdateUserDTO = Partial<IUser> & {
+// export type UpdateUserDTO = Partial<IUser> & {
+// 	id: string | Id;
+// 	updated_by: Id | string;
+// };
+
+export interface UpdateUserDTO extends Partial<IUser> {
 	id: string | Id;
-	updated_by: Id | string;
-};
+	updated_by: Id | string | null;
+}

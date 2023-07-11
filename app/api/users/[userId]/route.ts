@@ -1,15 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 
 import { connectToDatabase } from '@/config/database.config';
 import { deleteFileById, findFileByKey } from '@/database/file/file.repository';
 import { deleteUserById, findUserById } from '@/database/user/user.repository';
 import { deleteFileFromKey } from '@/lib/bucket';
+import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
-import { INTERNAL_ERROR, INVALID_INPUT_ERROR, UNAUTHORIZED_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
-
-import { authOptions } from '../../auth/[...nextauth]/route';
-
+import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
 
 export const DELETE = async (_: any, { params }: { params: { userId: string } }) => {
 	try {
@@ -26,16 +23,7 @@ export const DELETE = async (_: any, { params }: { params: { userId: string } })
 
 		await connectToDatabase();
 
-		const session = await getServerSession(authOptions);
-		const currentUser = session?.user;
-
-		if (!currentUser?.id) {
-			return sendError(buildError({
-				code: UNAUTHORIZED_ERROR,
-				message: 'Unauthorized.',
-				status: 401,
-			}));
-		}
+		await setServerAuthGuard({ rolesWhiteList: [ 'admin' ] });
 
 		const userData = await findUserById(userId);
 

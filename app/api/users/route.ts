@@ -1,7 +1,6 @@
 import { parse } from 'url';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { ZodError } from 'zod';
 
 import { connectToDatabase } from '@/config/database.config';
@@ -10,12 +9,11 @@ import { CreateUserSchema, FetchUsersSchema, UpdateUserSchema } from '@/database
 import { createUser, findUserByEmail, findUserById, findUsers, findUsersCount, updateUser } from '@/database/user/user.repository';
 import { deleteFileFromKey, getFileFromKey, uploadImageToS3 } from '@/lib/bucket';
 import { IUser } from '@/types/user.type';
+import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
-import { FILE_TOO_LARGE_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, UNAUTHORIZED_ERROR, USER_ALREADY_EXISTS_ERROR, USER_NOT_FOUND_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
+import { FILE_TOO_LARGE_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_ALREADY_EXISTS_ERROR, USER_NOT_FOUND_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
 import { AUTHORIZED_IMAGE_MIME_TYPES, AUTHORIZED_IMAGE_SIZE, convertFileRequestObjetToModel } from '@/utils/file.util';
 import { generatePassword, hashPassword } from '@/utils/password.util';
-
-import { authOptions } from '../auth/[...nextauth]/route';
 
 const uploadPhotoFile = async (currentUser: IUser, photoFile?: Blob | null, user?: IUser) => {
 	try {
@@ -74,16 +72,7 @@ export const POST = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		const session = await getServerSession(authOptions);
-		const currentUser = session?.user;
-
-		if (!currentUser?.id) {
-			return sendError(buildError({
-				code: UNAUTHORIZED_ERROR,
-				message: 'Unauthorized.',
-				status: 401,
-			}));
-		}
+		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'admin' ] });
 
 		const formData = await request.formData();
 
@@ -150,16 +139,7 @@ export const PUT = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		const session = await getServerSession(authOptions);
-		const currentUser = session?.user;
-
-		if (!currentUser?.id) {
-			return sendError(buildError({
-				code: UNAUTHORIZED_ERROR,
-				message: 'Unauthorized.',
-				status: 401,
-			}));
-		}
+		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'admin' ] });
 
 		const formData = await request.formData();
 
@@ -231,16 +211,7 @@ export const GET = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		const session = await getServerSession(authOptions);
-		const currentUser = session?.user;
-
-		if (!currentUser?.id) {
-			return sendError(buildError({
-				code: UNAUTHORIZED_ERROR,
-				message: 'Unauthorized.',
-				status: 401,
-			}));
-		}
+		await setServerAuthGuard({ rolesWhiteList: [ 'admin' ] });
 
 		const queryParams = parse(request.url, true).query;
 		const { sort_fields, sort_directions, skip, limit, search } = FetchUsersSchema.parse(queryParams);

@@ -7,6 +7,7 @@ export const TOKEN_NOT_FOUND_ERROR = 'token-not-found';
 export const TOKEN_ALREADY_SENT_ERROR = 'token-already-sent';
 export const INVALID_TOKEN_ERROR = 'invalid-token';
 export const UNAUTHORIZED_ERROR = 'unauthorized';
+export const FORBIDDEN_ERROR = 'forbidden';
 export const EMAIL_ALREADY_VERIFIED_ERROR = 'email-already-verified';
 export const INVALID_INPUT_ERROR = 'invalid-input';
 export const PASSWORD_REQUIRED_ERROR = 'password-required';
