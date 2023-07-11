@@ -4,10 +4,10 @@ import { Id } from '@/config/database.config';
 import { AuthProvider, IUser, UserRoles } from '@/types/user.type';
 
 export const FetchUsersSchema = object({
-	sort_fields: z.coerce.string().transform(value => value.split(',')).optional().default('created_at'),
-	sort_directions: z.coerce.string().transform(value => value.split(',').map(v => Number(v))).refine(value => value.every(v => v === 1 || v === -1)).optional().default('-1'),
-	limit: z.coerce.number().optional().default(10),
-	skip: z.coerce.number().optional().default(0),
+	sort_fields: z.coerce.string().optional().transform(value => value ? value.split(',') : [ 'created_at' ]),
+	sort_directions: z.coerce.string().optional().default('-1').transform(value => value.split(',').map(v => v ? Number(v) : -1)).refine(value => value.every(v => v === 1 || v === -1)),
+	page_size: z.coerce.number().optional().default(10),
+	page_index: z.coerce.number().optional().default(0),
 	search: z.coerce.string().optional(),
 });
 

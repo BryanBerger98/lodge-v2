@@ -8,35 +8,59 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { connectToDatabase } from '@/config/database.config';
 import UsersProvider from '@/context/users';
+import { FetchUsersSchema } from '@/database/user/user.dto';
 import { findUsers, findUsersCount } from '@/database/user/user.repository';
 import { getCsrfToken } from '@/utils/csrf.util';
 
 import Providers from './_components/Providers';
 
-
 const DynamicUsersDataTable = dynamic(() => import('./_components/UsersDataTable'));
 
-const UsersPage = async () => {
+type UsersPageProps = {
+	searchParams?: { [key: string]: string | string[] | undefined };
+}
+
+const UsersPage = async ({ searchParams }: UsersPageProps) => {
 
 	const csrfToken = await getCsrfToken(headers());
 
 	await connectToDatabase();
 
-	const users = await findUsers({}, {
-		sort: { 'created_at': -1 },
-		limit: 10, 
+	const { sort_fields, sort_directions, page_index, page_size, search } = FetchUsersSchema.parse(searchParams);
+
+	const searchArray = search ? search.trim().split(' ') : [];
+	const searchRegexArray = searchArray.map(string => new RegExp(string, 'i'));
+	const searchRequest = searchRegexArray.length > 0 ? { $or: [ { username: { $in: searchRegexArray } }, { email: { $in: searchRegexArray } } ] } : {};
+
+	const users = await findUsers(searchRequest, {
+		sort: Object.fromEntries(sort_fields.map((field, index) => [ field, sort_directions[ index ] as 1 | -1 ])),
+		skip: Math.round(page_index * page_size),
+		limit: page_size,
 	});
-	const totalUsers = await findUsersCount({});
-	const disabledUsersCount = await findUsersCount({ is_disabled: true });
-	const verifiedUsersCount = await findUsersCount({ has_email_verified: true });
-	const unverifiedUsersCount = await findUsersCount({ has_email_verified: false });
+	
+	const totalUsers = await findUsersCount(searchRequest);
+	const disabledUsersCount = await findUsersCount({
+		...searchRequest,
+		is_disabled: true, 
+	});
+	const verifiedUsersCount = await findUsersCount({
+		...searchRequest,
+		has_email_verified: true, 
+	});
+	const unverifiedUsersCount = await findUsersCount({
+		...searchRequest,
+		has_email_verified: false, 
+	});
 	const parsedUsers = JSON.parse(JSON.stringify(users));
 
 	return (
 		<>
 			<PageTitle><Users /> Users</PageTitle>
 			<Providers>
-				<UsersProvider users={ users }>
+				<UsersProvider
+					total={ totalUsers }
+					users={ parsedUsers }
+				>
 					<div className="container">
 						<div className="grid grid-cols-4 gap-4 mb-8">
 							<Card>
@@ -85,8 +109,6 @@ const UsersPage = async () => {
 							<CardContent>
 								<DynamicUsersDataTable
 									csrfToken={ csrfToken }
-									total={ totalUsers }
-									users={ parsedUsers }
 								/>
 							</CardContent>
 						</Card>

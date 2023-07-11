@@ -1,57 +1,84 @@
 'use client';
 
-import { createContext, ReactNode, useCallback, useMemo, useState } from 'react';
+import { createContext, ReactNode, useCallback, useMemo, useReducer } from 'react';
 
-import { Id } from '@/config/database.config';
-import { IUser } from '@/types/user.type';
+import { LoadingStateError, LoadingState } from '@/types/loading.type';
+import { IUpdateUser, IUser } from '@/types/user.type';
 
-type UsersContextValues = {
-	users: IUser[];
-	total: number;
-	dispatchUsers: (users: IUser[]) => void;
-	updateUser: (userToUpdate: Partial<IUser> & { id: Id | string }) => void;
+import { SetUsersStatePayload, USERS_ERROR_ACTION, USERS_IDLE_ACTION, USERS_PENDING_ACTION, USERS_SET_STATE_ACTION, USERS_UPDATE_ACTION } from './users.actions';
+import usersReducer, { UsersState } from './users.reducer';
+
+type UsersContextValues = UsersState & {
+	setUsersState: (newState: SetUsersStatePayload) => void;
+	updateUsers: (...userToUpdate: IUpdateUser[]) => void;
+	setLoadingState: <T extends LoadingState, E extends LoadingStateError<T>>(loading: T, ...error: E) => void;
 }
 
 const UsersContext = createContext<UsersContextValues | null>(null);
 export { UsersContext };
 
+const INITIAL_STATE: UsersState = {
+	users: [],
+	total: 0,
+	loading: 'idle',
+};
+
 
 type UsersProviderProps = {
 	children: ReactNode;
-	users: IUser[],
+	users?: IUser[],
+	total?: number,
 }
 
-const UsersProvider = ({ users: initialUsersState, children }: UsersProviderProps) => {
+const UsersProvider = ({ users: initialUsersState = [], total = 0, children }: UsersProviderProps) => {
 
-	const [ users, setUsers ] = useState<IUser[]>(initialUsersState);
-	const [ total, setTotal ] = useState<number>(0);
+	const [ state, dispatch ] = useReducer(usersReducer, {
+		...INITIAL_STATE,
+		total,
+		users: initialUsersState, 
+	});
 
-	const dispatchUsers = useCallback((users: IUser[]) => {
-		setUsers(users);
+	const updateUsers = useCallback((...usersToUpdate: IUpdateUser[]) => {
+		dispatch({
+			type: USERS_UPDATE_ACTION,
+			payload: usersToUpdate,
+		});
 	}, []);
 
-	const updateUser = useCallback((userToUpdate: Partial<IUser> & { id: Id | string }) => {
-		setUsers(prevUsers => prevUsers.map(user => {
-			if (user.id === userToUpdate.id) {
-				return {
-					...user,
-					...userToUpdate,
-				};
-			}
-			return user;
-		}));
+	const setUsersState = useCallback((newState: SetUsersStatePayload) => {
+		dispatch({
+			type: USERS_SET_STATE_ACTION,
+			payload: newState,
+		});
+	}, []);
+
+	const setLoadingState = useCallback(<T extends LoadingState>(loading: T, ...error: LoadingStateError<T>) => {
+		switch (loading) {
+			case 'pending':
+				dispatch({ type: USERS_PENDING_ACTION });
+				break;
+			case 'error':
+				dispatch({
+					type: USERS_ERROR_ACTION,
+					payload: error[ 0 ] as string,
+				});
+				break;
+			default:
+				dispatch({ type: USERS_IDLE_ACTION });
+				break;
+		}
 	}, []);
 
 	const contextValues = useMemo(() => ({
-		dispatchUsers,
-		users,
-		total,
-		updateUser,
+		...state,
+		setUsersState,
+		updateUsers,
+		setLoadingState,
 	}), [
-		total,
-		users,
-		dispatchUsers,
-		updateUser,
+		state,
+		setUsersState,
+		updateUsers,
+		setLoadingState,
 	]);
 
 	return(
