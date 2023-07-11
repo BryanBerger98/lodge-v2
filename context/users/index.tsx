@@ -1,7 +1,9 @@
 'use client';
 
-import { createContext, ReactNode, useCallback, useMemo, useReducer } from 'react';
+import { createContext, ReactNode, useCallback, useEffect, useMemo, useReducer } from 'react';
+import { KeyedMutator } from 'swr';
 
+import useFetchUsers, { FetchUsersResponse } from '@/hooks/users/useFetchUsers';
 import { LoadingStateError, LoadingState } from '@/types/loading.type';
 import { IUpdateUser, IUser } from '@/types/user.type';
 
@@ -12,6 +14,14 @@ type UsersContextValues = UsersState & {
 	setUsersState: (newState: SetUsersStatePayload) => void;
 	updateUsers: (...userToUpdate: IUpdateUser[]) => void;
 	setLoadingState: <T extends LoadingState, E extends LoadingStateError<T>>(loading: T, ...error: E) => void;
+	refetchUsers: KeyedMutator<FetchUsersResponse>;
+	routeParams: {
+		sortFields: string | null;
+		sortDirections: string | null;
+		pageIndex: string | null;
+		pageSize: string | null;
+		search: string | null;
+	};
 }
 
 const UsersContext = createContext<UsersContextValues | null>(null);
@@ -37,6 +47,8 @@ const UsersProvider = ({ users: initialUsersState = [], total = 0, children }: U
 		total,
 		users: initialUsersState, 
 	});
+
+	const { refetch, routeParams, data, isLoading, error } = useFetchUsers();
 
 	const updateUsers = useCallback((...usersToUpdate: IUpdateUser[]) => {
 		dispatch({
@@ -69,16 +81,38 @@ const UsersProvider = ({ users: initialUsersState = [], total = 0, children }: U
 		}
 	}, []);
 
+	useEffect(() => {
+		if (isLoading) {
+			setLoadingState('pending');
+		}
+		if (error) {
+			console.error(error);
+			setLoadingState('error', error.message);
+		}
+		if (data) {
+			setUsersState({
+				users: data.users,
+				total: data.total,
+			});
+			setLoadingState('idle');
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ isLoading, error, data ]);
+
 	const contextValues = useMemo(() => ({
 		...state,
 		setUsersState,
 		updateUsers,
 		setLoadingState,
+		refetchUsers: refetch,
+		routeParams,
 	}), [
 		state,
 		setUsersState,
 		updateUsers,
 		setLoadingState,
+		refetch,
+		routeParams,
 	]);
 
 	return(

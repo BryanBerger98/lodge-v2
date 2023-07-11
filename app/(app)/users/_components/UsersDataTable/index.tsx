@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 import DataTable from '@/components/ui/data-table';
 import useCsrf from '@/context/csrf/useCsrf';
 import useUsers from '@/context/users/useUsers';
-import useFetchUsers from '@/hooks/users/useFetchUsers';
 import useUpdateEffect from '@/hooks/utils/useUpdateEffect';
 import { getSortingFromURLParams } from '@/utils/table.utils';
 
@@ -20,8 +19,7 @@ type UsersDataTableProps = {
 const UsersDataTable = ({ csrfToken }: UsersDataTableProps) => {
 
 	const { dispatchCsrfToken } = useCsrf();
-	const { users, total } = useUsers();
-	const { routeParams } = useFetchUsers();
+	const { users, total, routeParams } = useUsers();
 
 	const router = useRouter();
 

@@ -1,11 +1,11 @@
 import { ChevronLeft, User } from 'lucide-react';
 import { headers } from 'next/headers';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import PageTitle from '@/components/layout/PageTitle';
-import { Button } from '@/components/ui/button';
+import BackButton from '@/components/ui/Button/BackButton';
 import { Id } from '@/config/database.config';
+import UsersProvider from '@/context/users';
 import { findFileByKey } from '@/database/file/file.repository';
 import { findUserById } from '@/database/user/user.repository';
 import { getFileFromKey } from '@/lib/bucket';
@@ -43,23 +43,19 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
 	return (
 		<>
 			<PageTitle><User /> Edit user</PageTitle>
-			<Button
-				className="gap-2 items-center mb-4"
-				variant="outline"
-				asChild
-			>
-				<Link href="/users">
-					<ChevronLeft /> Back
-				</Link>
-			</Button>
-			<div className="grid grid-cols-3">
-				<div className="col-span-2 flex flex-col gap-8">
-					<EditUserForm
-						csrfToken={ csrfToken }
-						user={ userData }
-					/>
+			<BackButton>
+				<ChevronLeft /> Back
+			</BackButton>
+			<UsersProvider>
+				<div className="grid grid-cols-3">
+					<div className="col-span-2 flex flex-col gap-8">
+						<EditUserForm
+							csrfToken={ csrfToken }
+							user={ userData }
+						/>
+					</div>
 				</div>
-			</div>
+			</UsersProvider>
 		</>
 	);
 };

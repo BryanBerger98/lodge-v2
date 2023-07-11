@@ -31,16 +31,3 @@ export interface IUserWithPassword extends IUser {
 export interface IUpdateUser extends Partial<IUser> {
 	id: Id | string;
 }
-
-export type CreateUserDTO = {
-	username: string;
-	email: string;
-	phone_number: string;
-	role: UserRole;
-	is_disabled: boolean;
-	avatar?: File | Blob | null;
-};
-
-export type UpdateUserDTO = Partial<CreateUserDTO> & {
-	id: Id | string;
-}

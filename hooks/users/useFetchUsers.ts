@@ -1,20 +1,16 @@
 import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
 import useSWR from 'swr';
 
-import useUsers from '@/context/users/useUsers';
 import { IUser } from '@/types/user.type';
 import fetcher from '@/utils/fetcher.util';
 
-type FetchUsersResponse = {
+export type FetchUsersResponse = {
 	users: IUser[],
 	count: number,
 	total: number,
 };
 
 const useFetchUsers = () => {
-
-	const { setUsersState, setLoadingState } = useUsers();
 
 	const searchParams = useSearchParams();
 	const sortFields = searchParams.get('sort_fields');
@@ -29,26 +25,6 @@ const useFetchUsers = () => {
 	const queryString = `?sort_fields=${ sortFields || '' }&sort_directions=${ sortDirections || '' }&page_size=${ formattedPageSize }&page_index=${ formattedPageIndex }&search=${ search || '' }`;
 
 	const { data, error, isLoading, mutate } = useSWR<FetchUsersResponse>(`/api/users${ queryString }`, fetcher);
-
-	console.log('FETCH USERS', data);
-
-	useEffect(() => {
-		if (isLoading) {
-			setLoadingState('pending');
-		}
-		if (error) {
-			console.error(error);
-			setLoadingState('error', error.message);
-		}
-		if (data) {
-			setUsersState({
-				users: data.users,
-				total: data.total,
-			});
-			setLoadingState('idle');
-		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ isLoading, error, data ]);
 
 	return {
 		data,

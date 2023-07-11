@@ -1,9 +1,18 @@
 import { SortingState } from '@tanstack/react-table';
 
 import { Id } from '@/config/database.config';
-import { CreateUserDTO, IUser, UpdateUserDTO } from '@/types/user.type';
+import { IUser, UserRole } from '@/types/user.type';
 import fetcher, { FetcherOptions } from '@/utils/fetcher.util';
 import { objectToFormData } from '@/utils/object.utils';
+
+export type CreateUserDTO = {
+	username: string;
+	email: string;
+	phone_number: string;
+	role: UserRole;
+	is_disabled: boolean;
+	avatar?: File | Blob | null;
+};
 
 export const createUser = async (userToCreate: CreateUserDTO, csrfToken: string, options?: FetcherOptions): Promise<IUser> => {
 	try {
@@ -27,6 +36,10 @@ export const createUser = async (userToCreate: CreateUserDTO, csrfToken: string,
 		throw error;
 	}
 };
+
+type UpdateUserDTO = Partial<CreateUserDTO> & {
+	id: Id | string;
+}
 
 export const updateUser = async (userToUpdate: UpdateUserDTO, csrfToken: string, options?: FetcherOptions): Promise<IUser> => {
 	try {
