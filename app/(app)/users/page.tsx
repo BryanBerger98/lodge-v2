@@ -7,6 +7,7 @@ import PageTitle from '@/components/layout/PageTitle';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { connectToDatabase } from '@/config/database.config';
+import UsersProvider from '@/context/users';
 import { findUsers, findUsersCount } from '@/database/user/user.repository';
 import { getCsrfToken } from '@/utils/csrf.util';
 
@@ -26,40 +27,71 @@ const UsersPage = async () => {
 		limit: 10, 
 	});
 	const totalUsers = await findUsersCount({});
+	const disabledUsersCount = await findUsersCount({ is_disabled: true });
+	const verifiedUsersCount = await findUsersCount({ has_email_verified: true });
+	const unverifiedUsersCount = await findUsersCount({ has_email_verified: false });
 	const parsedUsers = JSON.parse(JSON.stringify(users));
 
 	return (
 		<>
 			<PageTitle><Users /> Users</PageTitle>
 			<Providers>
-				<div className="container">
-					<Card>
-						<CardHeader className="flex-row justify-between items-start">
-							<div>
-								<CardTitle>Manage users</CardTitle>
-								<CardDescription>
-									Manage users accounts, permissions and roles.
-								</CardDescription>
-							</div>
-							<Button
-								className="gap-2 items-center"
-								asChild
-							>
-								<Link href="/users/create">
-									<UserPlus size="16" />
-									Create user
-								</Link>
-							</Button>
-						</CardHeader>
-						<CardContent>
-							<DynamicUsersDataTable
-								csrfToken={ csrfToken }
-								total={ totalUsers }
-								users={ parsedUsers }
-							/>
-						</CardContent>
-					</Card>
-				</div>
+				<UsersProvider users={ users }>
+					<div className="container">
+						<div className="grid grid-cols-4 gap-4 mb-8">
+							<Card>
+								<CardHeader>
+									<CardTitle>{ totalUsers }</CardTitle>
+									<CardDescription>Registered user{ totalUsers > 1 ? 's' : '' }</CardDescription>
+								</CardHeader>
+							</Card>
+							<Card>
+								<CardHeader>
+									<CardTitle>{ verifiedUsersCount }</CardTitle>
+									<CardDescription>Verified user{ verifiedUsersCount > 1 ? 's' : '' }</CardDescription>
+								</CardHeader>
+							</Card>
+							<Card>
+								<CardHeader>
+									<CardTitle>{ unverifiedUsersCount }</CardTitle>
+									<CardDescription>Unverified user{ unverifiedUsersCount > 1 ? 's' : '' }</CardDescription>
+								</CardHeader>
+							</Card>
+							<Card>
+								<CardHeader>
+									<CardTitle>{ disabledUsersCount }</CardTitle>
+									<CardDescription>Disabled user{ disabledUsersCount > 1 ? 's' : '' }</CardDescription>
+								</CardHeader>
+							</Card>
+						</div>
+						<Card>
+							<CardHeader className="flex-row justify-between items-start">
+								<div>
+									<CardTitle>Manage users</CardTitle>
+									<CardDescription>
+										Manage users accounts, permissions and roles.
+									</CardDescription>
+								</div>
+								<Button
+									className="gap-2 items-center"
+									asChild
+								>
+									<Link href="/users/create">
+										<UserPlus size="16" />
+										Create user
+									</Link>
+								</Button>
+							</CardHeader>
+							<CardContent>
+								<DynamicUsersDataTable
+									csrfToken={ csrfToken }
+									total={ totalUsers }
+									users={ parsedUsers }
+								/>
+							</CardContent>
+						</Card>
+					</div>
+				</UsersProvider>
 			</Providers>
 		</>
 	);

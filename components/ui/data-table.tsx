@@ -14,12 +14,13 @@ interface DataTableProps<TData, TValue> extends Omit<TableOptions<TData>, 'getCo
 	columns: ColumnDef<TData, TValue>[]
 	data: TData[]
 	withSearch?: boolean;
+	total?: number;
 	onSearch?: (value: string) => void;
 	searchPlaceholder?: string;
 	withCustomColumns?: boolean;
 }
 
-const DataTable = <TData, TValue>({ columns, data, withSearch = false, onSearch: handleSearch, searchPlaceholder, withCustomColumns = false, ...options }: DataTableProps<TData, TValue>) => {
+const DataTable = <TData, TValue>({ columns, data, withSearch = false, total = 0, onSearch: handleSearch, searchPlaceholder, withCustomColumns = false, ...options }: DataTableProps<TData, TValue>) => {
 
 	const table = useReactTable({
 		data,
@@ -122,23 +123,32 @@ const DataTable = <TData, TValue>({ columns, data, withSearch = false, onSearch:
 					) }
 				</TableBody>
 			</Table>
-			<div className="flex items-center justify-end space-x-2 py-4">
-				<Button
-					disabled={ !table.getCanPreviousPage() }
-					size="sm"
-					variant="outline"
-					onClick={ () => table.previousPage() }
-				>
-					Previous
-				</Button>
-				<Button
-					disabled={ !table.getCanNextPage() }
-					size="sm"
-					variant="outline"
-					onClick={ () => table.nextPage() }
-				>
-					Next
-				</Button>
+			<div className="flex items-center justify-between space-x-2 py-4">
+				{
+					total ?
+						<div className="px-4 text-base">
+							{ total } Entit{ total > 1 ? 'ies' : 'y' } 
+						</div>
+						: null
+				}
+				<div className="flex space-x-2 items-center">
+					<Button
+						disabled={ !table.getCanPreviousPage() }
+						size="sm"
+						variant="outline"
+						onClick={ () => table.previousPage() }
+					>
+						Previous
+					</Button>
+					<Button
+						disabled={ !table.getCanNextPage() }
+						size="sm"
+						variant="outline"
+						onClick={ () => table.nextPage() }
+					>
+						Next
+					</Button>
+				</div>
 			</div>
 		</>
 	);

@@ -3,14 +3,14 @@ type ConvertibleObject = Record<string, string | boolean | number | Blob | File 
 export const objectToFormData = (objectToConvert: ConvertibleObject) => {
 	const formData = new FormData();
 	for (const [ key, value ] of Object.entries(objectToConvert)) {
-		if (value) {
+		if (value !== undefined && value !== null) {
 			let parsedValue = value;
 			switch (typeof value) {
 				case 'number':
-					parsedValue = value.toString();					
+					parsedValue = value.toString();
 					break;
 				case 'boolean':
-					parsedValue = value.toString();					
+					parsedValue = value.toString();
 					break;
 				default:
 					parsedValue = value;

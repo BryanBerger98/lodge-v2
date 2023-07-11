@@ -177,7 +177,7 @@ export const PUT = async (request: NextRequest) => {
 			username: username || userData.username,
 			role: role || userData.role,
 			phone_number: phone_number || userData.phone_number,
-			is_disabled: is_disabled || userData.is_disabled,
+			is_disabled: is_disabled !== undefined && is_disabled !== null ? is_disabled : userData.is_disabled,
 			photo_key: photoFileData.photo_key || userData.photo_key,
 			updated_by: currentUser.id,
 		});
