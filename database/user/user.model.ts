@@ -64,6 +64,7 @@ const userSchema = new Schema<IUserWithPassword>({
 	id: false,
 });
 
+// eslint-disable-next-line func-names
 userSchema.virtual('id').get(function () {
 	return this._id.toHexString();
 });

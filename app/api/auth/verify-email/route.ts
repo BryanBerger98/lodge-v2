@@ -1,33 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 
 import { connectToDatabase } from '@/config/database.config';
 import { createToken, deleteTokenById, getTokenFromCreatedBy, getTokenFromTokenString } from '@/database/token/token.repository';
 import { findUserByEmail, findUserById, updateUser } from '@/database/user/user.repository';
 import { IToken } from '@/types/token.type';
 import { Optional } from '@/types/utils.type';
+import { setServerAuthGuard } from '@/utils/auth';
 import { sendAccountVerificationEmail } from '@/utils/email';
 import { buildError, sendError } from '@/utils/error';
-import { EMAIL_ALREADY_VERIFIED_ERROR, INTERNAL_ERROR, INVALID_TOKEN_ERROR, TOKEN_ALREADY_SENT_ERROR, TOKEN_EXPIRED_ERROR, TOKEN_NOT_FOUND_ERROR, UNAUTHORIZED_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
+import { EMAIL_ALREADY_VERIFIED_ERROR, INTERNAL_ERROR, INVALID_TOKEN_ERROR, TOKEN_ALREADY_SENT_ERROR, TOKEN_EXPIRED_ERROR, TOKEN_NOT_FOUND_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
 import { generateToken, verifyToken } from '@/utils/token.util';
-
-import { authOptions } from '../[...nextauth]/route';
 
 export const GET = async () => {
 
 	try {
 		await connectToDatabase();
 
-		const session = await getServerSession(authOptions);
-		const currentUser = session?.user;
-
-		if (!currentUser?.id) {
-			return sendError(buildError({
-				code: UNAUTHORIZED_ERROR,
-				message: 'Unauthorized.',
-				status: 401,
-			}));
-		}
+		const { user: currentUser } = await setServerAuthGuard();
 
 		const userData = await findUserById(currentUser.id);
 
@@ -78,16 +67,7 @@ export const POST = async () => {
 	try {
 		await connectToDatabase();
 
-		const session = await getServerSession(authOptions);
-		const currentUser = session?.user;
-
-		if (!currentUser?.id) {
-			return sendError(buildError({
-				code: UNAUTHORIZED_ERROR,
-				message: 'Unauthorized.',
-				status: 401,
-			}));
-		}
+		const { user: currentUser } = await setServerAuthGuard();
 
 		const userData = await findUserById(currentUser.id);
 
@@ -164,16 +144,7 @@ export const PUT = async (request: NextRequest) => {
 			}));
 		}
 
-		const session = await getServerSession(authOptions);
-		const currentUser = session?.user;
-
-		if (!currentUser) {
-			return sendError(buildError({
-				code: UNAUTHORIZED_ERROR,
-				message: 'Unauthorized.',
-				status: 401,
-			}));
-		}
+		const { user: currentUser } = await setServerAuthGuard();
 
 		const savedToken = await getTokenFromTokenString(token);
 

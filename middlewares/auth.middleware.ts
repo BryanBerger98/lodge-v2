@@ -19,7 +19,7 @@ export const authMiddleware: MiddlewareFactory = (next) => {
 				req: request,
 				secret: process.env.JWT_SECRET, 
 			});
-			
+
 			if (!tokenData) {
 				return NextResponse.redirect(new URL('/signin', request.url));
 			}

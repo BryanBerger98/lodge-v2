@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { ZodError, object, string } from 'zod';
 
 import { connectToDatabase } from '@/config/database.config';
 import { deleteFileById, findFileByKey } from '@/database/file/file.repository';
 import { deleteUserById, findUserWithPasswordById } from '@/database/user/user.repository';
 import { deleteFileFromKey } from '@/lib/bucket';
+import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
-import { INTERNAL_ERROR, PASSWORD_REQUIRED_ERROR, UNAUTHORIZED_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
+import { INTERNAL_ERROR, PASSWORD_REQUIRED_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
 import { verifyPassword } from '@/utils/password.util';
-
-import { authOptions } from '../../[...nextauth]/route';
 
 
 export const POST = async (request: NextRequest) => {
@@ -23,16 +21,7 @@ export const POST = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		const session = await getServerSession(authOptions);
-		const currentUser = session?.user;
-
-		if (!currentUser?.id) {
-			return sendError(buildError({
-				code: UNAUTHORIZED_ERROR,
-				message: 'Unauthorized.',
-				status: 401,
-			}));
-		}
+		const { user: currentUser } = await setServerAuthGuard();
 
 		const userData = await findUserWithPasswordById(currentUser.id);
 

@@ -26,6 +26,7 @@ const UsersPage = async () => {
 		limit: 10, 
 	});
 	const totalUsers = await findUsersCount({});
+	const parsedUsers = JSON.parse(JSON.stringify(users));
 
 	return (
 		<>
@@ -54,7 +55,7 @@ const UsersPage = async () => {
 							<DynamicUsersDataTable
 								csrfToken={ csrfToken }
 								total={ totalUsers }
-								users={ users }
+								users={ parsedUsers }
 							/>
 						</CardContent>
 					</Card>
