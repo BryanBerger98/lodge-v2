@@ -24,7 +24,7 @@ export const setServerAuthGuard = async (options?: ProtectionOptions) => {
 		redirect: false, 
 	};
 
-	if (!session && !currentUser?.id) {
+	if (!session || !currentUser?.id) {
 		if (redirect) {
 			return nextRedirect(typeof redirect === 'boolean' ? '/' : redirect);
 		}

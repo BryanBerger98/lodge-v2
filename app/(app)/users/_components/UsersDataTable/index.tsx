@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 
 import DataTable from '@/components/ui/data-table';
 import useCsrf from '@/context/csrf/useCsrf';
+import useUsers from '@/context/users/useUsers';
 import useUpdateEffect from '@/hooks/utils/useUpdateEffect';
 import { fetchUsers } from '@/services/users.service';
 import { IUser } from '@/types/user.type';
@@ -17,11 +18,12 @@ type UsersDataTableProps = {
 	csrfToken: string;
 };
 
-const UsersDataTable = ({ users, total, csrfToken }: UsersDataTableProps) => {
+const UsersDataTable = ({ total, csrfToken }: UsersDataTableProps) => {
 
 	const { dispatchCsrfToken } = useCsrf();
+	const { users, dispatchUsers } = useUsers();
 
-	const [ usersList, setUsersList ] = useState<IUser[]>(users);
+	// const [ usersList, setUsersList ] = useState<IUser[]>(users);
 	const [ usersTotal, setUsersTotal ] = useState<number>(total);
 
 	const [ sorting, setSorting ] = useState<SortingState>([]);
@@ -49,7 +51,7 @@ const UsersDataTable = ({ users, total, csrfToken }: UsersDataTableProps) => {
 		})
 			.then(({ total, users }) => {
 				setUsersTotal(total);
-				setUsersList(users);
+				dispatchUsers(users);
 			})
 			.catch(console.error);
 	}, [ sorting, pagination, searchValue ]);
@@ -60,13 +62,14 @@ const UsersDataTable = ({ users, total, csrfToken }: UsersDataTableProps) => {
 		<div>
 			<DataTable
 				columns={ columns }
-				data={ usersList }
+				data={ users }
 				pageCount={ usersTotal / pagination.pageSize }
 				searchPlaceholder="Search users..."
 				state={ {
 					sorting,
 					pagination,
 				} }
+				total={ usersTotal }
 				manualPagination
 				manualSorting
 				withCustomColumns
