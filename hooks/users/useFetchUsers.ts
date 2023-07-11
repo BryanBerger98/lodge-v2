@@ -30,6 +30,8 @@ const useFetchUsers = () => {
 
 	const { data, error, isLoading, mutate } = useSWR<FetchUsersResponse>(`/api/users${ queryString }`, fetcher);
 
+	console.log('FETCH USERS', data);
+
 	useEffect(() => {
 		if (isLoading) {
 			setLoadingState('pending');

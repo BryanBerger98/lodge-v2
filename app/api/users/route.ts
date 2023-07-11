@@ -215,6 +215,8 @@ export const GET = async (request: NextRequest) => {
 
 		const queryParams = parse(request.url, true).query;
 
+		console.log('FETCH ROUTE >>>', queryParams);
+
 		const { sort_fields, sort_directions, page_index, page_size, search } = FetchUsersSchema.parse(queryParams);
 
 		const searchArray = search ? search.trim().split(' ') : [];

@@ -18,9 +18,10 @@ interface DataTableProps<TData, TValue> extends Omit<TableOptions<TData>, 'getCo
 	onSearch?: (value: string) => void;
 	searchPlaceholder?: string;
 	withCustomColumns?: boolean;
+	defaultSearchValue?: string;
 }
 
-const DataTable = <TData, TValue>({ columns, data, withSearch = false, total = 0, onSearch: handleSearch, searchPlaceholder, withCustomColumns = false, ...options }: DataTableProps<TData, TValue>) => {
+const DataTable = <TData, TValue>({ columns, data, withSearch = false, defaultSearchValue = '', total = 0, onSearch: handleSearch, searchPlaceholder, withCustomColumns = false, ...options }: DataTableProps<TData, TValue>) => {
 
 	const table = useReactTable({
 		data,
@@ -33,6 +34,9 @@ const DataTable = <TData, TValue>({ columns, data, withSearch = false, total = 0
 	
 	  const handleChangeColumnDisplay = (column: Column<TData, unknown>) => (value: boolean) => column.toggleVisibility(!!value);
 
+	  const handleNextPage = () => table.nextPage();
+	  const handlePreviousPage = () => table.previousPage();
+
 	return (
 		<>
 			<div className="flex items-center py-4">
@@ -40,6 +44,7 @@ const DataTable = <TData, TValue>({ columns, data, withSearch = false, total = 0
 					withSearch ?
 						<InputSearch
 							className="flex-grow"
+							defaultValue={ defaultSearchValue }
 							inputClassName="max-w-sm"
 							placeholder={ searchPlaceholder || 'Search...' }
 							onSearch={ handleSearch }
@@ -136,7 +141,7 @@ const DataTable = <TData, TValue>({ columns, data, withSearch = false, total = 0
 						disabled={ !table.getCanPreviousPage() }
 						size="sm"
 						variant="outline"
-						onClick={ () => table.previousPage() }
+						onClick={ handlePreviousPage }
 					>
 						Previous
 					</Button>
@@ -144,7 +149,7 @@ const DataTable = <TData, TValue>({ columns, data, withSearch = false, total = 0
 						disabled={ !table.getCanNextPage() }
 						size="sm"
 						variant="outline"
-						onClick={ () => table.nextPage() }
+						onClick={ handleNextPage }
 					>
 						Next
 					</Button>
