@@ -1,7 +1,6 @@
 import { Id } from '@/config/database.config';
 
 export const UserRoles = [ 'admin', 'user' ] as const;
-// export type UserRoles = ['admin', 'user'];
 export type UserRole = typeof UserRoles[number];
 
 export const AuthProviders = [ 'email', 'google', 'facebook', 'github', 'microsoft' ] as const;
@@ -29,15 +28,6 @@ export interface IUserWithPassword extends IUser {
 	password: string;
 }
 
-export type CreateUserDTO = {
-	username: string;
-	email: string;
-	phone_number: string;
-	role: UserRole;
-	is_disabled: boolean;
-	avatar?: File | Blob | null;
-};
-
-export type UpdateUserDTO = Partial<CreateUserDTO> & {
+export interface IUpdateUser extends Partial<IUser> {
 	id: Id | string;
 }

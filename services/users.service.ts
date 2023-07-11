@@ -1,9 +1,18 @@
 import { SortingState } from '@tanstack/react-table';
 
 import { Id } from '@/config/database.config';
-import { CreateUserDTO, IUser, UpdateUserDTO } from '@/types/user.type';
+import { IUser, UserRole } from '@/types/user.type';
 import fetcher, { FetcherOptions } from '@/utils/fetcher.util';
 import { objectToFormData } from '@/utils/object.utils';
+
+export type CreateUserDTO = {
+	username: string;
+	email: string;
+	phone_number: string;
+	role: UserRole;
+	is_disabled: boolean;
+	avatar?: File | Blob | null;
+};
 
 export const createUser = async (userToCreate: CreateUserDTO, csrfToken: string, options?: FetcherOptions): Promise<IUser> => {
 	try {
@@ -28,6 +37,10 @@ export const createUser = async (userToCreate: CreateUserDTO, csrfToken: string,
 	}
 };
 
+type UpdateUserDTO = Partial<CreateUserDTO> & {
+	id: Id | string;
+}
+
 export const updateUser = async (userToUpdate: UpdateUserDTO, csrfToken: string, options?: FetcherOptions): Promise<IUser> => {
 	try {
 		const formData = objectToFormData({
@@ -46,12 +59,32 @@ export const updateUser = async (userToUpdate: UpdateUserDTO, csrfToken: string,
 	}
 };
 
-export type FetchUsersOptions = {
+export type FetchUsersQueryOptions = {
 	sort?: SortingState,
 	skip?: number;
 	limit?: number;
 	search?: string;
-} & FetcherOptions;
+};
+
+export const getFetchUsersQuery = (options?: FetchUsersQueryOptions) => {
+	const { sort, skip, limit, search } = options ? options : {
+		sort: undefined,
+		skip: undefined,
+		limit: undefined,
+		search: undefined,
+	};
+	const sortQuery = sort && sort.length > 0 ? `sort_fields=${ sort.map(el => el.id).join(',') }&sort_directions=${ sort.map(el => el.desc ? -1 : 1).join(',') }` : '';
+	const skipQuery = skip ? `skip=${ skip }` : '';
+	const limitQuery = limit ? `limit=${ limit }` : '';
+	const searchQuery = search ? `search=${ search }` : '';
+	let query = '';
+	if (sortQuery || skipQuery || limitQuery || searchQuery) {
+		query = `?${ sortQuery }${ sortQuery && skipQuery ? `&${ skipQuery }` : skipQuery }${ (sortQuery || skipQuery) && limitQuery ? `&${ limitQuery }` : limitQuery }${ (sortQuery || skipQuery || limitQuery) && searchQuery ? `&${ searchQuery }` : searchQuery }`;
+	}
+	return `/api/users/${ query }`;
+};
+
+export type FetchUsersOptions = FetchUsersQueryOptions & FetcherOptions;
 
 export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: IUser[], total: number, count: number }> => {
 	const { sort, skip, limit, search, ...restOptions } = options ? options : {

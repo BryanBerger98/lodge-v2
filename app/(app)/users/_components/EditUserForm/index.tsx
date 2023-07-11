@@ -3,7 +3,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Save, User, X } from 'lucide-react';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ChangeEventHandler, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -13,6 +12,7 @@ import { ZodError, boolean, object, string, z } from 'zod';
 import InputPhone from '@/components/forms/inputs/InputPhone';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import BackButton from '@/components/ui/Button/BackButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -20,6 +20,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
+import useUsers from '@/context/users/useUsers';
 import { createUser, updateUser } from '@/services/users.service';
 import { IUser, UserRole } from '@/types/user.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
@@ -32,6 +33,8 @@ type EditUserFormProps = {
 const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 
 	const { toast } = useToast();
+
+	const { updateUsers } = useUsers();
 
 	const [ fileToUpload, setFileToUpload ] = useState<File | null>(null);
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
@@ -71,12 +74,12 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 		try {
 			setIsLoading(true);
 			if (pathname.includes('/users/edit') && user) {
-				await updateUser({
+				const updatedUser = await updateUser({
 					...values,
 					id: user.id,
 					avatar: fileToUpload,
 				}, csrfToken);
-				router.refresh();
+				updateUsers(updatedUser);
 				return;
 			}
 			const createdUser = await createUser({
@@ -257,15 +260,9 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 				<div className="flex justify-end gap-4">
 					{
 						!isLoading ?
-							<Button
-								className="gap-2 items-center"
-								variant="outline"
-								asChild
-							>
-								<Link href="/users">
-									<X /> Cancel
-								</Link>
-							</Button>
+							<BackButton>
+								<X /> Cancel
+							</BackButton>
 							: null
 					}
 					<Button

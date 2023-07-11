@@ -1,13 +1,13 @@
 import { object, string, z } from 'zod';
 
 import { Id } from '@/config/database.config';
-import { AuthProvider, IUser, UserRoles } from '@/types/user.type';
+import { AuthProvider, UserRoles } from '@/types/user.type';
 
 export const FetchUsersSchema = object({
-	sort_fields: z.coerce.string().transform(value => value.split(',')).optional().default('created_at'),
-	sort_directions: z.coerce.string().transform(value => value.split(',').map(v => Number(v))).refine(value => value.every(v => v === 1 || v === -1)).optional().default('-1'),
-	limit: z.coerce.number().optional().default(10),
-	skip: z.coerce.number().optional().default(0),
+	sort_fields: z.coerce.string().optional().transform(value => value ? value.split(',') : [ 'created_at' ]),
+	sort_directions: z.coerce.string().optional().default('-1').transform(value => value.split(',').map(v => v ? Number(v) : -1)).refine(value => value.every(v => v === 1 || v === -1)),
+	page_size: z.coerce.number().optional().default(10),
+	page_index: z.coerce.number().optional().default(0),
 	search: z.coerce.string().optional(),
 });
 
@@ -26,6 +26,12 @@ export const CreateUserSchema = object({
 	is_disabled: z.enum([ 'true', 'false' ]).transform(value => value === 'true').default('false'),
 });
 
+export type CreateUserDTO = z.infer<typeof CreateUserSchema> & {
+	provider_data: AuthProvider,
+	created_by: Id | string;
+	photo_key: string | null;
+};
+
 export const UpdateUserSchema = object({
 	username: string().optional(),
 	email: string().email('Please, provide a valid email address.').optional(),
@@ -35,10 +41,9 @@ export const UpdateUserSchema = object({
 	id: string().min(1, 'Required.'),
 });
 
-export type CreateUserDTO = z.infer<typeof CreateUserSchema> & {
-	provider_data: AuthProvider,
-	created_by: Id | string;
-	photo_key: string | null;
+export type UpdateUserDTO = z.infer<typeof UpdateUserSchema> & {
+	photo_key?: string | null;
+	updated_by: Id | string | null;
 };
 
 export const UpdateUserAccountSchema = object({
@@ -61,13 +66,3 @@ export const UpdateUserPasswordSchema = object({
 	password: string().min(1, 'Required.'),
 	newPassword: string().min(1, 'Required.'),
 });
-
-// export type UpdateUserDTO = Partial<IUser> & {
-// 	id: string | Id;
-// 	updated_by: Id | string;
-// };
-
-export interface UpdateUserDTO extends Partial<IUser> {
-	id: string | Id;
-	updated_by: Id | string | null;
-}

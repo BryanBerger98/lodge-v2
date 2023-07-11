@@ -214,7 +214,8 @@ export const GET = async (request: NextRequest) => {
 		await setServerAuthGuard({ rolesWhiteList: [ 'admin' ] });
 
 		const queryParams = parse(request.url, true).query;
-		const { sort_fields, sort_directions, skip, limit, search } = FetchUsersSchema.parse(queryParams);
+
+		const { sort_fields, sort_directions, page_index, page_size, search } = FetchUsersSchema.parse(queryParams);
 
 		const searchArray = search ? search.trim().split(' ') : [];
 		const searchRegexArray = searchArray.map(string => new RegExp(string, 'i'));
@@ -222,8 +223,8 @@ export const GET = async (request: NextRequest) => {
 
 		const users = await findUsers(searchRequest, {
 			sort: Object.fromEntries(sort_fields.map((field, index) => [ field, sort_directions[ index ] as 1 | -1 ])),
-			skip,
-			limit,
+			skip: Math.round(page_index * page_size),
+			limit: page_size,
 		});
 		const count = users.length;
 		const total = await findUsersCount(searchRequest);

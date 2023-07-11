@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, ReactNode, useCallback, useMemo, useState } from 'react';
 
 type CsrfContextValues = {

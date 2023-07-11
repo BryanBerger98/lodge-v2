@@ -1,5 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, BadgeCheck, BadgeX } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, BadgeCheck, BadgeX } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,13 +24,15 @@ export const columns: ColumnDef<UserColumn>[] = [
 		accessorKey: 'username',
 		header: ({ column }) => {
 			const handleSort = () => column.toggleSorting(column.getIsSorted() === 'asc');
+			const sortState = column.getIsSorted();
 			return (
 				<Button
+					className="group"
 					variant="ghost"
 					onClick={ handleSort }
 				>
 					Username
-					<ArrowUpDown className="ml-2 h-4 w-4" />
+					{ sortState === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> : sortState === 'desc' ? <ArrowDown className="ml-2 h-4 w-4" /> : <ArrowUpDown className="ml-2 h-4 w-4 text-slate-500" /> }
 				</Button>
 			);
 		},
@@ -41,13 +43,14 @@ export const columns: ColumnDef<UserColumn>[] = [
 		accessorKey: 'email',
 		header: ({ column }) => {
 			const handleSort = () => column.toggleSorting(column.getIsSorted() === 'asc');
+			const sortState = column.getIsSorted();
 			return (
 				<Button
 					variant="ghost"
 					onClick={ handleSort }
 				>
 					Email
-					<ArrowUpDown className="ml-2 h-4 w-4" />
+					{ sortState === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> : sortState === 'desc' ? <ArrowDown className="ml-2 h-4 w-4" /> : <ArrowUpDown className="ml-2 h-4 w-4 text-slate-500" /> }
 				</Button>
 			);
 		},
@@ -84,13 +87,14 @@ export const columns: ColumnDef<UserColumn>[] = [
 		accessorKey: 'role',
 		header: ({ column }) => {
 			const handleSort = () => column.toggleSorting(column.getIsSorted() === 'asc');
+			const sortState = column.getIsSorted();
 			return (
 				<Button
 					variant="ghost"
 					onClick={ handleSort }
 				>
 					Role
-					<ArrowUpDown className="ml-2 h-4 w-4" />
+					{ sortState === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> : sortState === 'desc' ? <ArrowDown className="ml-2 h-4 w-4" /> : <ArrowUpDown className="ml-2 h-4 w-4 text-slate-500" /> }
 				</Button>
 			);
 		},

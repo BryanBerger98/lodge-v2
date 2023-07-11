@@ -45,7 +45,7 @@ const getModalContent = (rowData: UserColumn) => ({
 const Menu = ({ rowData }: MenuProps) => {
 
 	const { csrfToken } = useCsrf();
-	const { updateUser } = useUsers();
+	const { updateUsers, refetchUsers } = useUsers();
 
 	const [ confirmationModalState, setConfirmationModalState ] = useState<ModalState>({
 		isOpen: false,
@@ -95,13 +95,14 @@ const Menu = ({ rowData }: MenuProps) => {
 			if (confirmationModalState.action === 'delete') {
 				await deleteUser(rowData.id, csrfToken);
 				// TODO => Refetch users on delete
+				refetchUsers();
 			}
 			if (confirmationModalState.action === 'suspend') {
 				await updateUserQuery({
 					id: rowData.id,
 					is_disabled: true,
 				}, csrfToken);
-				updateUser({
+				updateUsers({
 					...rowData,
 					is_disabled: true, 
 				});
@@ -111,7 +112,7 @@ const Menu = ({ rowData }: MenuProps) => {
 					id: rowData.id,
 					is_disabled: false,
 				}, csrfToken);
-				updateUser({
+				updateUsers({
 					...rowData,
 					is_disabled: false, 
 				});
