@@ -3,7 +3,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Save } from 'lucide-react';
-import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ZodError, object, string, z } from 'zod';
@@ -13,6 +12,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
+import useAuth from '@/context/auth/useAuth';
 import { updateAccount } from '@/services/auth.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
@@ -22,9 +22,8 @@ type UpdateUsernameFormProps = {
 
 const UpdateUsernameForm = ({ csrfToken }: UpdateUsernameFormProps) => {
 
-	const { data: session, update: updateSession } = useSession();
-
 	const { toast } = useToast();
+	const { currentUser, updateCurrentUser } = useAuth();
 
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 
@@ -32,16 +31,16 @@ const UpdateUsernameForm = ({ csrfToken }: UpdateUsernameFormProps) => {
 
 	const form = useForm<z.infer<typeof usernameFormSchema>>({
 		resolver: zodResolver(usernameFormSchema),
-		defaultValues: { username: session?.user?.username || '' },
+		defaultValues: { username: currentUser?.username || '' },
 		mode: 'onTouched',
 	});
 
 	useEffect(() => {
-		if (session) {
-			form.setValue('username', session.user.username || '');
+		if (currentUser) {
+			form.setValue('username', currentUser.username || '');
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ session?.user?.id ]);
+	}, [ currentUser?.id ]);
 
 	const handleSubmitEmailForm = async (values: z.infer<typeof usernameFormSchema>) => {
 		const { username } = values;
@@ -49,13 +48,7 @@ const UpdateUsernameForm = ({ csrfToken }: UpdateUsernameFormProps) => {
 		try {
 			setIsLoading(true);
 			const updatedUser = await updateAccount({ username }, csrfToken);
-			await updateSession({
-				...session,
-				user: {
-					...session?.user,
-					username: updatedUser.username,
-				},
-			});
+			await updateCurrentUser(updatedUser);
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
 			if (apiError.code === 'invalid-input') {

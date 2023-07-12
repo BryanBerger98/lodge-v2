@@ -2,7 +2,6 @@
 'use client';
 
 import { Loader2, Save } from 'lucide-react';
-import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { isValidPhoneNumber } from 'react-phone-number-input';
@@ -13,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/components/ui/use-toast';
+import useAuth from '@/context/auth/useAuth';
 import { updateAccount } from '@/services/auth.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
@@ -22,23 +22,22 @@ type UpdatePhoneNumberFormProps = {
 
 const UpdatePhoneNumberForm = ({ csrfToken }: UpdatePhoneNumberFormProps) => {
 
-	const { data: session, update: updateSession } = useSession();
-
 	const { toast } = useToast();
+	const { currentUser, updateCurrentUser } = useAuth();
 
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 
 	const form = useForm<{ phone_number: string }>({
-		defaultValues: { phone_number: session?.user?.phone_number || '' },
+		defaultValues: { phone_number: currentUser?.phone_number || '' },
 		mode: 'onSubmit',
 	});
 
 	useEffect(() => {
-		if (session) {
-			form.setValue('phone_number', session.user.phone_number || '');
+		if (currentUser) {
+			form.setValue('phone_number', currentUser.phone_number || '');
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ session?.user?.id ]);
+	}, [ currentUser?.id ]);
 
 	const handleSubmitEmailForm = async (values: { phone_number: string }) => {
 		const { phone_number } = values;
@@ -46,13 +45,7 @@ const UpdatePhoneNumberForm = ({ csrfToken }: UpdatePhoneNumberFormProps) => {
 		try {
 			setIsLoading(true);
 			const updatedUser = await updateAccount({ phone_number }, csrfToken);
-			await updateSession({
-				...session,
-				user: {
-					...session?.user,
-					phone_number: updatedUser.phone_number,
-				},
-			});
+			await updateCurrentUser(updatedUser);
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
 			if (apiError.code === 'invalid-input') {

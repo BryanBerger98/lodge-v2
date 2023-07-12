@@ -2,7 +2,6 @@
 'use client';
 
 import { Loader2, Save, User, X } from 'lucide-react';
-import { useSession } from 'next-auth/react';
 import { ChangeEventHandler, useState } from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -25,8 +24,7 @@ const UpdateAvatarForm = ({ csrfToken }: UpdateAvatarFormProps) => {
 	const [ fileToUpload, setFileToUpload ] = useState<File | null>(null);
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 	
-	const { data: session, update: updateSession } = useSession();
-	const { currentUser, dispatchCurrentUser } = useAuth();
+	const { currentUser, updateCurrentUser } = useAuth();
 	
 	const { toast } = useToast();
 
@@ -47,14 +45,7 @@ const UpdateAvatarForm = ({ csrfToken }: UpdateAvatarFormProps) => {
 				const optimizedFile = await optimizeImage(fileToUpload);
 				const updatedUser = await updateUserAvatar(optimizedFile, csrfToken);
 				if (updatedUser) {
-					await updateSession({
-						...session,
-						user: {
-							...session?.user,
-							photo_key: updatedUser.photo_key,
-						},
-					});
-					dispatchCurrentUser(updatedUser);
+					await updateCurrentUser(updatedUser);
 				}
 			} catch (error) {
 				console.error(error);

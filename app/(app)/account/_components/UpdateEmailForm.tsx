@@ -3,7 +3,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Save } from 'lucide-react';
-import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ZodError, object, string, z } from 'zod';
@@ -14,6 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
+import useAuth from '@/context/auth/useAuth';
 import { updateUserEmail } from '@/services/auth.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
@@ -23,9 +23,9 @@ type UpdateEmailFormProps = {
 
 const UpdateEmailForm = ({ csrfToken }: UpdateEmailFormProps) => {
 
-	const { data: session, update: updateSession } = useSession();
-
 	const { toast } = useToast();
+
+	const { currentUser, updateCurrentUser } = useAuth();
 
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 	const [ isPasswordModalOpen, setIsPasswordModalOpen ] = useState<boolean>(false);
@@ -34,19 +34,19 @@ const UpdateEmailForm = ({ csrfToken }: UpdateEmailFormProps) => {
 
 	const form = useForm<z.infer<typeof emailFormSchema>>({
 		resolver: zodResolver(emailFormSchema),
-		defaultValues: { email: session?.user?.email || '' },
+		defaultValues: { email: currentUser?.email || '' },
 		mode: 'onTouched',
 	});
 
 	useEffect(() => {
-		if (session) {
-			form.setValue('email', session.user.email || '');
+		if (currentUser) {
+			form.setValue('email', currentUser.email || '');
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ session?.user?.id ]);
+	}, [ currentUser?.id ]);
 
 	const handleSubmitEmailForm = ({ email }: z.infer<typeof emailFormSchema>) => {
-		if (email !== session?.user?.email) {
+		if (email !== currentUser?.email) {
 			setIsPasswordModalOpen(true);
 		}
 	};
@@ -63,13 +63,7 @@ const UpdateEmailForm = ({ csrfToken }: UpdateEmailFormProps) => {
 			setIsPasswordModalOpen(openState);
 			setIsLoading(true);
 			const updatedUser = await updateUserEmail(email, password, csrfToken);
-			await updateSession({
-				...session,
-				user: {
-					...session?.user,
-					email: updatedUser.email,
-				},
-			});
+			await updateCurrentUser(updatedUser);
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
 			if (apiError.code === 'invalid-input') {
