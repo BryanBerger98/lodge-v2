@@ -46,7 +46,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 		username: string().min(1, 'Required.'),
 		email: string().email('Please, provide a valid email address.').min(1, 'Required.'),
 		phone_number: string(),
-		role: z.enum([ 'user', 'admin' ]),
+		role: z.enum([ 'user', 'admin', 'owner' ]),
 		is_disabled: boolean(),
 	});
 
@@ -71,11 +71,22 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 	};
 
 	const handleSubmitEditUserForm = async (values: z.infer<typeof editUserFormSchema>) => {
+		if (user?.role === 'owner') {
+			return;
+		}
+		if (values.role === 'owner') {
+			return toast({
+				title: 'Error',
+				description: 'The "Owner" role is not assignable to a user.',
+				variant: 'destructive',
+			});
+		}
 		try {
 			setIsLoading(true);
 			if (pathname.includes('/users/edit') && user) {
 				const updatedUser = await updateUser({
 					...values,
+					role: values.role,
 					id: user.id,
 					avatar: fileToUpload,
 				}, csrfToken);
@@ -84,6 +95,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 			}
 			const createdUser = await createUser({
 				...values,
+				role: values.role,
 				avatar: fileToUpload, 
 			}, csrfToken);
 			router.replace(`/users/edit/${ createdUser.id }`);
@@ -105,8 +117,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 				title: 'Error',
 				description: getErrorMessage(apiError),
 				variant: 'destructive',
-				
-			  });
+			});
 		} finally {
 			setIsLoading(false);
 		}
@@ -134,15 +145,19 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 								/>
 								<AvatarFallback><User /></AvatarFallback>
 							</Avatar>
-							<div className="grid w-full items-center gap-1.5">
-								<Label htmlFor="picture">Picture</Label>
-								<Input
-									accept="image/png, image/gif, image/jpeg"
-									id="picture"
-									type="file"
-									onChange={ handleUpdateFile }
-								/>
-							</div>
+							{
+								user?.role !== 'owner' ?
+									<div className="grid w-full items-center gap-1.5">
+										<Label htmlFor="picture">Picture</Label>
+										<Input
+											accept="image/png, image/gif, image/jpeg"
+											id="picture"
+											type="file"
+											onChange={ handleUpdateFile }
+										/>
+									</div>
+									: null
+							}
 						</div>
 						<FormField
 							control={ form.control }
@@ -152,6 +167,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 									<FormLabel>Username</FormLabel>
 									<FormControl>
 										<Input
+											disabled={ user?.role === 'owner' }
 											placeholder="John Doe"
 											type="text"
 											{ ...field }
@@ -169,6 +185,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 									<FormLabel>Email address</FormLabel>
 									<FormControl>
 										<Input
+											disabled={ user?.role === 'owner' }
 											placeholder="john@doe.com"
 											{ ...field }
 										/>
@@ -188,6 +205,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 										<FormControl>
 											<InputPhone
 												defaultCountry="FR"
+												disabled={ user?.role === 'owner' }
 												{ ...field }
 											/>
 										</FormControl>
@@ -215,6 +233,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 									<FormControl>
 										<Switch
 											checked={ field.value }
+											disabled={ user?.role === 'owner' }
 											onCheckedChange={ field.onChange }
 										/>
 									</FormControl>
@@ -241,13 +260,18 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 											onValueChange={ handleChange }
 										>
 											<FormControl>
-												<SelectTrigger>
+												<SelectTrigger disabled={ user?.role === 'owner' }>
 													<SelectValue placeholder="Select a verified email to display" />
 												</SelectTrigger>
 											</FormControl>
 											<SelectContent>
 												<SelectItem value="user">User</SelectItem>
 												<SelectItem value="admin">Admin</SelectItem>
+												<SelectItem
+													value="owner"
+													disabled
+												>Owner
+												</SelectItem>
 											</SelectContent>
 										</Select>
 										<FormMessage />
@@ -257,23 +281,27 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 						/>
 					</CardContent>
 				</Card>
-				<div className="flex justify-end gap-4">
-					{
-						!isLoading ?
-							<BackButton>
-								<X /> Cancel
-							</BackButton>
-							: null
-					}
-					<Button
-						className="gap-2"
-						disabled={ isLoading }
-						type="submit"
-					>
-						{ isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save /> }
-						Save
-					</Button>
-				</div>
+				{
+					user?.role !== 'owner' ?
+						<div className="flex justify-end gap-4">
+							{
+								!isLoading ?
+									<BackButton>
+										<X /> Cancel
+									</BackButton>
+									: null
+							}
+							<Button
+								className="gap-2"
+								disabled={ isLoading }
+								type="submit"
+							>
+								{ isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save /> }
+								Save
+							</Button>
+						</div>
+						: null
+				}
 			</form>
 		</Form>
 	);

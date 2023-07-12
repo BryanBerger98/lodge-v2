@@ -1,7 +1,7 @@
 import { object, string, z } from 'zod';
 
 import { Id } from '@/config/database.config';
-import { AuthProvider, UserRoles } from '@/types/user.type';
+import { AuthProvider, UserRole, UserRoleWithOwner, UserRoles } from '@/types/user.type';
 
 export const FetchUsersSchema = object({
 	sort_fields: z.coerce.string().optional().transform(value => value ? value.split(',') : [ 'created_at' ]),
@@ -41,8 +41,9 @@ export const UpdateUserSchema = object({
 	id: string().min(1, 'Required.'),
 });
 
-export type UpdateUserDTO = Omit<z.infer<typeof UpdateUserSchema>, 'id'> & {
+export type UpdateUserDTO = Omit<z.infer<typeof UpdateUserSchema>, 'id' | 'role'> & {
 	id: Id | string;
+	role: UserRoleWithOwner,
 	updated_by: Id | string | null;
 	has_email_verified?: boolean;
 	photo_key?: string | null;

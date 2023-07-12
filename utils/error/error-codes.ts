@@ -1,4 +1,5 @@
 export const USER_NOT_FOUND_ERROR = 'user-not-found';
+export const USER_UNEDITABLE_ERROR = 'user-uneditable';
 export const USER_ALREADY_EXISTS_ERROR = 'user-already-exists';
 export const MISSING_CREDENTIALS_ERROR = 'missing-credentials';
 export const ACCOUNT_DISABLED_ERROR = 'account-disabled';

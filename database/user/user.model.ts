@@ -1,7 +1,7 @@
 import { Schema, model, models, Model, Types } from 'mongoose';
 import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 
-import { AuthProviders, IUserWithPassword, UserRoles } from '@/types/user.type';
+import { AuthProviders, IUserWithPassword, UserRolesWithOwner } from '@/types/user.type';
 
 const userSchema = new Schema<IUserWithPassword>({
 	email: {
@@ -22,7 +22,7 @@ const userSchema = new Schema<IUserWithPassword>({
 	},
 	role: {
 		type: String,
-		enum: UserRoles,
+		enum: UserRolesWithOwner,
 		default: 'user',
 	},
 	username: { type: String },

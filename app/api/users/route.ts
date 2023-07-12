@@ -11,7 +11,7 @@ import { deleteFileFromKey, getFileFromKey, uploadImageToS3 } from '@/lib/bucket
 import { IUser } from '@/types/user.type';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
-import { FILE_TOO_LARGE_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_ALREADY_EXISTS_ERROR, USER_NOT_FOUND_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
+import { FILE_TOO_LARGE_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_ALREADY_EXISTS_ERROR, USER_NOT_FOUND_ERROR, USER_UNEDITABLE_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
 import { AUTHORIZED_IMAGE_MIME_TYPES, AUTHORIZED_IMAGE_SIZE, convertFileRequestObjetToModel } from '@/utils/file.util';
 import { generatePassword, hashPassword } from '@/utils/password.util';
 
@@ -166,6 +166,14 @@ export const PUT = async (request: NextRequest) => {
 				code: USER_NOT_FOUND_ERROR,
 				message: 'User not found.',
 				status: 404,
+			}));
+		}
+
+		if (currentUser.role !== 'owner' && userData.role === 'owner') {
+			return sendError(buildError({
+				code: USER_UNEDITABLE_ERROR,
+				message: 'This user is not editable',
+				status: 403,
 			}));
 		}
 
