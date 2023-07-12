@@ -13,7 +13,7 @@ import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
 import useCsrf from '@/context/csrf/useCsrf';
 import useUsers from '@/context/users/useUsers';
-import { deleteUser, updateUser as updateUserQuery } from '@/services/users.service';
+import { deleteUser, sendResetPasswordTokenToUser, sendVerificationTokenToUser, updateUser as updateUserQuery } from '@/services/users.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
 import { UserColumn } from '../columns';
@@ -24,7 +24,8 @@ type MenuProps = {
 
 type ModalState = {
 	isOpen: boolean;
-	action: 'delete' | 'suspend' | 'activate';
+	modalType: 'form' | 'simple';
+	action: 'delete' | 'suspend' | 'activate' | 'reset-password' | 'verify-email';
 }
 
 const getModalContent = (rowData: UserColumn) => ({
@@ -40,6 +41,14 @@ const getModalContent = (rowData: UserColumn) => ({
 		title: 'Activate user',
 		description: <span>Please confirm the account activation. The user will be able to log in again.</span>,
 	},
+	'reset-password': {
+		title: 'Send reset password email',
+		description: <span>The user will receive a reset password link by email.</span>,
+	},
+	'verify-email': {
+		title: 'Send verification email',
+		description: <span>The user will receive a verification link by email.</span>,
+	},
 });
 
 const Menu = ({ rowData }: MenuProps) => {
@@ -49,6 +58,7 @@ const Menu = ({ rowData }: MenuProps) => {
 
 	const [ confirmationModalState, setConfirmationModalState ] = useState<ModalState>({
 		isOpen: false,
+		modalType: 'form',
 		action: 'delete', 
 	});
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
@@ -59,6 +69,7 @@ const Menu = ({ rowData }: MenuProps) => {
 	const handleDeleteUser = () => {
 		setConfirmationModalState({
 			isOpen: true,
+			modalType: 'form',
 			action: 'delete', 
 		});
 	};
@@ -66,6 +77,7 @@ const Menu = ({ rowData }: MenuProps) => {
 	const handleSuspendUser = () => {
 		setConfirmationModalState({
 			isOpen: true,
+			modalType: 'form',
 			action: 'suspend', 
 		});
 	};
@@ -73,7 +85,24 @@ const Menu = ({ rowData }: MenuProps) => {
 	const handleActivateUser = () => {
 		setConfirmationModalState({
 			isOpen: true,
+			modalType: 'simple',
 			action: 'activate', 
+		});
+	};
+
+	const handleSendResetPasswordEmail = () => {
+		setConfirmationModalState({
+			isOpen: true,
+			modalType: 'simple',
+			action: 'reset-password', 
+		});
+	};
+
+	const handleSendVerificationEmail = () => {
+		setConfirmationModalState({
+			isOpen: true,
+			modalType: 'simple',
+			action: 'verify-email', 
 		});
 	};
 
@@ -115,6 +144,12 @@ const Menu = ({ rowData }: MenuProps) => {
 					...rowData,
 					is_disabled: false, 
 				});
+			}
+			if (confirmationModalState.action === 'reset-password') {
+				await sendResetPasswordTokenToUser(rowData.id, csrfToken);
+			}
+			if (confirmationModalState.action === 'verify-email') {
+				await sendVerificationTokenToUser(rowData.id, csrfToken);
 			}
 			setConfirmationModalState({
 				...confirmationModalState,
@@ -162,12 +197,12 @@ const Menu = ({ rowData }: MenuProps) => {
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						className="gap-2 hover:cursor-pointer"
-						disabled
+						onClick={ handleSendResetPasswordEmail }
 					><KeyRound size="16" /> Send reset password
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						className="gap-2 hover:cursor-pointer"
-						disabled
+						onClick={ handleSendVerificationEmail }
 					><BadgeCheck size="16" /> Send email verification
 					</DropdownMenuItem>
 					<DropdownMenuItem
@@ -202,7 +237,7 @@ const Menu = ({ rowData }: MenuProps) => {
 				data={ rowData }
 				description={ getModalContent(rowData)[ confirmationModalState.action ].description }
 				isLoading={ isLoading }
-				isOpen={ confirmationModalState.action !== 'activate' && confirmationModalState.isOpen }
+				isOpen={ confirmationModalState.modalType === 'form' && confirmationModalState.isOpen }
 				keyToValidate="email"
 				title={ getModalContent(rowData)[ confirmationModalState.action ].title }
 				variant="destructive"
@@ -211,7 +246,7 @@ const Menu = ({ rowData }: MenuProps) => {
 			<ConfirmationModal
 				description={ getModalContent(rowData)[ confirmationModalState.action ].description }
 				isLoading={ isLoading }
-				isOpen={ confirmationModalState.action === 'activate' && confirmationModalState.isOpen }
+				isOpen={ confirmationModalState.modalType === 'simple' && confirmationModalState.isOpen }
 				title={ getModalContent(rowData)[ confirmationModalState.action ].title }
 				onOpenChange={ handleConfirmationModalOpenChange }
 			/>

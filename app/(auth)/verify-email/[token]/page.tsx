@@ -19,6 +19,10 @@ const ConfirmEmailPage = async ({ params }: ConfirmEmailPageProps) => {
 
 	const session = await getServerSession(authOptions);
 
+	if (!session || !session?.user) {
+		redirect(`/signin?verification_token=${ params.token }`);
+	}
+
 	if (session?.user.has_email_verified) {
 		redirect('/');
 	}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Session } from 'next-auth';
 import { signOut, useSession } from 'next-auth/react';
 import { createContext, FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
@@ -26,6 +26,12 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 export { AuthContext };
 
+const UNAUTH_WHITELIST_PATHNAMES = [
+	'/signin',
+	'/signup',
+	'/forgot-password',
+];
+
 type AuthProviderProps = {
 	children: ReactNode;
 }
@@ -37,6 +43,8 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 	const [ error, setError ] = useState<string | null>(null);
 
 	const router = useRouter();
+	const pathname = usePathname();
+	const [ , basePathname ] = pathname.split('/');
 	const { status, data: session, update } = useSession();
 
 	useEffect(() => {
@@ -74,7 +82,9 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 				});
 		}
 		if (status === 'unauthenticated') {
-			router.replace('/signin');
+			if (!UNAUTH_WHITELIST_PATHNAMES.includes(`/${ basePathname }`)) {
+				router.replace('/signin');
+			}
 			setCurrentUser(null);
 			setLoading('idle');
 		}

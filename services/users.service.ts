@@ -1,6 +1,7 @@
 import { SortingState } from '@tanstack/react-table';
 
 import { Id } from '@/config/database.config';
+import { SafeTokenData } from '@/types/token.type';
 import { IUser, UserRole } from '@/types/user.type';
 import fetcher, { FetcherOptions } from '@/utils/fetcher.util';
 import { objectToFormData } from '@/utils/object.utils';
@@ -117,6 +118,30 @@ export const deleteUser = async (userId: string | Id, csrfToken: string, options
 			csrfToken,
 		});
 		return;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const sendResetPasswordTokenToUser = async (userId: string | Id, csrfToken: string): Promise<SafeTokenData> => {
+	try {
+		const data = await fetcher(`/api/users/${ userId }/reset-password`, {
+			method: 'POST',
+			csrfToken, 
+		});
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const sendVerificationTokenToUser = async (userId: string | Id, csrfToken: string): Promise<SafeTokenData> => {
+	try {
+		const data = await fetcher(`/api/users/${ userId }/verify-email`, {
+			method: 'POST',
+			csrfToken, 
+		});
+		return data;
 	} catch (error) {
 		throw error;
 	}
