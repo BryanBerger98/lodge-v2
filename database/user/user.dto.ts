@@ -41,9 +41,11 @@ export const UpdateUserSchema = object({
 	id: string().min(1, 'Required.'),
 });
 
-export type UpdateUserDTO = z.infer<typeof UpdateUserSchema> & {
-	photo_key?: string | null;
+export type UpdateUserDTO = Omit<z.infer<typeof UpdateUserSchema>, 'id'> & {
+	id: Id | string;
 	updated_by: Id | string | null;
+	has_email_verified?: boolean;
+	photo_key?: string | null;
 };
 
 export const UpdateUserAccountSchema = object({

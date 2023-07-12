@@ -4,7 +4,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Loader2, LogIn } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -21,8 +21,10 @@ const SignInForm = () => {
 
 	const [ error, setError ] = useState<string | null>(null);
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
-
+	
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const verificationToken = searchParams.get('verification_token');
 
 	const signInFormSchema = object({
 		email: string().email('Please, provide a valid email address.').min(1, 'Required.'),
@@ -51,7 +53,11 @@ const SignInForm = () => {
 				if (data?.error) {
 					setError('Incorrect credentials.');
 				} else {
-					router.replace('/verify-email');
+					if (verificationToken) {
+						router.replace(`/verify-email/${ verificationToken }`);
+					} else {
+						router.replace('/verify-email');
+					}
 				}
 			})
 			.catch((error) => {

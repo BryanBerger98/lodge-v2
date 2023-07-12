@@ -1,6 +1,8 @@
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
+import { getRedirectURLWithSearchParams } from '@/utils/url.util';
+
 import { MiddlewareFactory } from './middleware.type';
 
 
@@ -21,7 +23,7 @@ export const authMiddleware: MiddlewareFactory = (next) => {
 			});
 
 			if (!tokenData) {
-				return NextResponse.redirect(new URL('/signin', request.url));
+				return NextResponse.redirect(new URL(getRedirectURLWithSearchParams('signin', request.nextUrl.searchParams), request.url));
 			}
 		}
 		return next(request, _next);
