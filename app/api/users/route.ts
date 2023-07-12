@@ -72,7 +72,7 @@ export const POST = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'admin' ] });
+		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
 
 		const formData = await request.formData();
 
@@ -139,7 +139,7 @@ export const PUT = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'admin' ] });
+		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
 
 		const formData = await request.formData();
 
@@ -211,7 +211,7 @@ export const GET = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		await setServerAuthGuard({ rolesWhiteList: [ 'admin' ] });
+		await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
 
 		const queryParams = parse(request.url, true).query;
 

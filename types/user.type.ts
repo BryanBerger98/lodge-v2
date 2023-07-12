@@ -1,7 +1,8 @@
 import { Id } from '@/config/database.config';
 
-export const UserRoles = [ 'admin', 'user' ] as const;
-export type UserRole = typeof UserRoles[number];
+export const UserRoles = [ 'owner', 'admin', 'user' ] as const;
+export type UserRoleWithOwner = typeof UserRoles[number];
+export type UserRole = Exclude<UserRoleWithOwner, 'owner'>;
 
 export const AuthProviders = [ 'email', 'google', 'facebook', 'github', 'microsoft' ] as const;
 export type AuthProvider = typeof AuthProviders[number];

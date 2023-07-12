@@ -23,7 +23,7 @@ export const DELETE = async (_: any, { params }: { params: { userId: string } })
 
 		await connectToDatabase();
 
-		await setServerAuthGuard({ rolesWhiteList: [ 'admin' ] });
+		await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
 
 		const userData = await findUserById(userId);
 

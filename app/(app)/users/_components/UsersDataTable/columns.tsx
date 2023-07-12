@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Id } from '@/config/database.config';
-import { UserRole } from '@/types/user.type';
+import { UserRoleWithOwner } from '@/types/user.type';
 
 import Menu from './Menu';
 
@@ -15,7 +15,7 @@ export type UserColumn = {
   email: string;
   is_disabled: boolean;
   has_email_verified: boolean;
-  role: UserRole;
+  role: UserRoleWithOwner;
   created_at: Date;
 }
 
@@ -111,7 +111,7 @@ export const columns: ColumnDef<UserColumn>[] = [
 		cell: ({ row }) => (
 			<Badge
 				className="capitalize"
-				variant={ row.original.role === 'admin' ? 'default' : 'secondary' }
+				variant={ row.original.role === 'owner' ? 'destructive' : row.original.role === 'admin' ? 'default' : 'secondary' }
 			>{ row.original.role }
 			</Badge>
 		),

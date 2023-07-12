@@ -15,7 +15,7 @@ export const POST = async (_: any, { params }: { params: { userId: string } }) =
 
 	try {
 
-		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'admin' ] });
+		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
 
 		await connectToDatabase();
 

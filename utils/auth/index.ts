@@ -3,13 +3,13 @@ import { getServerSession } from 'next-auth';
 
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { connectToDatabase } from '@/config/database.config';
-import { UserRole } from '@/types/user.type';
+import { UserRoleWithOwner } from '@/types/user.type';
 
 import { buildError } from '../error';
 import { FORBIDDEN_ERROR, UNAUTHORIZED_ERROR } from '../error/error-codes';
 
 export interface ProtectionOptions {
-	rolesWhiteList?: UserRole[];
+	rolesWhiteList?: UserRoleWithOwner[];
 	redirect?: boolean | string;
 }
 
