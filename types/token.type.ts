@@ -4,6 +4,7 @@ export type TokenAction = 'reset_password' | 'email_verification';
 
 export interface IToken {
 	id: Id | string;
+	target_id: Id | string;
 	token: string;
 	expiration_date: Date;
 	action: TokenAction;

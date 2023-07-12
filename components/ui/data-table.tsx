@@ -19,9 +19,10 @@ interface DataTableProps<TData, TValue> extends Omit<TableOptions<TData>, 'getCo
 	searchPlaceholder?: string;
 	withCustomColumns?: boolean;
 	defaultSearchValue?: string;
+	columnNames?: Record<string, string>;
 }
 
-const DataTable = <TData, TValue>({ columns, data, withSearch = false, defaultSearchValue = '', total = 0, onSearch: handleSearch, searchPlaceholder, withCustomColumns = false, ...options }: DataTableProps<TData, TValue>) => {
+const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = false, defaultSearchValue = '', total = 0, onSearch: handleSearch, searchPlaceholder, withCustomColumns = false, ...options }: DataTableProps<TData, TValue>) => {
 
 	const table = useReactTable({
 		data,
@@ -74,7 +75,7 @@ const DataTable = <TData, TValue>({ columns, data, withSearch = false, defaultSe
 												className="capitalize"
 												onCheckedChange={ handleChangeColumnDisplay(column) }
 											>
-												{ column.id }
+												{ (columnNames && columnNames[ column.id ]) || column.id }
 											</DropdownMenuCheckboxItem>
 										);
 									}) }

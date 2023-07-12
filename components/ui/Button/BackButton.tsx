@@ -5,7 +5,7 @@ import { forwardRef } from 'react';
 
 import { Button, ButtonProps } from '../button';
 
-const BackButton: React.ForwardRefExoticComponent<ButtonProps & React.RefAttributes<HTMLButtonElement>> = forwardRef(({ children, ...rest }, ref) => {
+const BackButton: React.ForwardRefExoticComponent<ButtonProps & React.RefAttributes<HTMLButtonElement>> = forwardRef(({ children, className = '', ...rest }, ref) => {
 
 	const router = useRouter();
 
@@ -13,7 +13,7 @@ const BackButton: React.ForwardRefExoticComponent<ButtonProps & React.RefAttribu
 
 	return (
 		<Button
-			className="gap-2 items-center mb-4"
+			className={ `gap-2 items-center mb-4 ${ className }` }
 			variant="outline"
 			{ ...rest }
 			ref={ ref }

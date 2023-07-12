@@ -10,7 +10,7 @@ import useUsers from '@/context/users/useUsers';
 import useUpdateEffect from '@/hooks/utils/useUpdateEffect';
 import { getSortingFromURLParams } from '@/utils/table.utils';
 
-import { columns } from './columns';
+import { COLUMN_NAMES, columns } from './columns';
 
 type UsersDataTableProps = {
 	csrfToken: string;
@@ -47,6 +47,7 @@ const UsersDataTable = ({ csrfToken }: UsersDataTableProps) => {
 	return (
 		<div>
 			<DataTable
+				columnNames={ COLUMN_NAMES }
 				columns={ columns }
 				data={ users }
 				defaultSearchValue={ routeParams.search || '' }

@@ -5,4 +5,5 @@ export type CreateTokenDTO = {
 	expiration_date: Date;
 	action: 'reset_password' | 'email_verification';
 	created_by: Id | string | null;
+	target_id: Id | string;
 };

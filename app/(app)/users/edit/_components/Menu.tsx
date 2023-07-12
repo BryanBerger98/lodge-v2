@@ -1,7 +1,6 @@
 'use client';
 
-import { ArrowRightLeft, BadgeCheck, Edit, KeyRound, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react';
-import Link from 'next/link';
+import { ArrowRightLeft, BadgeCheck, KeyRound, MoreHorizontal, Trash } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
 
@@ -11,35 +10,26 @@ import ConfirmationFormModal, { ConfirmationModalOpenChangeEvent } from '@/compo
 import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal';
 import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
-import useCsrf from '@/context/csrf/useCsrf';
 import useUsers from '@/context/users/useUsers';
-import { deleteUser, sendResetPasswordTokenToUser, sendVerificationTokenToUser, updateUser as updateUserQuery } from '@/services/users.service';
+import { deleteUser, sendResetPasswordTokenToUser, sendVerificationTokenToUser } from '@/services/users.service';
+import { IUser } from '@/types/user.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
-import { UserColumn } from '../columns';
-
 type MenuProps = {
-	rowData: UserColumn;
+	userData: IUser;
+	csrfToken: string;
 }
 
 type ModalState = {
 	isOpen: boolean;
 	modalType: 'form' | 'simple';
-	action: 'delete' | 'suspend' | 'activate' | 'reset-password' | 'verify-email';
+	action: 'delete' | 'reset-password' | 'verify-email';
 }
 
-const getModalContent = (rowData: UserColumn) => ({
+const getModalContent = (userData: IUser) => ({
 	delete: {
 		title: 'Delete user',
-		description: <span>Please enter the email of the user <span className="font-bold text-slate-700 select-none">{ rowData.email }</span> to confirm the deletion. This action is irreversible.</span>,
-	},
-	suspend: {
-		title: 'Suspend user',
-		description: <span>Please enter the email of the user <span className="font-bold text-slate-700 select-none">{ rowData.email }</span> to confirm the account suspension. The user will no longer be able to log in.</span>,
-	},
-	activate: {
-		title: 'Activate user',
-		description: <span>Please confirm the account activation. The user will be able to log in again.</span>,
+		description: <span>Please enter the email of the user <span className="font-bold text-slate-700 select-none">{ userData.email }</span> to confirm the deletion. This action is irreversible.</span>,
 	},
 	'reset-password': {
 		title: 'Send reset password email',
@@ -51,10 +41,9 @@ const getModalContent = (rowData: UserColumn) => ({
 	},
 });
 
-const Menu = ({ rowData }: MenuProps) => {
+const Menu = ({ userData, csrfToken }: MenuProps) => {
 
-	const { csrfToken } = useCsrf();
-	const { updateUsers, refetchUsers } = useUsers();
+	const { refetchUsers } = useUsers();
 
 	const [ confirmationModalState, setConfirmationModalState ] = useState<ModalState>({
 		isOpen: false,
@@ -71,22 +60,6 @@ const Menu = ({ rowData }: MenuProps) => {
 			isOpen: true,
 			modalType: 'form',
 			action: 'delete', 
-		});
-	};
-
-	const handleSuspendUser = () => {
-		setConfirmationModalState({
-			isOpen: true,
-			modalType: 'form',
-			action: 'suspend', 
-		});
-	};
-
-	const handleActivateUser = () => {
-		setConfirmationModalState({
-			isOpen: true,
-			modalType: 'simple',
-			action: 'activate', 
 		});
 	};
 
@@ -121,40 +94,20 @@ const Menu = ({ rowData }: MenuProps) => {
 		try {
 			setIsLoading(true);
 			if (confirmationModalState.action === 'delete') {
-				await deleteUser(rowData.id, csrfToken);
+				await deleteUser(userData.id, csrfToken);
 				refetchUsers();
 			}
-			if (confirmationModalState.action === 'suspend') {
-				await updateUserQuery({
-					id: rowData.id,
-					is_disabled: true,
-				}, csrfToken);
-				updateUsers({
-					...rowData,
-					is_disabled: true, 
-				});
-			}
-			if (confirmationModalState.action === 'activate') {
-				await updateUserQuery({
-					id: rowData.id,
-					is_disabled: false,
-				}, csrfToken);
-				updateUsers({
-					...rowData,
-					is_disabled: false, 
-				});
-			}
 			if (confirmationModalState.action === 'reset-password') {
-				await sendResetPasswordTokenToUser(rowData.id, csrfToken);
+				await sendResetPasswordTokenToUser(userData.id, csrfToken);
 			}
 			if (confirmationModalState.action === 'verify-email') {
-				await sendVerificationTokenToUser(rowData.id, csrfToken);
+				await sendVerificationTokenToUser(userData.id, csrfToken);
 			}
 			setConfirmationModalState({
 				...confirmationModalState,
 				isOpen: openState,
 			});
-			if (currentUser && rowData.id.toString() === currentUser.id.toString() && [ 'delete', 'suspend' ].includes(confirmationModalState.action)) {
+			if (currentUser && userData.id.toString() === currentUser.id.toString() && [ 'delete', 'suspend' ].includes(confirmationModalState.action)) {
 				await signOut({ redirect: false });
 				return;
 			}
@@ -176,24 +129,16 @@ const Menu = ({ rowData }: MenuProps) => {
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Button
-						className="h-8 w-8 p-0"
+						className="gap-2 items-center"
 						variant="ghost"
 					>
 						<span className="sr-only">Open menu</span>
-						<MoreHorizontal className="h-4 w-4" />
+						<MoreHorizontal size="16" />
+						Actions
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">
 					<DropdownMenuLabel>Actions</DropdownMenuLabel>
-					<DropdownMenuItem
-						className="gap-2 hover:cursor-pointer"
-						asChild
-					>
-						<Link href={ `/users/edit/${ rowData.id }` }>
-							<Edit size="16" />
-							Edit
-						</Link>
-					</DropdownMenuItem>
 					<DropdownMenuItem
 						className="gap-2 hover:cursor-pointer"
 						onClick={ handleSendResetPasswordEmail }
@@ -210,20 +155,6 @@ const Menu = ({ rowData }: MenuProps) => {
 					><ArrowRightLeft size="16" /> Impersonate
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
-					{
-						rowData.is_disabled ?
-							<DropdownMenuItem
-								className="gap-2 hover:cursor-pointer"
-								onClick={ handleActivateUser }
-							><Unlock size="16" /> Activate
-							</DropdownMenuItem>
-							:
-							<DropdownMenuItem
-								className="gap-2 text-red-500 hover:cursor-pointer"
-								onClick={ handleSuspendUser }
-							><Lock size="16" /> Suspend
-							</DropdownMenuItem>
-					}
 					<DropdownMenuItem
 						className="gap-2 text-red-500 hover:cursor-pointer"
 						onClick={ handleDeleteUser }
@@ -233,20 +164,20 @@ const Menu = ({ rowData }: MenuProps) => {
 				</DropdownMenuContent>
 			</DropdownMenu>
 			<ConfirmationFormModal
-				data={ rowData }
-				description={ getModalContent(rowData)[ confirmationModalState.action ].description }
+				data={ userData }
+				description={ getModalContent(userData)[ confirmationModalState.action ].description }
 				isLoading={ isLoading }
 				isOpen={ confirmationModalState.modalType === 'form' && confirmationModalState.isOpen }
 				keyToValidate="email"
-				title={ getModalContent(rowData)[ confirmationModalState.action ].title }
+				title={ getModalContent(userData)[ confirmationModalState.action ].title }
 				variant="destructive"
 				onOpenChange={ handleConfirmationModalOpenChange }
 			/>
 			<ConfirmationModal
-				description={ getModalContent(rowData)[ confirmationModalState.action ].description }
+				description={ getModalContent(userData)[ confirmationModalState.action ].description }
 				isLoading={ isLoading }
 				isOpen={ confirmationModalState.modalType === 'simple' && confirmationModalState.isOpen }
-				title={ getModalContent(rowData)[ confirmationModalState.action ].title }
+				title={ getModalContent(userData)[ confirmationModalState.action ].title }
 				onOpenChange={ handleConfirmationModalOpenChange }
 			/>
 		</>

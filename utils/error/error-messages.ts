@@ -26,8 +26,8 @@ export const errorMessages: Record<string, { en: string, fr: string }> = {
 		fr: 'Jeton invalide.',
 	},
 	[ TOKEN_ALREADY_SENT_ERROR ]: {
-		en: 'Token already sent.',
-		fr: 'Jeton déjà envoyé.',
+		en: 'Token already sent. Wait a minute before sending a new one.',
+		fr: 'Jeton déjà envoyé. Attendez une minute avant d\'en envoyer un autre.',
 	},
 	[ INVALID_TOKEN_ERROR ]: {
 		en: 'Invalid token.',

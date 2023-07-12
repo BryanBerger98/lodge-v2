@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ZodError, object, string } from 'zod';
 
 import { connectToDatabase } from '@/config/database.config';
-import { createToken, deleteTokenById, getTokenFromCreatedBy, getTokenFromTokenString } from '@/database/token/token.repository';
+import { createToken, deleteTokenById, getTokenFromTargetId, getTokenFromTokenString } from '@/database/token/token.repository';
 import { findUserByEmail, findUserById, updateUserPassword } from '@/database/user/user.repository';
 import { IToken } from '@/types/token.type';
 import { Optional } from '@/types/utils.type';
@@ -33,7 +33,7 @@ export const POST = async (request: NextRequest) => {
 			}));
 		}
 
-		const oldToken = await getTokenFromCreatedBy(userData.id, { action: 'reset_password' });
+		const oldToken = await getTokenFromTargetId(userData.id, { action: 'reset_password' });
 
 		if (oldToken) {
 			const tokenCreationTimestamp = oldToken.created_at.getTime();
@@ -56,6 +56,7 @@ export const POST = async (request: NextRequest) => {
 			expiration_date: new Date(expirationDate),
 			action: 'reset_password',
 			created_by: userData.id,
+			target_id: userData.id,
 		});
 
 		await sendResetPasswordEmail(userData, savedToken);
@@ -116,7 +117,7 @@ export const PUT = async (request: NextRequest) => {
 			})); 
 		}
 
-		const userData = await findUserById(savedToken.created_by);
+		const userData = await findUserById(savedToken.target_id);
 
 		if (!userData) {
 			return sendError(buildError({

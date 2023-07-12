@@ -22,6 +22,10 @@ const tokenSchema = new Schema<IToken>({
 		type: Types.ObjectId,
 		default: null,
 	},
+	target_id: {
+		type: Schema.Types.ObjectId,
+		required: true,
+	},
 }, {
 	timestamps: {
 		createdAt: 'created_at',
