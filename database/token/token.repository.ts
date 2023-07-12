@@ -13,9 +13,29 @@ export const createToken = async (tokenToCreate: CreateTokenDTO): Promise<IToken
 	}
 };
 
+type GetTokenFromTargetIdFilter = {
+	action?: TokenAction,
+	created_at?: Date,
+	created_by?: Id | string,
+	expiration_date?: Date,
+}
+
+export const getTokenFromTargetId = async (target_id: Id | string, filter?: GetTokenFromTargetIdFilter): Promise<IToken | null> => {
+	try {
+		const foundToken = await TokenModel.findOne({
+			target_id: newId(target_id),
+			...filter,
+		});
+		return foundToken?.toObject() || null;
+	} catch (error) {
+		throw error;
+	}
+};
+
 type GetTokenFromCreatedByFilter = {
 	action?: TokenAction,
 	created_at?: Date,
+	target_id?: Id | string,
 	expiration_date?: Date,
 }
 

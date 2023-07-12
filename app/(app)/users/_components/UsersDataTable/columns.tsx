@@ -10,13 +10,23 @@ import { UserRole } from '@/types/user.type';
 import Menu from './Menu';
 
 export type UserColumn = {
-  id: string | Id
-  username: string
-  email: string
-  is_disabled: boolean,
-  has_email_verified: boolean,
+  id: string | Id;
+  username: string;
+  email: string;
+  is_disabled: boolean;
+  has_email_verified: boolean;
   role: UserRole;
+  created_at: Date;
 }
+
+export const COLUMN_NAMES = {
+	username: 'username',
+	email: 'email',
+	is_disabled: 'status',
+	has_email_verified: 'email verified',
+	role: 'role',
+	created_at: 'created at',
+};
 
 export const columns: ColumnDef<UserColumn>[] = [
 	{
@@ -107,10 +117,40 @@ export const columns: ColumnDef<UserColumn>[] = [
 		),
 	},
 	{
-		id: 'status',
+		id: 'is_disabled',
 		accessorKey: 'is_disabled',
-		header: 'Status',
+		header: ({ column }) => {
+			const handleSort = () => column.toggleSorting(column.getIsSorted() === 'asc');
+			const sortState = column.getIsSorted();
+			return (
+				<Button
+					variant="ghost"
+					onClick={ handleSort }
+				>
+					Status
+					{ sortState === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> : sortState === 'desc' ? <ArrowDown className="ml-2 h-4 w-4" /> : <ArrowUpDown className="ml-2 h-4 w-4 text-slate-500" /> }
+				</Button>
+			);
+		},
 		cell: ({ row }) => <Badge variant={ row.original.is_disabled ? 'destructive' : 'secondary' }>{ row.original.is_disabled ? 'Disabled' : 'Enabled' }</Badge>,
+	},
+	{
+		id: 'created_at',
+		accessorKey: 'created_at',
+		header: ({ column }) => {
+			const handleSort = () => column.toggleSorting(column.getIsSorted() === 'asc');
+			const sortState = column.getIsSorted();
+			return (
+				<Button
+					variant="ghost"
+					onClick={ handleSort }
+				>
+					Created at
+					{ sortState === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> : sortState === 'desc' ? <ArrowDown className="ml-2 h-4 w-4" /> : <ArrowUpDown className="ml-2 h-4 w-4 text-slate-500" /> }
+				</Button>
+			);
+		},
+		cell: ({ row }) => <span>{ new Date(row.original.created_at).toLocaleDateString('fr') } { new Date(row.original.created_at).toLocaleTimeString('fr') }</span>,
 	},
 	{
 		id: 'actions',

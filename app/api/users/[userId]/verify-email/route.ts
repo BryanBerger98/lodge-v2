@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { connectToDatabase } from '@/config/database.config';
-import { createToken, deleteTokenById, getTokenFromCreatedBy } from '@/database/token/token.repository';
+import { createToken, deleteTokenById, getTokenFromTargetId } from '@/database/token/token.repository';
 import { findUserById } from '@/database/user/user.repository';
 import { IToken } from '@/types/token.type';
 import { Optional } from '@/types/utils.type';
@@ -46,7 +46,7 @@ export const POST = async (_: any, { params }: { params: { userId: string } }) =
 			}));
 		}
 
-		const oldToken = await getTokenFromCreatedBy(userData.id, { action: 'email_verification' });
+		const oldToken = await getTokenFromTargetId(userData.id, { action: 'email_verification' });
 
 		if (oldToken) {
 			const tokenCreationTimestamp = oldToken.created_at.getTime();
@@ -69,6 +69,7 @@ export const POST = async (_: any, { params }: { params: { userId: string } }) =
 			expiration_date: new Date(expirationDate),
 			action: 'email_verification',
 			created_by: currentUser.id,
+			target_id: userData.id,
 		});
 
 		await sendAccountVerificationEmail(userData, savedToken);

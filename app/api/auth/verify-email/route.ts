@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { connectToDatabase } from '@/config/database.config';
-import { createToken, deleteTokenById, getTokenFromCreatedBy, getTokenFromTokenString } from '@/database/token/token.repository';
+import { createToken, deleteTokenById, getTokenFromTargetId, getTokenFromTokenString } from '@/database/token/token.repository';
 import { findUserByEmail, findUserById, updateUser } from '@/database/user/user.repository';
 import { IToken } from '@/types/token.type';
 import { Optional } from '@/types/utils.type';
@@ -36,7 +36,7 @@ export const GET = async () => {
 			}));
 		}
 
-		const tokenData = await getTokenFromCreatedBy(userData.id, { action: 'email_verification' });
+		const tokenData = await getTokenFromTargetId(userData.id, { action: 'email_verification' });
 
 		if (!tokenData) {
 			return sendError(buildError({
@@ -87,7 +87,7 @@ export const POST = async () => {
 			}));
 		}
 
-		const oldToken = await getTokenFromCreatedBy(userData.id, { action: 'email_verification' });
+		const oldToken = await getTokenFromTargetId(userData.id, { action: 'email_verification' });
 
 		if (oldToken) {
 			const tokenCreationTimestamp = oldToken.created_at.getTime();
@@ -110,6 +110,7 @@ export const POST = async () => {
 			expiration_date: new Date(expirationDate),
 			action: 'email_verification',
 			created_by: currentUser.id,
+			target_id: currentUser.id,
 		});
 
 		await sendAccountVerificationEmail(userData, savedToken);

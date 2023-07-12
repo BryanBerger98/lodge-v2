@@ -12,6 +12,7 @@ import { getFileFromKey } from '@/lib/bucket';
 import { getCsrfToken } from '@/utils/csrf.util';
 
 import EditUserForm from '../../_components/EditUserForm';
+import Menu from '../_components/Menu';
 
 type EditUserPageProps = {
 	params: {
@@ -43,12 +44,18 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
 	return (
 		<>
 			<PageTitle><User /> Edit user</PageTitle>
-			<BackButton>
-				<ChevronLeft /> Back
-			</BackButton>
 			<UsersProvider>
 				<div className="grid grid-cols-3">
 					<div className="col-span-2 flex flex-col gap-8">
+						<div className="flex justify-between items-center">
+							<BackButton className="mb-0">
+								<ChevronLeft /> Back
+							</BackButton>
+							<Menu
+								csrfToken={ csrfToken }
+								userData={ userData }
+							/>
+						</div>
 						<EditUserForm
 							csrfToken={ csrfToken }
 							user={ userData }
