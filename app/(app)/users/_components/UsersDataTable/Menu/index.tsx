@@ -2,8 +2,7 @@
 
 import { ArrowRightLeft, BadgeCheck, Edit, KeyRound, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { signOut, useSession } from 'next-auth/react';
+import { signOut } from 'next-auth/react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -11,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import ConfirmationFormModal, { ConfirmationModalOpenChangeEvent } from '@/components/ui/Modal/ConfirmationFormModal';
 import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal';
 import { useToast } from '@/components/ui/use-toast';
+import useAuth from '@/context/auth/useAuth';
 import useCsrf from '@/context/csrf/useCsrf';
 import useUsers from '@/context/users/useUsers';
 import { deleteUser, updateUser as updateUserQuery } from '@/services/users.service';
@@ -53,8 +53,7 @@ const Menu = ({ rowData }: MenuProps) => {
 	});
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 
-	const router = useRouter();
-	const { data: session } = useSession();
+	const { currentUser } = useAuth();
 	const { toast } = useToast();
 
 	const handleDeleteUser = () => {
@@ -121,9 +120,9 @@ const Menu = ({ rowData }: MenuProps) => {
 				...confirmationModalState,
 				isOpen: openState,
 			});
-			if (session && rowData.id.toString() === session.user.id.toString() && [ 'delete', 'suspend' ].includes(confirmationModalState.action)) {
+			if (currentUser && rowData.id.toString() === currentUser.id.toString() && [ 'delete', 'suspend' ].includes(confirmationModalState.action)) {
 				await signOut({ redirect: false });
-				return router.replace('/signin');
+				return;
 			}
 		} catch (error) {
 			console.error(error);

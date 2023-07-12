@@ -3,11 +3,11 @@
 import { ArrowRight, CheckCircle2, Loader2, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import useAuth from '@/context/auth/useAuth';
 import { verifyUserEmail } from '@/services/auth.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
@@ -21,28 +21,23 @@ const ConfirmEmailCard = ({ csrfToken, verificationToken }: ConfirmEmailCardProp
 	const [ isLoading, setIsLoading ] = useState(true);
 	const [ error, setError ] = useState('');
 
-	const { update, data: session } = useSession();
+	const { currentUser, updateCurrentUser } = useAuth();
 
 	const router = useRouter();
 
 	useEffect(() => {
-		if (session) {
+		if (currentUser) {
 			setIsLoading(true);
 			verifyUserEmail(verificationToken, csrfToken)
 				.then(({ has_email_verified }) => {
-					const newSession = {
-						...session,
-						user: {
-							...session?.user,
-							has_email_verified,
-						},
-				  };
-					update(newSession)
+					updateCurrentUser({
+						...currentUser,
+						has_email_verified,
+					})
 						.catch(console.error)
 						.finally(() => {
 							router.replace('/');
 						});
-
 				})
 				.catch((error) => {
 					const apiError = error as ApiError<unknown>;
@@ -52,7 +47,7 @@ const ConfirmEmailCard = ({ csrfToken, verificationToken }: ConfirmEmailCardProp
 				.finally(() => setIsLoading(false));
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ session?.user.id ]);
+	}, [ currentUser?.id ]);
 
 	return (
 		<Card className="min-w-[420px]">

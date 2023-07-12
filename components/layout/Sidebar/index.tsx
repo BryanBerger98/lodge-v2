@@ -1,9 +1,11 @@
+'use client';
+
 import { Layers, MessagesSquare, Users } from 'lucide-react';
 import Link from 'next/link';
-import { getServerSession } from 'next-auth';
 
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import CurrentUserAvatar from '@/components/features/users/CurrentUserAvatar';
+import useAuth from '@/context/auth/useAuth';
+import { USERS_ACTIONS } from '@/utils/role.util';
 
 import { Button } from '../../ui/button';
 
@@ -12,9 +14,9 @@ type SidebarProps = {
 	className?: string;
 }
 
-const Sidebar = async ({ className }: SidebarProps) => {
-	
-	const session = await getServerSession(authOptions);
+const Sidebar = ({ className }: SidebarProps) => {
+
+	const { currentUser, can } = useAuth(); 
 
 	return (
 		<div className={ `w-[200px] py-8 bg-white/50 h-screen fixed top-0 left-0 bottom-0 ${ className }` }>
@@ -35,17 +37,21 @@ const Sidebar = async ({ className }: SidebarProps) => {
 								</Link>
 							</Button>
 						</li>
-						<li>
-							<Button
-								className="w-full gap-2 justify-start"
-								variant="ghost"
-								asChild
-							>
-								<Link href="/users">
-									<Users size="16" /> Users
-								</Link>
-							</Button>
-						</li>
+						{
+							can(USERS_ACTIONS.GET_USERS) ?
+								<li>
+									<Button
+										className="w-full gap-2 justify-start"
+										variant="ghost"
+										asChild
+									>
+										<Link href="/users">
+											<Users size="16" /> Users
+										</Link>
+									</Button>
+								</li>
+								: null
+						}
 						<li>
 							<Button
 								className="w-full gap-2 justify-start"
@@ -63,7 +69,7 @@ const Sidebar = async ({ className }: SidebarProps) => {
 					<Link href="/account">
 						<CurrentUserAvatar />
 						<div className="flex flex-col gap-1 text-left">
-							<p className="text-xs font-semibold">{ session?.user?.username || <span className="italic">User</span> }</p>
+							<p className="text-xs font-semibold">{ currentUser?.username || <span className="italic">User</span> }</p>
 						</div>
 					</Link>
 				</Button>

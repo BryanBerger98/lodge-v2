@@ -1,7 +1,6 @@
 'use client';
 
 import { Loader2, Trash } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
 
@@ -21,7 +20,6 @@ const DeleteAccountButton = ({ className, csrfToken }: DeleteAccountButtonProps)
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 	const [ isPasswordModalOpen, setIsPasswordModalOpen ] = useState<boolean>(false);
 
-	const router = useRouter();
 	const { toast } = useToast();
 
 	const handleDeleteAccount = () => setIsPasswordModalOpen(true);
@@ -38,7 +36,6 @@ const DeleteAccountButton = ({ className, csrfToken }: DeleteAccountButtonProps)
 			setIsLoading(true);
 			await deleteUserAccount(csrfToken, password);
 			await signOut({ redirect: false });
-			router.replace('/signin');
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
 			toast({
