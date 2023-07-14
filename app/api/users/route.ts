@@ -223,13 +223,18 @@ export const GET = async (request: NextRequest) => {
 
 		const queryParams = parse(request.url, true).query;
 
-		const { sort_fields, sort_directions, page_index, page_size, search } = FetchUsersSchema.parse(queryParams);
+		const { sort_fields, sort_directions, page_index, page_size, search, roles } = FetchUsersSchema.parse(queryParams);
 
 		const searchArray = search ? search.trim().split(' ') : [];
 		const searchRegexArray = searchArray.map(string => new RegExp(string, 'i'));
 		const searchRequest = searchRegexArray.length > 0 ? { $or: [ { username: { $in: searchRegexArray } }, { email: { $in: searchRegexArray } } ] } : {};
 
-		const users = await findUsers(searchRequest, {
+		const rolesRequest = { role: { $in: roles } };
+
+		const users = await findUsers({
+			...rolesRequest,
+			...searchRequest, 
+		}, {
 			sort: Object.fromEntries(sort_fields.map((field, index) => [ field, sort_directions[ index ] as 1 | -1 ])),
 			skip: Math.round(page_index * page_size),
 			limit: page_size,

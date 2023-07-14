@@ -1,7 +1,7 @@
 import { object, string, z } from 'zod';
 
 import { Id } from '@/config/database.config';
-import { AuthProvider, UserRole, UserRoleWithOwner, UserRoles } from '@/types/user.type';
+import { AuthProvider, UserRoleWithOwner, UserRoles } from '@/types/user.type';
 
 export const FetchUsersSchema = object({
 	sort_fields: z.coerce.string().optional().transform(value => value ? value.split(',') : [ 'created_at' ]),
@@ -9,6 +9,7 @@ export const FetchUsersSchema = object({
 	page_size: z.coerce.number().optional().default(10),
 	page_index: z.coerce.number().optional().default(0),
 	search: z.coerce.string().optional(),
+	roles: z.string().optional().transform(value => value ? value.split(',') : [ 'user', 'admin', 'owner' ]),
 });
 
 export const SignUpUserSchema = object({

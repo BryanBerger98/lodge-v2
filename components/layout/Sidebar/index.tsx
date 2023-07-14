@@ -1,11 +1,11 @@
 'use client';
 
-import { Layers, MessagesSquare, Users } from 'lucide-react';
+import { Layers, Settings, Users } from 'lucide-react';
 import Link from 'next/link';
 
 import CurrentUserAvatar from '@/components/features/users/CurrentUserAvatar';
 import useAuth from '@/context/auth/useAuth';
-import { USERS_ACTIONS } from '@/utils/role.util';
+import { SETTINGS_ACTIONS, USERS_ACTIONS } from '@/utils/role.util';
 
 import { Button } from '../../ui/button';
 
@@ -52,13 +52,21 @@ const Sidebar = ({ className }: SidebarProps) => {
 								</li>
 								: null
 						}
-						<li>
-							<Button
-								className="w-full gap-2 justify-start"
-								variant="ghost"
-							><MessagesSquare size="16" /> Messages
-							</Button>
-						</li>
+						{
+							can(SETTINGS_ACTIONS.GET_SETTINGS) ?
+								<li>
+									<Button
+										className="w-full gap-2 justify-start"
+										variant="ghost"
+										asChild
+									>
+										<Link href="/settings">
+											<Settings size="16" /> Settings
+										</Link>
+									</Button>
+								</li>
+								: null
+						}
 					</ul>
 				</nav>
 				<Button

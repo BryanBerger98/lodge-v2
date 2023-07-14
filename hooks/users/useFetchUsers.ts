@@ -10,19 +10,24 @@ export type FetchUsersResponse = {
 	total: number,
 };
 
-const useFetchUsers = () => {
+export type UseFetchUsersOptions = {
+	sortFields?: string[],
+	sortDirections?: string[],
+	pageIndex?: number,
+	pageSize?: number,
+	search? : string,
+}
+
+const useFetchUsers = (options?: UseFetchUsersOptions) => {
 
 	const searchParams = useSearchParams();
-	const sortFields = searchParams.get('sort_fields');
-	const sortDirections = searchParams.get('sort_directions');
-	const pageIndex = searchParams.get('page_index');
-	const pageSize = searchParams.get('page_size');
-	const search = searchParams.get('search');
+	const sortFields = options?.sortFields?.join(',') || searchParams.get('sort_fields');
+	const sortDirections = options?.sortDirections?.join(',') || searchParams.get('sort_directions');
+	const pageIndex = options?.pageIndex !== undefined ? options.pageIndex : Number(searchParams.get('page_index'));
+	const pageSize = options?.pageSize !== undefined ? options.pageSize : Number(searchParams.get('page_size'));
+	const search = options?.search || searchParams.get('search');
 
-	const formattedPageSize = Number(pageSize) || 10;
-	const formattedPageIndex = Number(pageIndex) || 0;
-
-	const queryString = `?sort_fields=${ sortFields || '' }&sort_directions=${ sortDirections || '' }&page_size=${ formattedPageSize }&page_index=${ formattedPageIndex }&search=${ search || '' }`;
+	const queryString = `?sort_fields=${ sortFields || '' }&sort_directions=${ sortDirections || '' }&page_size=${ !isNaN(pageSize) ? pageSize : 10 }&page_index=${ !isNaN(pageIndex) ? pageIndex : 0 }&search=${ search || '' }`;
 
 	const { data, error, isLoading, mutate } = useSWR<FetchUsersResponse>(`/api/users${ queryString }`, fetcher);
 
