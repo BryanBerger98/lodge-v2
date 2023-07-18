@@ -8,11 +8,14 @@ import { Command,
 	CommandEmpty,
 	CommandGroup,
 	CommandInput,
-	CommandItem } from '@/components/ui/command';
+	CommandItem, 
+	CommandList } from '@/components/ui/command';
 import { Popover,
 	PopoverContent,
 	PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/utils/ui.util';
+
+import { Input } from './input';
 
 export type ComboOption = {
 	value: string;
@@ -71,7 +74,8 @@ export const Combobox = ({ children, options, placeholder, notFoundText, value, 
 						onKeyUp={ handleSearchValue }
 					/>
 					<CommandEmpty className="flex justify-center items-center text-sm py-6">{ isLoading ? <Loader2 className="animate-spin" /> : notFoundText || 'No option found.' }</CommandEmpty>
-					<CommandGroup>
+					<CommandList>
+						{ console.log('OPTIONS MAP', options) }
 						{ options.map((option) => (
 							<CommandItem
 								key={ option.value }
@@ -86,7 +90,7 @@ export const Combobox = ({ children, options, placeholder, notFoundText, value, 
 								{ option.label }
 							</CommandItem>
 						)) }
-					</CommandGroup>
+					</CommandList>
 				</Command>
 			</PopoverContent>
 		</Popover>

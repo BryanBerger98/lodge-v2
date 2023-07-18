@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ComboOption, Combobox } from '@/components/ui/combobox';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import SearchSelect from '@/components/ui/Select/SearchSelect';
 import { Switch } from '@/components/ui/switch';
 import { fetchUsers } from '@/services/users.service';
 
@@ -90,14 +91,13 @@ const ShareSettings = () => {
 								</FormItem>
 							) }
 						/>
-
 						<FormField
 							control={ form.control }
 							name="owner"
 							render={ ({ field }) => (
 								<FormItem className="flex flex-col">
 									<FormLabel>Owner</FormLabel>
-									<Combobox
+									<SearchSelect
 										isLoading={ isSearchLoading }
 										options={ searchedOptions }
 										value={ field.value }
@@ -118,7 +118,7 @@ const ShareSettings = () => {
 											}
 											<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 										</Button>
-									</Combobox>
+									</SearchSelect>
 									<FormDescription>
 										Select user to tranfer ownership.
 									</FormDescription>
