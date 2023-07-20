@@ -5,6 +5,7 @@ import { SafeTokenData } from '@/types/token.type';
 import { IUser, UserRole, UserRoleWithOwner } from '@/types/user.type';
 import fetcher, { FetcherOptions } from '@/utils/fetcher.util';
 import { objectToFormData } from '@/utils/object.utils';
+import { buildQueryUrl } from '@/utils/url.util';
 
 export type CreateUserDTO = {
 	username: string;
@@ -69,28 +70,23 @@ export type FetchUsersOptions = {
 } & FetcherOptions;
 
 export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: IUser[], total: number, count: number }> => {
-	const { sort, skip, limit, search, roles, ...restOptions } = options ? options : {
-		sort: undefined,
+	const { sort = [], skip, limit, search, roles = [], ...restOptions } = options ? options : {
+		sort: [],
 		skip: undefined,
 		limit: undefined,
 		search: undefined,
-		roles: undefined,
+		roles: [],
 	};
-	const sortQuery = sort && sort.length > 0 ? `sort_fields=${ sort.map(el => el.id).join(',') }&sort_directions=${ sort.map(el => el.desc ? -1 : 1).join(',') }` : '';
-	const skipQuery = skip ? `skip=${ skip }` : '';
-	const limitQuery = limit ? `limit=${ limit }` : '';
-	const searchQuery = search ? `search=${ search }` : '';
-	const rolesQuery = roles && roles.length > 0 ? `roles=${ roles.join(',') }` : '';
-	let query = '';
-	if (sortQuery || skipQuery || limitQuery || searchQuery) {
-		query = `?${ sortQuery }${ sortQuery && skipQuery ? `&${ skipQuery }` : skipQuery }${ (sortQuery || skipQuery) && limitQuery ? `&${ limitQuery }` : limitQuery }${ (sortQuery || skipQuery || limitQuery) && searchQuery ? `&${ searchQuery }` : searchQuery }`;
-	}
-	if (rolesQuery) {
-		if (query) {
-			query += `&${ rolesQuery }`;
-		}
-		query = `?${ rolesQuery }`;
-	}
+
+	const query = buildQueryUrl({
+		sort_fields: sort.map(el => el.id).join(','),
+		sort_directions: sort.map(el => el.desc ? -1 : 1).join(','),
+		limit,
+		skip,
+		search,
+		roles: roles.join(','),
+	});
+
 	try {
 		const data = await fetcher(`/api/users/${ query }`, restOptions);
 		return data;

@@ -56,8 +56,6 @@ export const Combobox = ({ children, options, placeholder, notFoundText, value, 
 		}
 	};
 
-	console.log('OPTIONS', options);
-
 	return (
 		<Popover
 			open={ isOpen }
@@ -75,7 +73,6 @@ export const Combobox = ({ children, options, placeholder, notFoundText, value, 
 					/>
 					<CommandEmpty className="flex justify-center items-center text-sm py-6">{ isLoading ? <Loader2 className="animate-spin" /> : notFoundText || 'No option found.' }</CommandEmpty>
 					<CommandList>
-						{ console.log('OPTIONS MAP', options) }
 						{ options.map((option) => (
 							<CommandItem
 								key={ option.value }

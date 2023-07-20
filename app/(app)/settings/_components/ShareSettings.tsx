@@ -3,28 +3,42 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronsUpDown, Loader2, Save, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ComboOption, Combobox } from '@/components/ui/combobox';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
-import SearchSelect from '@/components/ui/Select/SearchSelect';
+import SearchSelect, { SelectOption } from '@/components/ui/Select/SearchSelect';
 import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/components/ui/use-toast';
+import { getShareSettings, updateSettings } from '@/services/settings.service';
 import { fetchUsers } from '@/services/users.service';
+import { ISetting } from '@/types/setting.type';
+import { IUser } from '@/types/user.type';
+import { ApiError, getErrorMessage } from '@/utils/error';
+import { OWNER_SETTING, SHARE_WITH_ADMIN_SETTING } from '@/utils/settings';
 
 const shareSettingsFormSchema = z.object({
 	share_with_admin: z.boolean().default(false).optional(),
 	owner: z.string().optional(),
 });
 
-const ShareSettings = () => {
+type ShareSettingsProps = {
+	csrfToken: string;
+};
+
+const ShareSettings = ({ csrfToken }: ShareSettingsProps) => {
 
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 	const [ isSearchLoading, setIsSearchLoading ] = useState<boolean>(false);
-	const [ searchedOptions, setSearchedOptions ] = useState<ComboOption[]>([]);
+	const [ searchedOptions, setSearchedOptions ] = useState<SelectOption[]>([]);
+	const [ ownerUser, setOwnerUser ] = useState<IUser | null>(null);
+	const [ shareWithAdminSetting, setShareWithAdminSetting ] = useState<ISetting | null>(null);
+	const [ ownerSetting, setOwnerSetting ] = useState<ISetting | null>(null);
+
+	const { toast } = useToast();
 
 	const form = useForm<z.infer<typeof shareSettingsFormSchema>>({
 		resolver: zodResolver(shareSettingsFormSchema),
@@ -35,6 +49,24 @@ const ShareSettings = () => {
 		mode: 'onSubmit',
 	});
 
+	useEffect(() => {
+		getShareSettings()
+			.then(({ ownerUser: owner, settings }) => {
+				form.setValue('owner', owner.id.toString());
+				setOwnerUser(owner);
+				setOwnerSetting(settings.owner);
+				const { value } = settings.shareWithAdmin;
+				if (typeof value === 'boolean') {
+					form.setValue('share_with_admin', value);
+				} else {
+					form.setValue('share_with_admin', false);
+				}
+				setShareWithAdminSetting(settings.shareWithAdmin);
+			})
+			.catch(console.error);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
 	const handleSearch = async (value: string) => {
 		try {
 			setIsSearchLoading(true);
@@ -42,11 +74,9 @@ const ShareSettings = () => {
 				search: value,
 				roles: [ 'admin', 'user' ],
 			});
-			console.log(value);
-			console.log(data.users);
 			const options = value ? data.users.map(user => ({
 				value: user.id.toString(),
-				label: `${ user.email }<${ user.username || 'No name' }>`,
+				label: `${ user.username ? user.username + ' - ' : '' }${ user.email }`,
 			})) : [];
 			setSearchedOptions(options);
 		} catch (error) {
@@ -56,8 +86,42 @@ const ShareSettings = () => {
 		}
 	};
 
-	const handleSubmitShareForm = (values: z.infer<typeof shareSettingsFormSchema>) => {
-		console.log(values);
+	const handleCancel = () => {
+		form.setValue('owner', ownerUser?.id.toString() || '');
+		if (shareWithAdminSetting?.value && typeof shareWithAdminSetting.value === 'boolean') {
+			form.setValue('share_with_admin', shareWithAdminSetting.value);
+		} else {
+			form.setValue('share_with_admin', false);
+		}
+	};
+
+	const handleSubmitShareForm = async (values: z.infer<typeof shareSettingsFormSchema>) => {
+		try {
+			setIsLoading(true);
+			await updateSettings(csrfToken,
+				{
+					id: ownerSetting?.id,
+					name: ownerSetting?.name || OWNER_SETTING,
+					value: values.owner,
+					data_type: 'objectId',
+				},
+				{
+					id: shareWithAdminSetting?.id,
+					name: shareWithAdminSetting?.name || SHARE_WITH_ADMIN_SETTING,
+					value: values.share_with_admin || false,
+					data_type: 'boolean',
+				}
+			);
+		} catch (error) {
+			const apiError = error as ApiError<unknown>;
+			toast({
+				title: 'Error',
+				description: getErrorMessage(apiError),
+				variant: 'destructive',
+			});
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	return (
@@ -110,11 +174,13 @@ const ShareSettings = () => {
 											variant="outline"
 										>
 											{
-									 			field.value
-													? searchedOptions.find(
-														(option) => option.value === field.value
-													)?.label
-													: 'Select a user as owner'
+												field.value === ownerUser?.id && ownerUser
+													? `${ ownerUser.username ? ownerUser.username + ' - ' : '' }${ ownerUser.email }`
+													: field.value
+														? searchedOptions.find(
+															(option) => option.value === field.value
+														)?.label
+														: 'Select a user as owner' 
 											}
 											<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 										</Button>
@@ -131,6 +197,7 @@ const ShareSettings = () => {
 							className="gap-2"
 							type="button"
 							variant="outline"
+							onClick={ handleCancel }
 						>
 							<X />
 							Cancel
