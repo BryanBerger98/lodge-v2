@@ -1,14 +1,7 @@
-/* eslint-disable no-console */
-// /lib/dbConnect.js
 import mongoose, { Types } from 'mongoose';
 
 export type Id = Types.ObjectId;
 export const newId = (idString?: string | Id) => new Types.ObjectId(idString);
-
-/**
-Source :
-https://github.com/vercel/next.js/blob/canary/examples/with-mongodb-mongoose/utils/dbConnect.js
-**/
 
 const { DB_USER, DB_PASSWORD, DB_CLUSTER, DB_NAME, DB_PORT } = process.env;
 
@@ -19,7 +12,7 @@ const getMongoDBURI = () => {
 		}
 		return `mongodb://localhost:${ DB_PORT || '27017' }/${ DB_NAME }?retryWrites=true&w=majority`;
 	}
-	console.log('Connecting to MongoDB server...');
+	console.info('Connecting to MongoDB server...');
 	return `mongodb+srv://${ DB_USER }:${ DB_PASSWORD }@${ DB_CLUSTER }.mongodb.net/${ DB_NAME }?retryWrites=true&w=majority`;
 };
 
@@ -64,7 +57,7 @@ export const connectToDatabase = async () => {
 			};
 
 			cached.promise = mongoose.connect(MONGODB_URI, opts).then(mongoose => {
-				console.log('MongoDB connected successfully.');
+				console.info('MongoDB connected successfully.');
 				return mongoose;
 			});
 		}

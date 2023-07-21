@@ -7,7 +7,38 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "analyze": "ANALYZE=true next build"
+    "analyze": "ANALYZE=true next build",
+    "prepare": "husky install",
+    "commit": "git-cz",
+    "commit:all": "git add . && git-cz"
+  },
+  "validate-branch-name": {
+    "pattern": "^(main|development|staging){1}$|^(feat|fix|hotfix|release|chore)/.+$",
+    "errorMsg": "Please, set a valid branch name."
+  },
+  "git-precommit-checks": {
+    "rules": [
+      {
+        "filter": "*.{ts,tsx,js,jsx}",
+        "nonBlocking": "true",
+        "message": "You've got leftover `console.log`",
+        "regex": "console\\.log"
+      },
+      {
+        "message": "You've got leftover conflict markers",
+        "regex": "/^[<>|=]{4,}/m"
+      },
+      {
+        "message": "You have unfinished devs",
+        "nonBlocking": "true",
+        "regex": "(?:FIXME|TODO)"
+      }
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "@commitlint/cz-commitlint"
+    }
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.374.0",
@@ -55,6 +86,9 @@
   },
   "devDependencies": {
     "@aws-sdk/signature-v4-crt": "^3.369.0",
+    "@commitlint/cli": "^17.6.7",
+    "@commitlint/config-conventional": "^17.6.7",
+    "@commitlint/cz-commitlint": "^17.6.7",
     "@types/bcryptjs": "^2.4.2",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^20.3.3",
@@ -65,6 +99,7 @@
     "@typescript-eslint/parser": "^5.60.1",
     "autoprefixer": "^10.4.14",
     "aws-crt": "^1.15.20",
+    "commitizen": "^4.3.0",
     "eslint": "^8.44.0",
     "eslint-config-next": "^13.4.7",
     "eslint-import-resolver-typescript": "^3.5.5",
@@ -72,7 +107,12 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "git-precommit-checks": "^3.1.0",
+    "husky": "^8.0.0",
+    "inquirer": "^8.2.5",
+    "lint-staged": "^13.2.3",
     "postcss": "^8.4.24",
-    "tailwindcss": "^3.3.2"
+    "tailwindcss": "^3.3.2",
+    "validate-branch-name": "^1.3.0"
   }
 }
