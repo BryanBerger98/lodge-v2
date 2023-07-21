@@ -3,6 +3,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Save } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ZodError, object, string, z } from 'zod';
@@ -26,6 +27,8 @@ const UpdateEmailForm = ({ csrfToken }: UpdateEmailFormProps) => {
 	const { toast } = useToast();
 
 	const { currentUser, updateCurrentUser } = useAuth();
+
+	const router = useRouter();
 
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 	const [ isPasswordModalOpen, setIsPasswordModalOpen ] = useState<boolean>(false);
@@ -64,6 +67,7 @@ const UpdateEmailForm = ({ csrfToken }: UpdateEmailFormProps) => {
 			setIsLoading(true);
 			const updatedUser = await updateUserEmail(email, password, csrfToken);
 			await updateCurrentUser(updatedUser);
+			router.replace('/verify-email');
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
 			if (apiError.code === 'invalid-input') {
@@ -136,6 +140,13 @@ const UpdateEmailForm = ({ csrfToken }: UpdateEmailFormProps) => {
 				</Form>
 			</Card>
 			<PasswordModal
+				description={
+					<>
+						<p>Please verify that your email address is right: <span className="font-bold">{ form.getValues().email }</span>.</p>
+						<p className="mb-4">We will send a validation link to your inbox.</p>
+						<p>Enter your password to confirm the action.</p>
+					</>
+				}
 				isOpen={ isPasswordModalOpen }
 				onOpenChange={ handlePasswordModalOpenChange }
 			/>
