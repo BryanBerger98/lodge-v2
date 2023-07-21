@@ -1,4 +1,5 @@
 export const USER_NOT_FOUND_ERROR = 'user-not-found';
+export const USER_UNEDITABLE_ERROR = 'user-uneditable';
 export const USER_ALREADY_EXISTS_ERROR = 'user-already-exists';
 export const MISSING_CREDENTIALS_ERROR = 'missing-credentials';
 export const ACCOUNT_DISABLED_ERROR = 'account-disabled';
@@ -17,3 +18,4 @@ export const TOKEN_EXPIRED_ERROR = 'token-expired';
 export const FILE_NOT_FOUND_ERROR = 'file-not-found';
 export const WRONG_FILE_FORMAT_ERROR = 'wrong-file-format';
 export const FILE_TOO_LARGE_ERROR = 'file-too-large';
+export const SETTING_NOT_FOUND = 'setting-not-found';

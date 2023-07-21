@@ -149,17 +149,23 @@ const Menu = ({ userData, csrfToken }: MenuProps) => {
 						onClick={ handleSendVerificationEmail }
 					><BadgeCheck size="16" /> Send email verification
 					</DropdownMenuItem>
-					<DropdownMenuItem
-						className="gap-2 hover:cursor-pointer"
-						disabled
-					><ArrowRightLeft size="16" /> Impersonate
-					</DropdownMenuItem>
-					<DropdownMenuSeparator />
-					<DropdownMenuItem
-						className="gap-2 text-red-500 hover:cursor-pointer"
-						onClick={ handleDeleteUser }
-					><Trash size="16" /> Delete
-					</DropdownMenuItem>
+					{
+						userData.role !== 'owner' ?
+							<>
+								<DropdownMenuItem
+									className="gap-2 hover:cursor-pointer"
+									disabled
+								><ArrowRightLeft size="16" /> Impersonate
+								</DropdownMenuItem>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem
+									className="gap-2 text-red-500 hover:cursor-pointer"
+									onClick={ handleDeleteUser }
+								><Trash size="16" /> Delete
+								</DropdownMenuItem>
+							</>
+							: null
+					}
 				
 				</DropdownMenuContent>
 			</DropdownMenu>

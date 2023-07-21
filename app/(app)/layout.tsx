@@ -1,7 +1,9 @@
+'use client';
+
 import dynamic from 'next/dynamic';
 import { ReactNode } from 'react';
 
-// import Sidebar from '@/components/layout/Sidebar';
+import SettingsProvider from '@/context/settings';
 
 const DynamicSidebar = dynamic(() => import('@/components/layout/Sidebar'));
 
@@ -13,7 +15,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
 	return (
 		<div>
-			<DynamicSidebar />
+			<SettingsProvider>
+				<DynamicSidebar />
+			</SettingsProvider>
 			<div className="ml-[200px] p-8">
 				{ children }
 			</div>

@@ -37,6 +37,15 @@ export const findUsersCount = async (searchRequest: FilterQuery<IUser>): Promise
 	}
 };
 
+export const findOwnerUser = async (): Promise<IUser | null> => {
+	try {
+		const ownerUser = await UserModel.findOne({ role: 'owner' }, { password: 0 });
+		return ownerUser?.toObject() || null;
+	} catch (error) {
+		throw error;
+	}
+};
+
 export const findUserByEmail = async (email: string): Promise<IUser | null> => {
 	try {
 		const serializedEmail = email.toLowerCase().trim();

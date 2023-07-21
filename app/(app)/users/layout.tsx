@@ -9,7 +9,7 @@ type UsersLayoutProps = {
 const UsersLayout = async ({ children }: UsersLayoutProps) => {
 
 	await setServerAuthGuard({
-		rolesWhiteList: [ 'admin' ],
+		rolesWhiteList: [ 'owner', 'admin' ],
 		redirect: '/', 
 	});
 

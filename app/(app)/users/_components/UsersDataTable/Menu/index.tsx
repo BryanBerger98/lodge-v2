@@ -185,15 +185,19 @@ const Menu = ({ rowData }: MenuProps) => {
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">
 					<DropdownMenuLabel>Actions</DropdownMenuLabel>
-					<DropdownMenuItem
-						className="gap-2 hover:cursor-pointer"
-						asChild
-					>
-						<Link href={ `/users/edit/${ rowData.id }` }>
-							<Edit size="16" />
-							Edit
-						</Link>
-					</DropdownMenuItem>
+					{
+						rowData.role !== 'owner' ?
+							<DropdownMenuItem
+								className="gap-2 hover:cursor-pointer"
+								asChild
+							>
+								<Link href={ `/users/edit/${ rowData.id }` }>
+									<Edit size="16" />
+									Edit
+								</Link>
+							</DropdownMenuItem>
+							: null
+					}
 					<DropdownMenuItem
 						className="gap-2 hover:cursor-pointer"
 						onClick={ handleSendResetPasswordEmail }
@@ -204,31 +208,37 @@ const Menu = ({ rowData }: MenuProps) => {
 						onClick={ handleSendVerificationEmail }
 					><BadgeCheck size="16" /> Send email verification
 					</DropdownMenuItem>
-					<DropdownMenuItem
-						className="gap-2 hover:cursor-pointer"
-						disabled
-					><ArrowRightLeft size="16" /> Impersonate
-					</DropdownMenuItem>
-					<DropdownMenuSeparator />
 					{
-						rowData.is_disabled ?
-							<DropdownMenuItem
-								className="gap-2 hover:cursor-pointer"
-								onClick={ handleActivateUser }
-							><Unlock size="16" /> Activate
-							</DropdownMenuItem>
-							:
-							<DropdownMenuItem
-								className="gap-2 text-red-500 hover:cursor-pointer"
-								onClick={ handleSuspendUser }
-							><Lock size="16" /> Suspend
-							</DropdownMenuItem>
+						rowData.role !== 'owner' ?
+							<>
+								<DropdownMenuItem
+									className="gap-2 hover:cursor-pointer"
+									disabled
+								><ArrowRightLeft size="16" /> Impersonate
+								</DropdownMenuItem>
+								<DropdownMenuSeparator />
+								{
+									rowData.is_disabled ?
+										<DropdownMenuItem
+											className="gap-2 hover:cursor-pointer"
+											onClick={ handleActivateUser }
+										><Unlock size="16" /> Activate
+										</DropdownMenuItem>
+										:
+										<DropdownMenuItem
+											className="gap-2 text-red-500 hover:cursor-pointer"
+											onClick={ handleSuspendUser }
+										><Lock size="16" /> Suspend
+										</DropdownMenuItem>
+								}
+								<DropdownMenuItem
+									className="gap-2 text-red-500 hover:cursor-pointer"
+									onClick={ handleDeleteUser }
+								><Trash size="16" /> Delete
+								</DropdownMenuItem>
+							</>
+							: null
 					}
-					<DropdownMenuItem
-						className="gap-2 text-red-500 hover:cursor-pointer"
-						onClick={ handleDeleteUser }
-					><Trash size="16" /> Delete
-					</DropdownMenuItem>
 				
 				</DropdownMenuContent>
 			</DropdownMenu>

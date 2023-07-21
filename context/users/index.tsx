@@ -18,8 +18,8 @@ type UsersContextValues = UsersState & {
 	routeParams: {
 		sortFields: string | null;
 		sortDirections: string | null;
-		pageIndex: string | null;
-		pageSize: string | null;
+		pageIndex: number;
+		pageSize: number;
 		search: string | null;
 	};
 }

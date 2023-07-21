@@ -11,7 +11,7 @@ import { deleteFileFromKey, getFileFromKey, uploadImageToS3 } from '@/lib/bucket
 import { IUser } from '@/types/user.type';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
-import { FILE_TOO_LARGE_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_ALREADY_EXISTS_ERROR, USER_NOT_FOUND_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
+import { FILE_TOO_LARGE_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_ALREADY_EXISTS_ERROR, USER_NOT_FOUND_ERROR, USER_UNEDITABLE_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
 import { AUTHORIZED_IMAGE_MIME_TYPES, AUTHORIZED_IMAGE_SIZE, convertFileRequestObjetToModel } from '@/utils/file.util';
 import { generatePassword, hashPassword } from '@/utils/password.util';
 
@@ -72,7 +72,7 @@ export const POST = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'admin' ] });
+		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
 
 		const formData = await request.formData();
 
@@ -139,7 +139,7 @@ export const PUT = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'admin' ] });
+		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
 
 		const formData = await request.formData();
 
@@ -166,6 +166,14 @@ export const PUT = async (request: NextRequest) => {
 				code: USER_NOT_FOUND_ERROR,
 				message: 'User not found.',
 				status: 404,
+			}));
+		}
+
+		if (currentUser.role !== 'owner' && userData.role === 'owner') {
+			return sendError(buildError({
+				code: USER_UNEDITABLE_ERROR,
+				message: 'This user is not editable',
+				status: 403,
 			}));
 		}
 
@@ -211,17 +219,22 @@ export const GET = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		await setServerAuthGuard({ rolesWhiteList: [ 'admin' ] });
+		await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
 
 		const queryParams = parse(request.url, true).query;
 
-		const { sort_fields, sort_directions, page_index, page_size, search } = FetchUsersSchema.parse(queryParams);
+		const { sort_fields, sort_directions, page_index, page_size, search, roles } = FetchUsersSchema.parse(queryParams);
 
 		const searchArray = search ? search.trim().split(' ') : [];
 		const searchRegexArray = searchArray.map(string => new RegExp(string, 'i'));
 		const searchRequest = searchRegexArray.length > 0 ? { $or: [ { username: { $in: searchRegexArray } }, { email: { $in: searchRegexArray } } ] } : {};
 
-		const users = await findUsers(searchRequest, {
+		const rolesRequest = { role: { $in: roles } };
+
+		const users = await findUsers({
+			...rolesRequest,
+			...searchRequest, 
+		}, {
 			sort: Object.fromEntries(sort_fields.map((field, index) => [ field, sort_directions[ index ] as 1 | -1 ])),
 			skip: Math.round(page_index * page_size),
 			limit: page_size,

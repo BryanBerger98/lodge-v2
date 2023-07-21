@@ -3,13 +3,15 @@ import { getServerSession } from 'next-auth';
 
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { connectToDatabase } from '@/config/database.config';
-import { UserRole } from '@/types/user.type';
+import { findUserById, findUserWithPasswordById } from '@/database/user/user.repository';
+import { IUser, UserRoleWithOwner } from '@/types/user.type';
 
 import { buildError } from '../error';
-import { FORBIDDEN_ERROR, UNAUTHORIZED_ERROR } from '../error/error-codes';
+import { FORBIDDEN_ERROR, MISSING_CREDENTIALS_ERROR, UNAUTHORIZED_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '../error/error-codes';
+import { verifyPassword } from '../password.util';
 
 export interface ProtectionOptions {
-	rolesWhiteList?: UserRole[];
+	rolesWhiteList?: UserRoleWithOwner[];
 	redirect?: boolean | string;
 }
 
@@ -35,7 +37,20 @@ export const setServerAuthGuard = async (options?: ProtectionOptions) => {
 		});
 	}
 
-	if (rolesWhiteList.length > 0 && (!session || !currentUser?.id || !rolesWhiteList?.includes(currentUser.role))) {
+	const currentUserData = await findUserById(currentUser.id);
+
+	if (!currentUserData) {
+		if (redirect) {
+			return nextRedirect(typeof redirect === 'boolean' ? '/' : redirect);
+		}
+		throw buildError({
+			code: UNAUTHORIZED_ERROR,
+			message: 'Unauthorized.',
+			status: 401,
+		});
+	}
+
+	if (rolesWhiteList.length > 0 && (!session || !currentUser?.id || !rolesWhiteList?.includes(currentUserData.role))) {
 		if (redirect) {
 			return nextRedirect(typeof redirect === 'boolean' ? '/' : redirect);
 		}
@@ -46,7 +61,7 @@ export const setServerAuthGuard = async (options?: ProtectionOptions) => {
 				status: 401,
 			});
 		}
-		if (!rolesWhiteList?.includes(currentUser.role)) {
+		if (!rolesWhiteList?.includes(currentUserData.role)) {
 			throw buildError({
 				code: FORBIDDEN_ERROR,
 				message: 'Forbidden.',
@@ -55,5 +70,44 @@ export const setServerAuthGuard = async (options?: ProtectionOptions) => {
 		}
 	}
 
-	return session;
+	return {
+		session,
+		user: currentUserData, 
+	};
+};
+
+export const authenticateUserWithPassword = async (userToAuthenticate: IUser, password?: string) => {
+	try {
+		if (!password) {
+			throw buildError({
+				code: MISSING_CREDENTIALS_ERROR,
+				message: 'Missing credentials.',
+				status: 401,
+			});
+		}
+
+		const user = await findUserWithPasswordById(userToAuthenticate.id);
+
+		if (!user) {
+			throw buildError({
+				code: USER_NOT_FOUND_ERROR,
+				message: 'User not found.',
+				status: 404,
+			});
+		}
+
+		const isPasswordValid = await verifyPassword(password, user.password);
+
+		if (!isPasswordValid) {
+			throw buildError({
+				code: WRONG_PASSWORD_ERROR,
+				message: 'Wrong password.',
+				status: 401,
+			});
+		}
+
+		return;
+	} catch (error) {
+		throw error;
+	}
 };

@@ -6,7 +6,7 @@ import { deleteUserById, findUserById } from '@/database/user/user.repository';
 import { deleteFileFromKey } from '@/lib/bucket';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
-import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
+import { FORBIDDEN_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
 
 export const DELETE = async (_: any, { params }: { params: { userId: string } }) => {
 	try {
@@ -23,7 +23,7 @@ export const DELETE = async (_: any, { params }: { params: { userId: string } })
 
 		await connectToDatabase();
 
-		await setServerAuthGuard({ rolesWhiteList: [ 'admin' ] });
+		await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
 
 		const userData = await findUserById(userId);
 
@@ -32,6 +32,14 @@ export const DELETE = async (_: any, { params }: { params: { userId: string } })
 				code: USER_NOT_FOUND_ERROR,
 				message: 'User not found.',
 				status: 404,
+			}));
+		}
+
+		if (userData.role === 'owner') {
+			return sendError(buildError({
+				code: FORBIDDEN_ERROR,
+				message: 'Forbidden.',
+				status: 403,
 			}));
 		}
 
