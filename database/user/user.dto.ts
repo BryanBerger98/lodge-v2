@@ -48,6 +48,7 @@ export type UpdateUserDTO = Omit<z.infer<typeof UpdateUserSchema>, 'id' | 'role'
 	updated_by: Id | string | null;
 	has_email_verified?: boolean;
 	photo_key?: string | null;
+	last_login_date?: Date | null;
 };
 
 export const UpdateUserAccountSchema = object({

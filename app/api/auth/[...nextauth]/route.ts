@@ -66,6 +66,7 @@ export const authOptions: NextAuthOptions = {
 
 					const updatedUser = await updateUser({
 						id: user.id,
+						updated_by: user.id,
 						last_login_date: new Date(), 
 					}, { newDocument: true });
 

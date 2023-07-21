@@ -1,4 +1,5 @@
 import { ChevronLeft, UserPlus } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 
 import PageTitle from '@/components/layout/PageTitle';
@@ -6,7 +7,8 @@ import BackButton from '@/components/ui/Button/BackButton';
 import UsersProvider from '@/context/users';
 import { getCsrfToken } from '@/utils/csrf.util';
 
-import EditUserForm from '../_components/EditUserForm';
+
+const DynamicEditUserForm = dynamic(() => import('../_components/EditUserForm'));
 
 const CreateUserPage = async () => {
 
@@ -21,7 +23,7 @@ const CreateUserPage = async () => {
 			<UsersProvider>
 				<div className="grid grid-cols-3">
 					<div className="col-span-2 flex flex-col gap-8">
-						<EditUserForm csrfToken={ csrfToken } />
+						<DynamicEditUserForm csrfToken={ csrfToken } />
 					</div>
 				</div>
 			</UsersProvider>
