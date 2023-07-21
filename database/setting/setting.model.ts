@@ -1,4 +1,5 @@
 import { Schema, model, Types, Model, models } from 'mongoose';
+import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 
 import { ISetting, SettingTypes } from '@/types/setting.type';
 
@@ -32,7 +33,14 @@ const settingSchema = new Schema<ISetting>({
 	},
 });
 
+// eslint-disable-next-line func-names
+settingSchema.virtual('id').get(function () {
+	return this._id.toHexString();
+});
+
 settingSchema.set('toObject', { virtuals: true });
+
+settingSchema.plugin(mongooseLeanVirtuals);
 
 const SettingModel: Model<ISetting> = models.Setting || model<ISetting>('Setting', settingSchema);
 

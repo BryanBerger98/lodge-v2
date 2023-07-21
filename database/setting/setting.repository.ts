@@ -12,6 +12,15 @@ export const findSettingByName = async (name: string): Promise<ISetting | null> 
 	}
 };
 
+export const findSettings = async (): Promise<ISetting[]> => {
+	try {
+		const settings = await SettingModel.find().lean({ virtuals: [ 'id' ] });
+		return settings;
+	} catch (error) {
+		throw error;
+	}
+};
+
 export const createSetting = async (settingToCreate: CreateSettingDTO): Promise<ISetting> => {
 	try {
 		const createdSetting = await SettingModel.create(settingToCreate);

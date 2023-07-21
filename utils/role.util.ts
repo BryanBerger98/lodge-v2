@@ -38,7 +38,7 @@ export type SettingsActions = Record<'GET_SETTINGS' | 'UPDATE_SETTINGS' | 'CHANG
 export const SETTINGS_ACTIONS: SettingsActions = {
 	GET_SETTINGS: {
 		owner: true,
-		admin: false,
+		admin: true,
 		user: false,
 	},
 	UPDATE_SETTINGS: {

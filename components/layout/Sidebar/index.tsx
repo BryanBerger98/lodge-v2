@@ -5,7 +5,9 @@ import Link from 'next/link';
 
 import CurrentUserAvatar from '@/components/features/users/CurrentUserAvatar';
 import useAuth from '@/context/auth/useAuth';
+import useSettings from '@/context/settings/useSettings';
 import { SETTINGS_ACTIONS, USERS_ACTIONS } from '@/utils/role.util';
+import { SHARE_WITH_ADMIN_SETTING } from '@/utils/settings';
 
 import { Button } from '../../ui/button';
 
@@ -17,6 +19,9 @@ type SidebarProps = {
 const Sidebar = ({ className }: SidebarProps) => {
 
 	const { currentUser, can } = useAuth(); 
+	const { getSetting } = useSettings();
+
+	const hasSettingsAccess = currentUser?.role === 'owner' || can(SETTINGS_ACTIONS.GET_SETTINGS) && getSetting(SHARE_WITH_ADMIN_SETTING)?.value;
 
 	return (
 		<div className={ `w-[200px] py-8 bg-white/50 h-screen fixed top-0 left-0 bottom-0 ${ className }` }>
@@ -53,7 +58,7 @@ const Sidebar = ({ className }: SidebarProps) => {
 								: null
 						}
 						{
-							can(SETTINGS_ACTIONS.GET_SETTINGS) ?
+							hasSettingsAccess ?
 								<li>
 									<Button
 										className="w-full gap-2 justify-start"

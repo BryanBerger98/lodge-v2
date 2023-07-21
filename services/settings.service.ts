@@ -1,6 +1,5 @@
-import { ISetting } from '@/types/setting.type';
+import { ISetting, UnregisteredSetting } from '@/types/setting.type';
 import { IUser } from '@/types/user.type';
-import { Optional } from '@/types/utils.type';
 import fetcher from '@/utils/fetcher.util';
 
 export type ShareSettings = {
@@ -20,11 +19,28 @@ export const getShareSettings = async (): Promise<ShareSettings> => {
 	}
 };
 
-export const updateSettings = async (csrfToken: string, ...settings: Optional<ISetting, 'id' | 'created_at' | 'created_by' | 'updated_at' | 'updated_by'>[]): Promise<{ message: string }> => {
+export const updateSettings = async (settings: UnregisteredSetting[], csrfToken: string): Promise<{ message: string }> => {
 	try {
 		const data = await fetcher('/api/settings', {
 			method: 'PUT',
-			body: JSON.stringify(settings),
+			body: JSON.stringify({ settings }),
+			headers: { 'Content-Type': 'application/json' },
+			csrfToken,
+		});
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const updateShareSettings = async (settings: UnregisteredSetting[], csrfToken: string, password: string): Promise<{ message: string }> => {
+	try {
+		const data = await fetcher('/api/settings/share', {
+			method: 'PUT',
+			body: JSON.stringify({
+				settings,
+				password, 
+			}),
 			headers: { 'Content-Type': 'application/json' },
 			csrfToken,
 		});

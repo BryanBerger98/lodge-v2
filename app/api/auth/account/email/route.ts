@@ -27,7 +27,7 @@ export const PUT = async (request: NextRequest) => {
 		if (!user) {
 			return sendError(buildError({
 				code: USER_NOT_FOUND_ERROR,
-				message: 'USer not password.',
+				message: 'User not found.',
 				status: 404,
 			}));
 		}

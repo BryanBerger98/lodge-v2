@@ -3,11 +3,11 @@ import { ZodError } from 'zod';
 
 import { connectToDatabase } from '@/config/database.config';
 import { UpdateSettingsSchema } from '@/database/setting/setting.dto';
-import { findSettingByName, updateSetting } from '@/database/setting/setting.repository';
+import { findSettingByName, findSettings, updateSetting } from '@/database/setting/setting.repository';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { INTERNAL_ERROR, INVALID_INPUT_ERROR } from '@/utils/error/error-codes';
-import { SHARE_WITH_ADMIN_SETTING } from '@/utils/settings';
+import { OWNER_SETTING, SHARE_WITH_ADMIN_SETTING } from '@/utils/settings';
 
 export const PUT = async (request: NextRequest) => {
 	try {
@@ -22,11 +22,13 @@ export const PUT = async (request: NextRequest) => {
 
 		const body = await request.json();
 
-		const settingsToUpdate = UpdateSettingsSchema.parse(body);
+		const { settings } = UpdateSettingsSchema.parse(body);
 
-		if (settingsToUpdate.length === 0) {
+		if (settings.length === 0) {
 			return NextResponse.json({ message: 'Nothing to update.' });
 		}
+
+		const settingsToUpdate = settings.filter(setting => setting.name !== OWNER_SETTING && setting.name !== SHARE_WITH_ADMIN_SETTING);
 		
 		for (const setting of settingsToUpdate) {
 			await updateSetting({
@@ -48,7 +50,27 @@ export const PUT = async (request: NextRequest) => {
 			}));
 		}
 		return sendError(buildError({
-			code: INTERNAL_ERROR,
+			code: error.code || INTERNAL_ERROR,
+			message: error.message || 'An error occured.',
+			status: 500,
+			data: error,
+		}));
+	}
+};
+
+export const GET = async () => {
+	try {
+
+		await connectToDatabase();
+		
+		const settings = await findSettings();
+		
+		return NextResponse.json({ settings });
+		
+	} catch (error: any) {
+		console.error(error);
+		return sendError(buildError({
+			code: error.code || INTERNAL_ERROR,
 			message: error.message || 'An error occured.',
 			status: 500,
 			data: error,

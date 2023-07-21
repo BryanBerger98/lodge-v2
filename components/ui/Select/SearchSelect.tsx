@@ -1,6 +1,6 @@
 /* eslint-disable react/button-has-type */
 import { Check, Loader2, Search } from 'lucide-react';
-import { ChangeEventHandler, ReactNode } from 'react';
+import { ChangeEventHandler, FocusEventHandler, ReactNode } from 'react';
 
 import { cn } from '@/utils/ui.util';
 
@@ -25,9 +25,10 @@ type SearchSelectProps = {
 	isOpen?: boolean;
 	onOpenChange?: (open: boolean) => void;
 	isLoading?: boolean;
+	onBlur?: FocusEventHandler<HTMLDivElement>;
 };
 
-const SearchSelect = ({ children, options, placeholder, notFoundText, value, onSelect, isOpen, onOpenChange: handleOpenChange, onSearch, debounceDelay = 400, isLoading = false }: SearchSelectProps) => {
+const SearchSelect = ({ children, options, placeholder, notFoundText, value, onSelect, isOpen, onOpenChange: handleOpenChange, onSearch, debounceDelay = 400, isLoading = false, onBlur: handleBlur }: SearchSelectProps) => {
 
 	const handleSelect = (option: SelectOption) => () => onSelect(option.value);
 
@@ -54,10 +55,15 @@ const SearchSelect = ({ children, options, placeholder, notFoundText, value, onS
 			open={ isOpen }
 			onOpenChange={ handleOpenChange }
 		>
-			<PopoverTrigger asChild>
+			<PopoverTrigger
+				asChild
+			>
 				{ children }
 			</PopoverTrigger>
-			<PopoverContent className="w-full p-0">
+			<PopoverContent
+				className="w-full p-0"
+				onBlur={ handleBlur }
+			>
 				<div className="flex items-center border-b px-3 overflow-hidden">
 					<Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
 					<Input
