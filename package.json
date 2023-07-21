@@ -63,7 +63,11 @@
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ]
-  },
+  	},
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:BryanBerger98/lodge-v2.git"
+	},
   "dependencies": {
     "@aws-sdk/client-s3": "^3.374.0",
     "@hookform/resolvers": "^3.1.1",
