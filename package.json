@@ -1,6 +1,6 @@
 {
   "name": "lodge-v2",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -49,7 +49,9 @@
     "@semantic-release/git"
   ],
   "release": {
-	"branches": [ "main" ],
+    "branches": [
+      "main"
+    ],
     "prepare": [
       "@semantic-release/changelog",
       "@semantic-release/npm",
@@ -63,11 +65,11 @@
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ]
-  	},
-	"repository": {
-		"type": "git",
-		"url": "git@github.com:BryanBerger98/lodge-v2.git"
-	},
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:BryanBerger98/lodge-v2.git"
+  },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.374.0",
     "@hookform/resolvers": "^3.1.1",
