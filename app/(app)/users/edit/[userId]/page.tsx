@@ -1,4 +1,5 @@
 import { ChevronLeft, User } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -11,8 +12,9 @@ import { findUserById } from '@/database/user/user.repository';
 import { getFileFromKey } from '@/lib/bucket';
 import { getCsrfToken } from '@/utils/csrf.util';
 
-import EditUserForm from '../../_components/EditUserForm';
-import Menu from '../_components/Menu';
+
+const DynamicEditUserForm = dynamic(() => import('../../_components/EditUserForm'));
+const DynamicMenu = dynamic(() => import('../_components/Menu'));
 
 type EditUserPageProps = {
 	params: {
@@ -51,12 +53,12 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
 							<BackButton className="mb-0">
 								<ChevronLeft /> Back
 							</BackButton>
-							<Menu
+							<DynamicMenu
 								csrfToken={ csrfToken }
 								userData={ userData }
 							/>
 						</div>
-						<EditUserForm
+						<DynamicEditUserForm
 							csrfToken={ csrfToken }
 							user={ userData }
 						/>

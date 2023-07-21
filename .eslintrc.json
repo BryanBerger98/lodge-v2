@@ -2,9 +2,12 @@
 	"plugins": ["@typescript-eslint"],
 	"overrides": [
 		{
-			"files": ["**/*.ts", "**/*.tsx"],
+			"files": ["**/*.ts", "**/*.tsx", "./*.js", "./*.mjs"],
 			"extends": ["plugin:@typescript-eslint/recommended", "plugin:react-hooks/recommended"],
 			"parser": "@typescript-eslint/parser",
+			"parserOptions": {
+				"ecmaVersion": "latest"
+			},
 			"env": {
 				"browser": true,
 				"node": true,

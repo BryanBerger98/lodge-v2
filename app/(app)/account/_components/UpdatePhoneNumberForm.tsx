@@ -2,12 +2,12 @@
 'use client';
 
 import { Loader2, Save } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import { ZodError } from 'zod';
 
-import InputPhone from '@/components/forms/inputs/InputPhone';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -15,6 +15,8 @@ import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
 import { updateAccount } from '@/services/auth.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
+
+const DynamicInputPhone = dynamic(() => import('@/components/forms/inputs/InputPhone'));
 
 type UpdatePhoneNumberFormProps = {
 	csrfToken: string;
@@ -95,7 +97,7 @@ const UpdatePhoneNumberForm = ({ csrfToken }: UpdatePhoneNumberFormProps) => {
 										<FormItem>
 											<FormLabel>Phone number</FormLabel>
 											<FormControl>
-												<InputPhone
+												<DynamicInputPhone
 													defaultCountry="FR"
 													{ ...field }
 												/>

@@ -57,6 +57,7 @@ export const POST = async (request: NextRequest) => {
 			expiration_date: new Date(expirationDate),
 			action: 'email_verification',
 			created_by: createdUser.id,
+			target_id: createdUser.id,
 		});
 
 		await sendAccountVerificationEmail(createdUser, savedToken);
