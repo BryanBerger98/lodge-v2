@@ -27,4 +27,4 @@ jobs:
           git checkout develop
           git pull
           git merge origin/main
-          git push origin develop
+          git push -f origin develop
