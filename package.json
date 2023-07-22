@@ -13,7 +13,7 @@
     "commit:all": "git add . && git-cz"
   },
   "validate-branch-name": {
-    "pattern": "^(main|development|staging){1}$|^(feat|fix|hotfix|release|chore)/.+$",
+    "pattern": "^(main|development|develop|staging){1}$|^(feat|fix|hotfix|release|chore)/.+$",
     "errorMsg": "Please, set a valid branch name."
   },
   "git-precommit-checks": {
