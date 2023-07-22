@@ -1,3 +1,11 @@
+## [1.0.1](https://github.com/BryanBerger98/lodge-v2/compare/v1.0.0...v1.0.1) (2023-07-22)
+
+
+### Bug Fixes
+
+* commitlint config ([#106](https://github.com/BryanBerger98/lodge-v2/issues/106)) ([#107](https://github.com/BryanBerger98/lodge-v2/issues/107)) ([99d1817](https://github.com/BryanBerger98/lodge-v2/commit/99d1817eccac1e9931b9f7f2df6d3cda4af390a7))
+* dependencies conflicts ([532a3ce](https://github.com/BryanBerger98/lodge-v2/commit/532a3ced9e5d442ca77bc48f699ebef27ccd6f06))
+
 # 1.0.0 (2023-07-21)
 
 
