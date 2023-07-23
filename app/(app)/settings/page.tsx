@@ -39,6 +39,7 @@ const SettingsPage = async () => {
 						<TabsTrigger
 							className="gap-2 w-full py-2 text-slate-900 justify-start data-[state=active]:bg-muted hover:bg-muted"
 							value="auth"
+							disabled
 						><KeyRound size="16" /> Authentication
 						</TabsTrigger>
 						<TabsTrigger
@@ -54,25 +55,28 @@ const SettingsPage = async () => {
 						><Unplug size="16" /> Integrations
 						</TabsTrigger>
 					</TabsList>
-					<div className="grid grid-cols-3">
-						<TabsContent
-							className="col-span-2 flex flex-col gap-8 mt-0"
-							value="access"
-						>
-							<h2 className="text-xl font-semibold flex gap-2 items-center"><Unlock size="16" /> Access settings</h2>
+					<TabsContent
+						className="grid grid-cols-3"
+						value="access"
+					>
+						<div className="col-span-2 flex flex-col gap-8 mt-0">
+							<h2 className="text-xl font-semibold flex gap-2 items-center"><Unlock size="16" /> Settings access</h2>
 							<DynamicShareSettings
 								csrfToken={ csrfToken }
 								ownerUser={ ownerUser }
 							/>
-						</TabsContent>
-						<TabsContent
-							className="col-span-2 flex flex-col gap-8 mt-0"
-							value="users"
-						>
+						</div>
+							
+					</TabsContent>
+					<TabsContent
+						className="grid grid-cols-3"
+						value="users"
+					>
+						<div className="col-span-2 flex flex-col gap-8 mt-0">
 							<h2 className="text-xl font-semibold flex gap-2 items-center"><Users size="16" /> Users settings</h2>
 							<DynamicUsersSettings csrfToken={ csrfToken } />
-						</TabsContent>
-					</div>
+						</div>
+					</TabsContent>
 				</Tabs>
 				
 			</SettingsProvider>
