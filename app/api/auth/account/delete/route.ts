@@ -3,25 +3,37 @@ import { ZodError, object, string } from 'zod';
 
 import { connectToDatabase } from '@/config/database.config';
 import { deleteFileById, findFileByKey } from '@/database/file/file.repository';
+import { findSettingByName } from '@/database/setting/setting.repository';
 import { deleteUserById, findUserWithPasswordById } from '@/database/user/user.repository';
 import { deleteFileFromKey } from '@/lib/bucket';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
-import { INTERNAL_ERROR, PASSWORD_REQUIRED_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
+import { FORBIDDEN_ERROR, INTERNAL_ERROR, PASSWORD_REQUIRED_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
 import { verifyPassword } from '@/utils/password.util';
+import { USER_ACCOUNT_DELETION_SETTING } from '@/utils/settings';
 
 
 export const POST = async (request: NextRequest) => {
 	try {
+
+		await connectToDatabase();
+
+		const userAccountDeletionSetting = await findSettingByName(USER_ACCOUNT_DELETION_SETTING);
+
+		if (userAccountDeletionSetting && userAccountDeletionSetting.data_type === 'boolean' && !userAccountDeletionSetting.value) {
+			return sendError(buildError({
+				code: FORBIDDEN_ERROR,
+				message: 'Forbidden.',
+				status: 403,
+			}));
+		}
 
 		const deleteUserEmailSchema = object({ password: string().min(1, 'Required.') });
 
 		const body = await request.json();
 		const { password } = deleteUserEmailSchema.parse(body);
 
-		await connectToDatabase();
-
-		const { user: currentUser } = await setServerAuthGuard();
+		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'admin', 'user' ] });
 
 		const userData = await findUserWithPasswordById(currentUser.id);
 
