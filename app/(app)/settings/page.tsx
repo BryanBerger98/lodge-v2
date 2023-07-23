@@ -25,31 +25,30 @@ const SettingsPage = async () => {
 					className="flex gap-4"
 					defaultValue="access"
 				>
-					<TabsList className="flex flex-col h-fit min-w-[220px]">
+					<TabsList className="flex flex-col h-fit min-w-[220px] bg-transparent">
 						<TabsTrigger
-							className="gap-2 w-full justify-start"
+							className="gap-2 w-full py-2 text-slate-900 justify-start data-[state=active]:bg-muted hover:bg-muted"
 							value="access"
 						><Unlock size="16" /> Access
 						</TabsTrigger>
 						<TabsTrigger
-							className="gap-2 w-full justify-start"
+							className="gap-2 w-full py-2 text-slate-900 justify-start data-[state=active]:bg-muted hover:bg-muted"
 							value="users"
 						><Users size="16" /> Users
 						</TabsTrigger>
 						<TabsTrigger
-							className="gap-2 w-full justify-start"
+							className="gap-2 w-full py-2 text-slate-900 justify-start data-[state=active]:bg-muted hover:bg-muted"
 							value="auth"
-							disabled
 						><KeyRound size="16" /> Authentication
 						</TabsTrigger>
 						<TabsTrigger
-							className="gap-2 w-full justify-start"
+							className="gap-2 w-full py-2 text-slate-900 justify-start data-[state=active]:bg-muted hover:bg-muted"
 							value="env"
 							disabled
 						><Database size="16" /> Environment
 						</TabsTrigger>
 						<TabsTrigger
-							className="gap-2 w-full justify-start"
+							className="gap-2 w-full py-2 text-slate-900 justify-start data-[state=active]:bg-muted hover:bg-muted"
 							value="integrations"
 							disabled
 						><Unplug size="16" /> Integrations
