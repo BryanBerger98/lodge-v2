@@ -18,13 +18,15 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { signUpUser } from '@/services/auth.service';
+import { ISetting } from '@/types/setting.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
 type SignUpFormProperties = {
-	csrfToken: string,
+	csrfToken: string;
+	userVerifyEmailSetting: ISetting | null;
 };
 
-const SignUpForm = ({ csrfToken }: SignUpFormProperties) => {
+const SignUpForm = ({ csrfToken, userVerifyEmailSetting }: SignUpFormProperties) => {
 
 	const [ error, setError ] = useState<string | null>(null);
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
@@ -65,7 +67,11 @@ const SignUpForm = ({ csrfToken }: SignUpFormProperties) => {
 			if (signInData?.error) {
 				setError('Incorrect credentials.');
 			} else {
-				router.replace('/verify-email');
+				if (userVerifyEmailSetting?.data_type === 'boolean' && userVerifyEmailSetting?.value) {
+					router.replace('/verify-email');
+					return;
+				}
+				router.replace('/');
 			}
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;

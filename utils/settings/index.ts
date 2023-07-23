@@ -6,8 +6,7 @@ export const OWNER_SETTING = 'owner';
 
 // User settings
 export const NEW_USERS_SIGNUP_SETTING = 'new_users_signup';
-export const USER_VERIFY_EMAIL_SIGNUP_SETTING = 'user_verify_email_on_signup';
-export const USER_VERIFY_EMAIL_UPDATE_SETTING = 'user_verify_email_on_update';
+export const USER_VERIFY_EMAIL_SETTING = 'user_verify_email';
 export const USER_ACCOUNT_DELETION_SETTING = 'user_account_deletion';
 
 export const DEFAULT_SETTINGS: UnregisteredSetting[] = [
@@ -27,12 +26,7 @@ export const DEFAULT_SETTINGS: UnregisteredSetting[] = [
 		data_type: 'boolean',
 	},
 	{
-		name: USER_VERIFY_EMAIL_SIGNUP_SETTING,
-		value: true,
-		data_type: 'boolean',
-	},
-	{
-		name: USER_VERIFY_EMAIL_UPDATE_SETTING,
+		name: USER_VERIFY_EMAIL_SETTING,
 		value: true,
 		data_type: 'boolean',
 	},

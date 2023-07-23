@@ -19,10 +19,11 @@ import { Separator } from '@/components/ui/separator';
 import { ISetting } from '@/types/setting.type';
 
 type SignInFormProps = {
-	newUserSignUpSetting: ISetting | null
+	newUserSignUpSetting: ISetting | null;
+	userVerifyEmailSetting: ISetting | null;
 };
 
-const SignInForm = ({ newUserSignUpSetting }: SignInFormProps) => {
+const SignInForm = ({ newUserSignUpSetting, userVerifyEmailSetting }: SignInFormProps) => {
 
 	const [ error, setError ] = useState<string | null>(null);
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
@@ -58,11 +59,15 @@ const SignInForm = ({ newUserSignUpSetting }: SignInFormProps) => {
 				if (data?.error) {
 					setError('Incorrect credentials.');
 				} else {
-					if (verificationToken) {
-						router.replace(`/verify-email/${ verificationToken }`);
-					} else {
-						router.replace('/verify-email');
+					if (userVerifyEmailSetting?.data_type === 'boolean' && userVerifyEmailSetting?.value) {
+						if (verificationToken) {
+							router.replace(`/verify-email/${ verificationToken }`);
+						} else {
+							router.replace('/verify-email');
+						}
+						return;
 					}
+					router.replace('/');
 				}
 			})
 			.catch((error) => {

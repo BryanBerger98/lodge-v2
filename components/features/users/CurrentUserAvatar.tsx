@@ -17,7 +17,7 @@ const CurrentUserAvatar = () => {
 				src={ currentUser?.photo_url || undefined }
 				width="40"
 			/>
-			<AvatarFallback><User /></AvatarFallback>
+			<AvatarFallback><User size="16" /></AvatarFallback>
 		</Avatar>
 	);
 };

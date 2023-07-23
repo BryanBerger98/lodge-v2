@@ -16,12 +16,11 @@ import useSettings from '@/context/settings/useSettings';
 import { updateSettings } from '@/services/settings.service';
 import { UnregisteredSetting } from '@/types/setting.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
-import { NEW_USERS_SIGNUP_SETTING, USER_ACCOUNT_DELETION_SETTING, USER_VERIFY_EMAIL_SIGNUP_SETTING, USER_VERIFY_EMAIL_UPDATE_SETTING } from '@/utils/settings';
+import { NEW_USERS_SIGNUP_SETTING, USER_ACCOUNT_DELETION_SETTING, USER_VERIFY_EMAIL_SETTING } from '@/utils/settings';
 
 const usersSettingsFormSchema = z.object({
 	can_new_user_signup: z.boolean().default(true).optional(),
-	should_verify_email_on_signup: z.boolean().default(true).optional(),
-	should_verify_email_on_update: z.boolean().default(true).optional(),
+	should_verify_email: z.boolean().default(true).optional(),
 	can_user_delete_account: z.boolean().default(true).optional(),
 });
 
@@ -36,8 +35,7 @@ const UsersManagementSettings = ({ csrfToken }: UsersManagementSettingsProps) =>
 	const { getSetting, loading, refetchSettings } = useSettings();
 
 	const newUserSignupSetting = getSetting(NEW_USERS_SIGNUP_SETTING);
-	const userVerifyEmailOnSignupSetting = getSetting(USER_VERIFY_EMAIL_SIGNUP_SETTING);
-	const userVerifyEmailOnUpdateSetting = getSetting(USER_VERIFY_EMAIL_UPDATE_SETTING);
+	const userVerifyEmailSetting = getSetting(USER_VERIFY_EMAIL_SETTING);
 	const userAccountDeletionSetting = getSetting(USER_ACCOUNT_DELETION_SETTING);
 
 	const { toast } = useToast();
@@ -46,8 +44,7 @@ const UsersManagementSettings = ({ csrfToken }: UsersManagementSettingsProps) =>
 		resolver: zodResolver(usersSettingsFormSchema),
 		defaultValues: {
 			can_new_user_signup: true,
-			should_verify_email_on_signup: true,
-			should_verify_email_on_update: true,
+			should_verify_email: true,
 			can_user_delete_account: true,
 		},
 		mode: 'onTouched',
@@ -55,8 +52,7 @@ const UsersManagementSettings = ({ csrfToken }: UsersManagementSettingsProps) =>
 
 	const handleSetDefaultValues = () => {
 		form.setValue('can_new_user_signup', newUserSignupSetting?.value !== undefined ? newUserSignupSetting.value : true);
-		form.setValue('should_verify_email_on_signup', userVerifyEmailOnSignupSetting?.value !== undefined ? userVerifyEmailOnSignupSetting.value : true);
-		form.setValue('should_verify_email_on_update', userVerifyEmailOnUpdateSetting?.value !== undefined ? userVerifyEmailOnUpdateSetting.value : true);
+		form.setValue('should_verify_email', userVerifyEmailSetting?.value !== undefined ? userVerifyEmailSetting.value : true);
 		form.setValue('can_user_delete_account', userAccountDeletionSetting?.value !== undefined ? userAccountDeletionSetting.value : true);
 	};
 
@@ -65,12 +61,11 @@ const UsersManagementSettings = ({ csrfToken }: UsersManagementSettingsProps) =>
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		newUserSignupSetting?.value,
-		userVerifyEmailOnSignupSetting?.value,
-		userVerifyEmailOnUpdateSetting?.value,
+		userVerifyEmailSetting?.value,
 		userAccountDeletionSetting?.value,
 	]);
 
-	const handleSubmitUsersSettingsForm = async ({ can_new_user_signup, should_verify_email_on_signup, should_verify_email_on_update, can_user_delete_account }: z.infer<typeof usersSettingsFormSchema>) => {
+	const handleSubmitUsersSettingsForm = async ({ can_new_user_signup, should_verify_email, can_user_delete_account }: z.infer<typeof usersSettingsFormSchema>) => {
 		try {
 			const settingsValues: (UnregisteredSetting & { settingName: string, settingValue: boolean | string | number | undefined })[] = [
 				{
@@ -81,17 +76,10 @@ const UsersManagementSettings = ({ csrfToken }: UsersManagementSettingsProps) =>
 					data_type: 'boolean',
 				},
 				{
-					settingName: userVerifyEmailOnSignupSetting?.name || USER_VERIFY_EMAIL_SIGNUP_SETTING,
-					settingValue: userVerifyEmailOnSignupSetting?.value,
-					name: 'should_verify_email_on_signup',
-					value: should_verify_email_on_signup,
-					data_type: 'boolean',
-				},
-				{
-					settingName: userVerifyEmailOnUpdateSetting?.name || USER_VERIFY_EMAIL_UPDATE_SETTING,
-					settingValue: userVerifyEmailOnUpdateSetting?.value,
-					name: 'should_verify_email_on_update',
-					value: should_verify_email_on_update,
+					settingName: userVerifyEmailSetting?.name || USER_VERIFY_EMAIL_SETTING,
+					settingValue: userVerifyEmailSetting?.value,
+					name: 'should_verify_email',
+					value: should_verify_email,
 					data_type: 'boolean',
 				},
 				{
@@ -158,39 +146,15 @@ const UsersManagementSettings = ({ csrfToken }: UsersManagementSettingsProps) =>
 						/>
 						<FormField
 							control={ form.control }
-							name="should_verify_email_on_signup"
+							name="should_verify_email"
 							render={ ({ field }) => (
 								<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 mb-4">
 									<div className="space-y-0.5">
 										<FormLabel className="text-base">
-											Email verification on signup
+											Email verification
 										</FormLabel>
 										<FormDescription>
-											New users must verify their email to access the whole app.
-										</FormDescription>
-									</div>
-									<FormControl>
-										<Switch
-											checked={ field.value }
-											disabled={ loading === 'pending' }
-											onBlur={ field.onBlur }
-											onCheckedChange={ field.onChange }
-										/>
-									</FormControl>
-								</FormItem>
-							) }
-						/>
-						<FormField
-							control={ form.control }
-							name="should_verify_email_on_update"
-							render={ ({ field }) => (
-								<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 mb-4">
-									<div className="space-y-0.5">
-										<FormLabel className="text-base">
-											Email verification on email update
-										</FormLabel>
-										<FormDescription>
-											Users must verify their email to access the whole app again after updating their email address.
+											Users must verify their email when they sign up or update their email address to access the whole app.
 										</FormDescription>
 									</div>
 									<FormControl>
