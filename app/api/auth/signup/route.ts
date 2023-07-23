@@ -2,19 +2,31 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 
 import { connectToDatabase } from '@/config/database.config';
+import { findSettingByName } from '@/database/setting/setting.repository';
 import { createToken } from '@/database/token/token.repository';
 import { SignUpUserSchema } from '@/database/user/user.dto';
 import { createUser, findUserByEmail } from '@/database/user/user.repository';
 import { sendAccountVerificationEmail } from '@/utils/email';
 import { buildError, sendError } from '@/utils/error';
-import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_ALREADY_EXISTS_ERROR } from '@/utils/error/error-codes';
+import { FORBIDDEN_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_ALREADY_EXISTS_ERROR } from '@/utils/error/error-codes';
 import { hashPassword } from '@/utils/password.util';
+import { NEW_USERS_SIGNUP_SETTING } from '@/utils/settings';
 import { generateToken } from '@/utils/token.util';
 
 export const POST = async (request: NextRequest) => {
 
 	try {
 		await connectToDatabase();
+
+		const newUserSignUpSetting = await findSettingByName(NEW_USERS_SIGNUP_SETTING);
+
+		if (newUserSignUpSetting && newUserSignUpSetting.data_type === 'boolean' && !newUserSignUpSetting.value) {
+			return sendError(buildError({
+				code: FORBIDDEN_ERROR,
+				message: 'Forbidden.',
+				status: 403,
+			}));
+		}
 
 		const body = await request.json();
 		const { email, password } = SignUpUserSchema.parse(body);

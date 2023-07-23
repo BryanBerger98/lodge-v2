@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 
+import { connectToDatabase } from '@/config/database.config';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { setServerAuthGuard } from '@/utils/auth';
 import { SHARE_WITH_ADMIN_SETTING } from '@/utils/settings';
@@ -9,6 +10,8 @@ type SettingsLayoutProps = {
 };
 
 const SettingsLayout = async ({ children }: SettingsLayoutProps) => {
+
+	await connectToDatabase();
 
 	const shareWithAdminSetting = await findSettingByName(SHARE_WITH_ADMIN_SETTING);
 
