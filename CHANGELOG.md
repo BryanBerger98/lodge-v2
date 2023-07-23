@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.0.1...v1.1.0) (2023-07-23)
+
+
+### Features
+
+* **settings:** add users management settings ([#128](https://github.com/BryanBerger98/lodge-v2/issues/128)) ([de84655](https://github.com/BryanBerger98/lodge-v2/commit/de84655b7fa12aa2e4836ca8c4bf929286899c70)), closes [#106](https://github.com/BryanBerger98/lodge-v2/issues/106) [#108](https://github.com/BryanBerger98/lodge-v2/issues/108) [#109](https://github.com/BryanBerger98/lodge-v2/issues/109) [#111](https://github.com/BryanBerger98/lodge-v2/issues/111) [#113](https://github.com/BryanBerger98/lodge-v2/issues/113) [#115](https://github.com/BryanBerger98/lodge-v2/issues/115) [#117](https://github.com/BryanBerger98/lodge-v2/issues/117) [#126](https://github.com/BryanBerger98/lodge-v2/issues/126)
+
 ## [1.0.1](https://github.com/BryanBerger98/lodge-v2/compare/v1.0.0...v1.0.1) (2023-07-22)
 
 
