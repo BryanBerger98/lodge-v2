@@ -1,6 +1,7 @@
 import { ISetting, UnregisteredSetting } from '@/types/setting.type';
 import { IUser } from '@/types/user.type';
-import fetcher from '@/utils/fetcher.util';
+import fetcher, { FetcherOptions } from '@/utils/fetcher.util';
+import { buildQueryUrl } from '@/utils/url.util';
 
 export type ShareSettings = {
 	settings: {
@@ -13,6 +14,23 @@ export type ShareSettings = {
 export const getShareSettings = async (): Promise<ShareSettings> => {
 	try {
 		const data = await fetcher('/api/settings/share');
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export type FetchSettingsOptions = {
+	name?: string | string[]
+} & FetcherOptions;
+
+export const fetchSettings = async (options?: FetchSettingsOptions): Promise<ISetting[]> => {
+
+	const { name = '', ...restOptions } = options ? options : { name: '' };
+
+	const query = buildQueryUrl({ name: name && Array.isArray(name) ? name.join(',') : name && typeof name === 'string' ? name : '' });
+	try {
+		const data = await fetcher(`/api/settings${ query }`, restOptions);
 		return data;
 	} catch (error) {
 		throw error;

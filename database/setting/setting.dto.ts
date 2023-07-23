@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { Id } from '@/config/database.config';
 import { SettingTypes } from '@/types/setting.type';
 
+export const FetchSettingsSchema = z.object({ name: z.coerce.string().optional().transform(value => value ? value.split(',') : []) });
+
 export const CreateSettingSchema = z.object({
 	name: z.string().min(1, 'Required.'),
 	value: z.any(),

@@ -1,9 +1,14 @@
-'use client';
-
 import dynamic from 'next/dynamic';
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
 import { ReactNode } from 'react';
 
-import SettingsProvider from '@/context/settings';
+import { connectToDatabase } from '@/config/database.config';
+import { findSettingByName } from '@/database/setting/setting.repository';
+import { findUserById } from '@/database/user/user.repository';
+import { SHARE_WITH_ADMIN_SETTING, USER_VERIFY_EMAIL_SETTING } from '@/utils/settings';
+
+import { authOptions } from '../api/auth/[...nextauth]/route';
 
 const DynamicSidebar = dynamic(() => import('@/components/layout/Sidebar'));
 
@@ -11,13 +16,35 @@ type AppLayoutProps = {
 	children: ReactNode;
 };
 
-const AppLayout = ({ children }: AppLayoutProps) => {
+const AppLayout = async ({ children }: AppLayoutProps) => {
+
+	await connectToDatabase();
+
+	const session = await getServerSession(authOptions);
+
+	if (!session) {
+		redirect('/signin');
+	}
+
+	const currentUser = await findUserById(session?.user.id);
+
+	if (!currentUser) {
+		redirect('/signin');
+	}
+
+	const userVerifyEmailSetting = await findSettingByName(USER_VERIFY_EMAIL_SETTING);
+
+	if (userVerifyEmailSetting && userVerifyEmailSetting.data_type === 'boolean' && userVerifyEmailSetting.value && !currentUser?.has_email_verified) {
+		redirect('/verify-email');
+	}
+
+	const shareWithAdminSetting = await findSettingByName(SHARE_WITH_ADMIN_SETTING);
+
+	const hasSettingsAccess = currentUser?.role === 'owner' || (shareWithAdminSetting?.data_type === 'boolean' && shareWithAdminSetting?.value);
 
 	return (
 		<div>
-			<SettingsProvider>
-				<DynamicSidebar />
-			</SettingsProvider>
+			<DynamicSidebar hasSettingsAccess={ hasSettingsAccess } />
 			<div className="ml-[200px] p-8">
 				{ children }
 			</div>

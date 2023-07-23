@@ -1,8 +1,10 @@
+import { parse } from 'url';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 
 import { connectToDatabase } from '@/config/database.config';
-import { UpdateSettingsSchema } from '@/database/setting/setting.dto';
+import { FetchSettingsSchema, UpdateSettingsSchema } from '@/database/setting/setting.dto';
 import { findSettingByName, findSettings, updateSetting } from '@/database/setting/setting.repository';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
@@ -58,12 +60,18 @@ export const PUT = async (request: NextRequest) => {
 	}
 };
 
-export const GET = async () => {
+export const GET = async (request: NextRequest) => {
 	try {
 
 		await connectToDatabase();
+
+		const queryParams = parse(request.url, true).query;
+
+		const { name } = FetchSettingsSchema.parse(queryParams);
+
+		const query = name && name.length > 0 ? { name: { $in: name } } : {};
 		
-		const settings = await findSettings();
+		const settings = await findSettings(query);
 		
 		return NextResponse.json({ settings });
 		
