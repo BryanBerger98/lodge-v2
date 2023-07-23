@@ -1,3 +1,5 @@
+import { FilterQuery } from 'mongoose';
+
 import { ISetting } from '@/types/setting.type';
 
 import { CreateSettingDTO, UpdateSettingDTO } from './setting.dto';
@@ -12,9 +14,9 @@ export const findSettingByName = async (name: string): Promise<ISetting | null> 
 	}
 };
 
-export const findSettings = async (): Promise<ISetting[]> => {
+export const findSettings = async (query: FilterQuery<ISetting>): Promise<ISetting[]> => {
 	try {
-		const settings = await SettingModel.find().lean({ virtuals: [ 'id' ] });
+		const settings = await SettingModel.find(query).lean({ virtuals: [ 'id' ] });
 		return settings;
 	} catch (error) {
 		throw error;

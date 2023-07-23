@@ -16,8 +16,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { ISetting } from '@/types/setting.type';
 
-const SignInForm = () => {
+type SignInFormProps = {
+	newUserSignUpSetting: ISetting | null
+};
+
+const SignInForm = ({ newUserSignUpSetting }: SignInFormProps) => {
 
 	const [ error, setError ] = useState<string | null>(null);
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
@@ -124,16 +129,20 @@ const SignInForm = () => {
 								Sign in
 							</Button>
 							<Separator orientation="horizontal" />
-							<div className="flex justify-between w-full">
-								<Button
-									className="gap-2 items-center"
-									variant="link"
-									asChild
-								>
-									<Link href="/signup">
-										<LogIn /> Sign Up
-									</Link>
-								</Button>
+							<div className="flex justify-center w-full">
+								{
+									newUserSignUpSetting && newUserSignUpSetting.data_type === 'boolean' && newUserSignUpSetting.value ?
+										<Button
+											className="gap-2 items-center"
+											variant="link"
+											asChild
+										>
+											<Link href="/signup">
+												<LogIn /> Sign Up
+											</Link>
+										</Button>
+										: null
+								}
 								<Button
 									className="gap-2 items-center"
 									variant="link"
