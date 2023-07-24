@@ -1,6 +1,6 @@
 'use client';
 
-import { Layers, Settings, Users } from 'lucide-react';
+import { Home, Layers, Settings, Users } from 'lucide-react';
 import Link from 'next/link';
 
 import CurrentUserAvatar from '@/components/features/users/CurrentUserAvatar';
@@ -34,7 +34,7 @@ const Sidebar = ({ className, hasSettingsAccess }: SidebarProps) => {
 								asChild
 							>
 								<Link href="/">
-									<Users size="16" /> Dashboard
+									<Home size="16" /> Dashboard
 								</Link>
 							</Button>
 						</li>

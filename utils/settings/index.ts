@@ -9,6 +9,16 @@ export const NEW_USERS_SIGNUP_SETTING = 'new_users_signup';
 export const USER_VERIFY_EMAIL_SETTING = 'user_verify_email';
 export const USER_ACCOUNT_DELETION_SETTING = 'user_account_deletion';
 
+// Auth settings
+
+// Password settings
+export const PASSWORD_UPPERCASE_MIN_SETTING = 'password_uppercase_min';
+export const PASSWORD_LOWERCASE_MIN_SETTING = 'password_lowercase_min';
+export const PASSWORD_NUMBERS_MIN_SETTING = 'password_numbers_min';
+export const PASSWORD_SYMBOLS_MIN_SETTING = 'password_symbols_min';
+export const PASSWORD_MIN_LENGTH_SETTING = 'password_min_length';
+export const PASSWORD_UNIQUE_CHARS_SETTING = 'password_unique_chars';
+
 export const DEFAULT_SETTINGS: UnregisteredSetting[] = [
 	{
 		name: SHARE_WITH_ADMIN_SETTING,
