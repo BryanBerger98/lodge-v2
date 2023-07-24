@@ -59,8 +59,6 @@ const PasswordSettings = ({ csrfToken }: PasswordSettingsProps) => {
 		mode: 'onTouched',
 	});
 
-	console.log(form.formState.errors);
-
 	const handleSetDefaultValues = () => {
 		form.setValue('uppercase_min', passwordLowercaseMinSetting?.value !== undefined ? passwordLowercaseMinSetting.value : 0);
 		form.setValue('lowercase_min', passwordUppercaseMinSetting?.value !== undefined ? passwordUppercaseMinSetting.value : 0);
