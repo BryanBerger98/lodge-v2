@@ -1,7 +1,6 @@
 import { redirect as nextRedirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { connectToDatabase } from '@/config/database.config';
 import { findUserById, findUserWithPasswordById } from '@/database/user/user.repository';
 import { IUser, UserRoleWithOwner } from '@/types/user.type';
@@ -9,6 +8,8 @@ import { IUser, UserRoleWithOwner } from '@/types/user.type';
 import { buildError } from '../error';
 import { FORBIDDEN_ERROR, MISSING_CREDENTIALS_ERROR, UNAUTHORIZED_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '../error/error-codes';
 import { verifyPassword } from '../password.util';
+
+import authOptions from './auth-options';
 
 export interface ProtectionOptions {
 	rolesWhiteList?: UserRoleWithOwner[];
