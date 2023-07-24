@@ -1,4 +1,4 @@
-import { Database, KeyRound, Settings, Unlock, Unplug, Users } from 'lucide-react';
+import { Database, KeyRound, Mail, Settings, Unlock, Unplug, Users } from 'lucide-react';
 import { default as nextDynamic } from 'next/dynamic';
 import { headers } from 'next/headers';
 
@@ -9,6 +9,7 @@ import { findOwnerUser } from '@/database/user/user.repository';
 import { getCsrfToken } from '@/utils/csrf.util';
 const DynamicShareSettings = nextDynamic(() => import('./_components/ShareSettings'));
 const DynamicUsersSettings = nextDynamic(() => import('./_components/UsersManagementSettings'));
+const DynamicPasswordSettings = nextDynamic(() => import('./_components/AuthSettings/PasswordSettings'));
 
 export const dynamic = 'force-dynamic';
 
@@ -39,7 +40,6 @@ const SettingsPage = async () => {
 						<TabsTrigger
 							className="gap-2 w-full py-2 text-slate-900 justify-start data-[state=active]:bg-muted hover:bg-muted"
 							value="auth"
-							disabled
 						><KeyRound size="16" /> Authentication
 						</TabsTrigger>
 						<TabsTrigger
@@ -53,6 +53,12 @@ const SettingsPage = async () => {
 							value="integrations"
 							disabled
 						><Unplug size="16" /> Integrations
+						</TabsTrigger>
+						<TabsTrigger
+							className="gap-2 w-full py-2 text-slate-900 justify-start data-[state=active]:bg-muted hover:bg-muted"
+							value="emails"
+							disabled
+						><Mail size="16" /> Emails
 						</TabsTrigger>
 					</TabsList>
 					<TabsContent
@@ -75,6 +81,15 @@ const SettingsPage = async () => {
 						<div className="col-span-2 flex flex-col gap-8 mt-0">
 							<h2 className="text-xl font-semibold flex gap-2 items-center"><Users size="16" /> Users settings</h2>
 							<DynamicUsersSettings csrfToken={ csrfToken } />
+						</div>
+					</TabsContent>
+					<TabsContent
+						className="grid grid-cols-3"
+						value="auth"
+					>
+						<div className="col-span-2 flex flex-col gap-8 mt-0">
+							<h2 className="text-xl font-semibold flex gap-2 items-center"><Users size="16" /> Authentication settings</h2>
+							<DynamicPasswordSettings csrfToken={ csrfToken } />
 						</div>
 					</TabsContent>
 				</Tabs>

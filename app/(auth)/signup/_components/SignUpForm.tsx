@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ZodError, boolean, object, string, z } from 'zod';
 
+import PasswordValidationCheckList from '@/components/features/auth/PasswordValidationCheckList';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,13 +21,22 @@ import { Separator } from '@/components/ui/separator';
 import { signUpUser } from '@/services/auth.service';
 import { ISetting } from '@/types/setting.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
+import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules } from '@/utils/password.util';
 
 type SignUpFormProperties = {
 	csrfToken: string;
 	userVerifyEmailSetting: ISetting | null;
+	passwordRules: {
+		uppercase_min: number;
+		lowercase_min: number;
+		numbers_min: number;
+		symbols_min: number;
+		min_length: number;
+		should_contain_unique_chars: boolean;
+	};
 };
 
-const SignUpForm = ({ csrfToken, userVerifyEmailSetting }: SignUpFormProperties) => {
+const SignUpForm = ({ csrfToken, userVerifyEmailSetting, passwordRules }: SignUpFormProperties) => {
 
 	const [ error, setError ] = useState<string | null>(null);
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
@@ -35,7 +45,7 @@ const SignUpForm = ({ csrfToken, userVerifyEmailSetting }: SignUpFormProperties)
 
 	const signUpFormSchema = object({
 		email: string().email('Please, provide a valid email address.').min(1, 'Required.'),
-		password: string().min(8, 'At least 8 characters.'),
+		password: string().min(passwordRules.min_length, `At least ${ passwordRules.min_length } characters.`).regex(getValidationRegexFromPasswordRules(passwordRules), { message: getErrorMessageFromPasswordRules(passwordRules) }),
 		passwordConfirm: string().min(1, 'Required'),
 		termsCheck: boolean({ required_error: 'Required.' }),
 	}).refine((data) => data.password === data.passwordConfirm, {
@@ -131,7 +141,14 @@ const SignUpForm = ({ csrfToken, userVerifyEmailSetting }: SignUpFormProperties)
 												{ ...field }
 											/>
 										</FormControl>
-										<FormMessage />
+										{
+											field.value.length > 0 ?
+												<PasswordValidationCheckList
+													passwordRules={ passwordRules }
+													value={ field.value }
+												/>
+												: null
+										}
 									</FormItem>
 								) }
 							/>

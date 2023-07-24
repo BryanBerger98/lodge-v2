@@ -67,6 +67,7 @@ const UsersManagementSettings = ({ csrfToken }: UsersManagementSettingsProps) =>
 
 	const handleSubmitUsersSettingsForm = async ({ can_new_user_signup, should_verify_email, can_user_delete_account }: z.infer<typeof usersSettingsFormSchema>) => {
 		try {
+			setIsLoading(true);
 			const settingsValues: (UnregisteredSetting & { settingName: string, settingValue: boolean | string | number | undefined })[] = [
 				{
 					settingName: newUserSignupSetting?.name || NEW_USERS_SIGNUP_SETTING,
