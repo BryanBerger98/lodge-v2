@@ -6,9 +6,8 @@ import { ReactNode } from 'react';
 import { connectToDatabase } from '@/config/database.config';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { findUserById } from '@/database/user/user.repository';
+import authOptions from '@/utils/auth/auth-options';
 import { SHARE_WITH_ADMIN_SETTING, USER_VERIFY_EMAIL_SETTING } from '@/utils/settings';
-
-import { authOptions } from '../api/auth/[...nextauth]/route';
 
 const DynamicSidebar = dynamic(() => import('@/components/layout/Sidebar'));
 
