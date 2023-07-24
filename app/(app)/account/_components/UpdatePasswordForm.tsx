@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { ZodError, object, string, z } from 'zod';
 
 import PasswordModal, { PasswordModalOpenChangeEvent } from '@/components/features/auth/PasswordModal';
+import PasswordValidationCheckList from '@/components/features/auth/PasswordValidationCheckList';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -15,12 +16,21 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { updateUserPassword } from '@/services/auth.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
+import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules } from '@/utils/password.util';
 
 type UpdatePasswordFormProps = {
 	csrfToken: string;
+	passwordRules: {
+		uppercase_min: number;
+		lowercase_min: number;
+		numbers_min: number;
+		symbols_min: number;
+		min_length: number;
+		should_contain_unique_chars: boolean;
+	};
 };
 
-const UpdatePasswordForm = ({ csrfToken }: UpdatePasswordFormProps) => {
+const UpdatePasswordForm = ({ csrfToken, passwordRules }: UpdatePasswordFormProps) => {
 
 	const { toast } = useToast();
 
@@ -29,7 +39,7 @@ const UpdatePasswordForm = ({ csrfToken }: UpdatePasswordFormProps) => {
 
 	const passwordFormSchema = object({ 
 		password: string().min(8, 'At least 8 characters.'),
-		passwordConfirm: string().min(1, 'Required'),
+		passwordConfirm: string().min(passwordRules.min_length, `At least ${ passwordRules.min_length } characters.`).regex(getValidationRegexFromPasswordRules(passwordRules), { message: getErrorMessageFromPasswordRules(passwordRules) }),
 	}).refine((data) => data.password === data.passwordConfirm, {
 		path: [ 'passwordConfirm' ],
 		message: 'Must be the same as password.',
@@ -113,7 +123,14 @@ const UpdatePasswordForm = ({ csrfToken }: UpdatePasswordFormProps) => {
 													{ ...field }
 												/>
 											</FormControl>
-											<FormMessage />
+											{
+												field.value.length > 0 ?
+													<PasswordValidationCheckList
+														passwordRules={ passwordRules }
+														value={ field.value }
+													/>
+													: null
+											}
 										</FormItem>
 									) }
 								/>
