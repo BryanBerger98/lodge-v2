@@ -57,14 +57,14 @@ const AccountPage = async () => {
 						} }
 					/>
 				</div>
-				<div className="flex gap-4">
-					<DynamicSignOutButton />
-					{
-						canDeleteAccount && currentUser.role !== 'owner' ?
-							<DynamicDeleteAccountButton csrfToken={ csrfToken } />
-							: null
-					}
-				</div>
+			</div>
+			<div className="flex gap-4">
+				<DynamicSignOutButton />
+				{
+					canDeleteAccount && currentUser.role !== 'owner' ?
+						<DynamicDeleteAccountButton csrfToken={ csrfToken } />
+						: null
+				}
 			</div>
 		</>
 	);

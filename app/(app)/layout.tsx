@@ -45,7 +45,7 @@ const AppLayout = async ({ children }: AppLayoutProps) => {
 	return (
 		<HeaderProvider>
 			<DynamicSidebar hasSettingsAccess={ hasSettingsAccess } />
-			<div className="ml-0 md:ml-[200px] container !w-auto p-4 md:p-4 lg:p-8">
+			<div className="ml-0 md:ml-[200px] container !w-auto p-4 lg:p-8">
 				{ children }
 			</div>
 		</HeaderProvider>
