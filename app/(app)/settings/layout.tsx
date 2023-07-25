@@ -15,7 +15,6 @@ import { SHARE_WITH_ADMIN_SETTING } from '@/utils/settings';
 
 type SettingsLayoutProps = {
 	children: ReactNode;
-	url: string;
 };
 
 const SettingsLayout = async ({ children }: SettingsLayoutProps) => {
