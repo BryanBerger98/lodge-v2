@@ -130,7 +130,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 				onSubmit={ form.handleSubmit(handleSubmitEditUserForm) }
 			>
 				<Card>
-					<CardHeader className="w-1/3">
+					<CardHeader className="w-full lg:w-1/3">
 						<CardTitle>User informations</CardTitle>
 						<CardDescription>
 							Manage user informations.
@@ -218,7 +218,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 					</CardContent>
 				</Card>
 				<Card>
-					<CardHeader className="w-1/3">
+					<CardHeader className="w-full lg:w-1/3">
 						<CardTitle>User access rights</CardTitle>
 						<CardDescription>
 							Manage user role and permissions.
