@@ -2,6 +2,7 @@ import { Unlock } from 'lucide-react';
 import { default as nextDynamic } from 'next/dynamic';
 import { headers } from 'next/headers';
 
+import { connectToDatabase } from '@/config/database.config';
 import { findOwnerUser } from '@/database/user/user.repository';
 import { getCsrfToken } from '@/utils/csrf.util';
 
@@ -10,6 +11,8 @@ const DynamicShareSettings = nextDynamic(() => import('../_components/ShareSetti
 export const dynamic = 'force-dynamic';
 
 const AccessSettingsPage = async () => {
+
+	await connectToDatabase();
 
 	const csrfToken = await getCsrfToken(headers());
 
