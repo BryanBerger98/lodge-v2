@@ -2,14 +2,13 @@
 
 import { ColumnDef, useReactTable, getCoreRowModel, flexRender, TableOptions, getSortedRowModel, getPaginationRowModel, Column } from '@tanstack/react-table';
 import { ChevronDown } from 'lucide-react';
-import dynamic from 'next/dynamic';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
+import InputSearch from '../forms/inputs/InputSearch';
+
 import { Button } from './button';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from './dropdown-menu';
-
-const DynamicInputSearch = dynamic(() => import('../forms/inputs/InputSearch'), { ssr: false });
 
 interface DataTableProps<TData, TValue> extends Omit<TableOptions<TData>, 'getCoreRowModel'> {
 	columns: ColumnDef<TData, TValue>[]
@@ -44,7 +43,7 @@ const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = fal
 			<div className="flex items-center py-4">
 				{
 					withSearch ?
-						<DynamicInputSearch
+						<InputSearch
 							className="flex-grow"
 							defaultValue={ defaultSearchValue }
 							inputClassName="max-w-sm"
@@ -85,7 +84,7 @@ const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = fal
 						: null
 				}
 			</div>
-			<Table className="overflow-x-scroll w-full relative">
+			<Table>
 				<TableHeader>
 					{ table.getHeaderGroups().map((headerGroup) => (
 						<TableRow key={ headerGroup.id }>

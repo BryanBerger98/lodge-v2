@@ -50,7 +50,7 @@ const ConfirmEmailCard = ({ csrfToken, verificationToken }: ConfirmEmailCardProp
 	}, [ currentUser?.id ]);
 
 	return (
-		<Card className="lg:min-w-[420px]">
+		<Card className="min-w-[420px]">
 			<CardHeader>
 				<CardTitle>Email verification</CardTitle>
 				<CardDescription>

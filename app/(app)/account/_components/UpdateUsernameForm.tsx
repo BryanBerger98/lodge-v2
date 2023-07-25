@@ -78,17 +78,17 @@ const UpdateUsernameForm = ({ csrfToken }: UpdateUsernameFormProps) => {
 		<Card className="w-full">
 			<Form { ...form }>
 				<form
-					className="lg:flex"
+					className="flex"
 					onSubmit={ form.handleSubmit(handleSubmitEmailForm) }
 				>
-					<CardHeader className="lg:w-1/3">
+					<CardHeader className="w-1/3">
 						<CardTitle>Username</CardTitle>
 						<CardDescription>
 							Update your username.
 						</CardDescription>
 					</CardHeader>
-					<div className="lg:w-2/3">
-						<CardContent className="lg:pt-6">
+					<div className="w-2/3">
+						<CardContent className="pt-6">
 							<FormField
 								control={ form.control }
 								name="username"

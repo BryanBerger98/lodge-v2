@@ -81,7 +81,7 @@ const SignInForm = ({ newUserSignUpSetting, userVerifyEmailSetting }: SignInForm
 
 	return (
 		<div className="flex flex-col gap-4 items-center">
-			<Card className="lg:min-w-[420px]">
+			<Card className="min-w-[420px]">
 				<Form { ...form }>
 					<form onSubmit={ form.handleSubmit(handleSubmitSignInForm) }>
 						<CardHeader>

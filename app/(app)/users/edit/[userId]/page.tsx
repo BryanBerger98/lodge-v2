@@ -47,7 +47,7 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
 		<>
 			<PageTitle><User /> Edit user</PageTitle>
 			<UsersProvider>
-				<div className="grid gird-cols-1 lg:grid-cols-3">
+				<div className="grid grid-cols-3">
 					<div className="col-span-2 flex flex-col gap-8">
 						<div className="flex justify-between items-center">
 							<BackButton className="mb-0">
