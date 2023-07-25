@@ -1,11 +1,14 @@
 'use client';
 
 import { OnChangeFn, PaginationState, SortingState } from '@tanstack/react-table';
+import { Plus, User, UserPlus } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import DataTable from '@/components/ui/data-table';
 import useCsrf from '@/context/csrf/useCsrf';
+import useHeader from '@/context/layout/header/useHeader';
 import useUsers from '@/context/users/useUsers';
 import useUpdateEffect from '@/hooks/utils/useUpdateEffect';
 import { getSortingFromURLParams } from '@/utils/table.utils';
@@ -20,6 +23,18 @@ const UsersDataTable = ({ csrfToken }: UsersDataTableProps) => {
 
 	const { dispatchCsrfToken } = useCsrf();
 	const { users, total, routeParams } = useUsers();
+
+	const { setTitle, setButtonProps } = useHeader();
+
+	useEffect(() => {
+		setTitle(<><User /> Users</>);
+		setButtonProps({
+			asChild: true,
+			className: 'gap-2 items-center',
+			children: <Link href="/users/create"><Plus /></Link>,
+		});
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const router = useRouter();
 

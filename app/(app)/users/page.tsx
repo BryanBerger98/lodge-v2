@@ -1,9 +1,8 @@
-import { UserPlus, Users } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 
-import PageTitle from '@/components/layout/PageTitle';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { connectToDatabase } from '@/config/database.config';
@@ -52,66 +51,63 @@ const UsersPage = async ({ searchParams }: UsersPageProps) => {
 	const parsedUsers = JSON.parse(JSON.stringify(users));
 
 	return (
-		<>
-			<PageTitle><Users /> Users</PageTitle>
-			<UsersProvider
-				total={ totalUsers }
-				users={ parsedUsers }
-			>
-				<div className="container">
-					<div className="grid grid-cols-4 gap-4 mb-8">
-						<Card>
-							<CardHeader>
-								<CardTitle>{ totalUsers }</CardTitle>
-								<CardDescription>Registered user{ totalUsers > 1 ? 's' : '' }</CardDescription>
-							</CardHeader>
-						</Card>
-						<Card>
-							<CardHeader>
-								<CardTitle>{ verifiedUsersCount }</CardTitle>
-								<CardDescription>Verified user{ verifiedUsersCount > 1 ? 's' : '' }</CardDescription>
-							</CardHeader>
-						</Card>
-						<Card>
-							<CardHeader>
-								<CardTitle>{ unverifiedUsersCount }</CardTitle>
-								<CardDescription>Unverified user{ unverifiedUsersCount > 1 ? 's' : '' }</CardDescription>
-							</CardHeader>
-						</Card>
-						<Card>
-							<CardHeader>
-								<CardTitle>{ disabledUsersCount }</CardTitle>
-								<CardDescription>Disabled user{ disabledUsersCount > 1 ? 's' : '' }</CardDescription>
-							</CardHeader>
-						</Card>
-					</div>
+		<UsersProvider
+			total={ totalUsers }
+			users={ parsedUsers }
+		>
+			<div className="container">
+				<div className="grid grid-cols-4 gap-4 mb-8">
 					<Card>
-						<CardHeader className="flex-row justify-between items-start">
-							<div>
-								<CardTitle>Manage users</CardTitle>
-								<CardDescription>
-									Manage users accounts, permissions and roles.
-								</CardDescription>
-							</div>
-							<Button
-								className="gap-2 items-center"
-								asChild
-							>
-								<Link href="/users/create">
-									<UserPlus size="16" />
-									Create user
-								</Link>
-							</Button>
+						<CardHeader>
+							<CardTitle>{ totalUsers }</CardTitle>
+							<CardDescription>Registered user{ totalUsers > 1 ? 's' : '' }</CardDescription>
 						</CardHeader>
-						<CardContent>
-							<DynamicUsersDataTable
-								csrfToken={ csrfToken }
-							/>
-						</CardContent>
+					</Card>
+					<Card>
+						<CardHeader>
+							<CardTitle>{ verifiedUsersCount }</CardTitle>
+							<CardDescription>Verified user{ verifiedUsersCount > 1 ? 's' : '' }</CardDescription>
+						</CardHeader>
+					</Card>
+					<Card>
+						<CardHeader>
+							<CardTitle>{ unverifiedUsersCount }</CardTitle>
+							<CardDescription>Unverified user{ unverifiedUsersCount > 1 ? 's' : '' }</CardDescription>
+						</CardHeader>
+					</Card>
+					<Card>
+						<CardHeader>
+							<CardTitle>{ disabledUsersCount }</CardTitle>
+							<CardDescription>Disabled user{ disabledUsersCount > 1 ? 's' : '' }</CardDescription>
+						</CardHeader>
 					</Card>
 				</div>
-			</UsersProvider>
-		</>
+				<Card>
+					<CardHeader className="flex-row justify-between items-start">
+						<div>
+							<CardTitle>Manage users</CardTitle>
+							<CardDescription>
+								Manage users accounts, permissions and roles.
+							</CardDescription>
+						</div>
+						<Button
+							className="hidden md:flex gap-2 items-center"
+							asChild
+						>
+							<Link href="/users/create">
+								<UserPlus size="16" />
+								Create user
+							</Link>
+						</Button>
+					</CardHeader>
+					<CardContent>
+						<DynamicUsersDataTable
+							csrfToken={ csrfToken }
+						/>
+					</CardContent>
+				</Card>
+			</div>
+		</UsersProvider>
 	);
 };
 

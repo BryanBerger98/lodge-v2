@@ -1,13 +1,13 @@
-import { User } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 
-import PageTitle from '@/components/layout/PageTitle';
 import { connectToDatabase } from '@/config/database.config';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { setServerAuthGuard } from '@/utils/auth';
 import { getCsrfToken } from '@/utils/csrf.util';
 import { PASSWORD_LOWERCASE_MIN_SETTING, PASSWORD_MIN_LENGTH_SETTING, PASSWORD_NUMBERS_MIN_SETTING, PASSWORD_SYMBOLS_MIN_SETTING, PASSWORD_UNIQUE_CHARS_SETTING, PASSWORD_UPPERCASE_MIN_SETTING, USER_ACCOUNT_DELETION_SETTING } from '@/utils/settings';
+
+import AccountPageEffects from './_components/AccountPageEffects';
 
 const DynamicSignOutButton = dynamic(() => import('./_components/SignOutButton'), { ssr: false });
 const DynamicDeleteAccountButton = dynamic(() => import('./_components/DeleteAccountButton'), { ssr: false });
@@ -38,7 +38,7 @@ const AccountPage = async () => {
 
 	return (
 		<>
-			<PageTitle><User /> Account</PageTitle>
+			<AccountPageEffects />
 			<div className="grid grid-cols-3">
 				<div className="col-span-2 flex flex-col gap-8">
 					<DynamicUpdateAvatarForm csrfToken={ csrfToken } />

@@ -1,12 +1,13 @@
-import { Database, KeyRound, Mail, Settings, Unlock, Unplug, Users } from 'lucide-react';
+import { Database, KeyRound, Mail, Unlock, Unplug, Users } from 'lucide-react';
 import { default as nextDynamic } from 'next/dynamic';
 import { headers } from 'next/headers';
 
-import PageTitle from '@/components/layout/PageTitle';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SettingsProvider from '@/context/settings';
 import { findOwnerUser } from '@/database/user/user.repository';
 import { getCsrfToken } from '@/utils/csrf.util';
+
+import SettingsPageEffects from './_components/SettingsPageEffects';
 const DynamicShareSettings = nextDynamic(() => import('./_components/ShareSettings'));
 const DynamicUsersSettings = nextDynamic(() => import('./_components/UsersManagementSettings'));
 const DynamicPasswordSettings = nextDynamic(() => import('./_components/AuthSettings/PasswordSettings'));
@@ -20,7 +21,7 @@ const SettingsPage = async () => {
 
 	return (
 		<>
-			<PageTitle><Settings /> Settings</PageTitle>
+			<SettingsPageEffects />
 			<SettingsProvider>
 				<Tabs
 					className="flex gap-4"
@@ -93,7 +94,6 @@ const SettingsPage = async () => {
 						</div>
 					</TabsContent>
 				</Tabs>
-				
 			</SettingsProvider>
 		</>
 	);

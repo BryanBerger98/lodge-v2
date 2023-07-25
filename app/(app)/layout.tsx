@@ -3,7 +3,9 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { ReactNode } from 'react';
 
+import PageTitle from '@/components/layout/PageTitle';
 import { connectToDatabase } from '@/config/database.config';
+import HeaderProvider from '@/context/layout/header';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { findUserById } from '@/database/user/user.repository';
 import authOptions from '@/utils/auth/auth-options';
@@ -42,12 +44,15 @@ const AppLayout = async ({ children }: AppLayoutProps) => {
 	const hasSettingsAccess = currentUser?.role === 'owner' || (shareWithAdminSetting?.data_type === 'boolean' && shareWithAdminSetting?.value);
 
 	return (
-		<div>
-			<DynamicSidebar hasSettingsAccess={ hasSettingsAccess } />
-			<div className="ml-[200px] p-8">
-				{ children }
+		<HeaderProvider>
+			<div className="w-screen overflow-hidden">
+				<DynamicSidebar hasSettingsAccess={ hasSettingsAccess } />
+				<div className="ml-0 md:ml-[200px] px-0 py-4 md:p-4 lg:p-8">
+					<PageTitle />
+					{ children }
+				</div>
 			</div>
-		</div>
+		</HeaderProvider>
 	);
 };
 

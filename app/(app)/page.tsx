@@ -1,7 +1,12 @@
+import AppPageEffects from './_components/AppPageEffects';
+
 const AppPage = () => {
 
 	return (
-		<h1>App page!</h1>
+		<>
+			<AppPageEffects />
+			<p className="text-slate-500">Here will be the dashboard page.</p>
+		</>
 	);
 };
 
