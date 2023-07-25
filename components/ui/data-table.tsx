@@ -85,7 +85,7 @@ const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = fal
 						: null
 				}
 			</div>
-			<Table>
+			<Table className="overflow-x-scroll w-full relative">
 				<TableHeader>
 					{ table.getHeaderGroups().map((headerGroup) => (
 						<TableRow key={ headerGroup.id }>

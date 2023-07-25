@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { ReactNode } from 'react';
 
-import PageTitle from '@/components/layout/PageTitle';
 import { connectToDatabase } from '@/config/database.config';
 import HeaderProvider from '@/context/layout/header';
 import { findSettingByName } from '@/database/setting/setting.repository';
@@ -45,12 +44,9 @@ const AppLayout = async ({ children }: AppLayoutProps) => {
 
 	return (
 		<HeaderProvider>
-			<div className="w-screen overflow-hidden">
-				<DynamicSidebar hasSettingsAccess={ hasSettingsAccess } />
-				<div className="ml-0 md:ml-[200px] px-0 py-4 md:p-4 lg:p-8">
-					<PageTitle />
-					{ children }
-				</div>
+			<DynamicSidebar hasSettingsAccess={ hasSettingsAccess } />
+			<div className="ml-0 md:ml-[200px] container !w-auto p-4 md:p-4 lg:p-8">
+				{ children }
 			</div>
 		</HeaderProvider>
 	);

@@ -1,13 +1,13 @@
+import { User } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 
+import PageTitle from '@/components/layout/PageTitle';
 import { connectToDatabase } from '@/config/database.config';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { setServerAuthGuard } from '@/utils/auth';
 import { getCsrfToken } from '@/utils/csrf.util';
 import { PASSWORD_LOWERCASE_MIN_SETTING, PASSWORD_MIN_LENGTH_SETTING, PASSWORD_NUMBERS_MIN_SETTING, PASSWORD_SYMBOLS_MIN_SETTING, PASSWORD_UNIQUE_CHARS_SETTING, PASSWORD_UPPERCASE_MIN_SETTING, USER_ACCOUNT_DELETION_SETTING } from '@/utils/settings';
-
-import AccountPageEffects from './_components/AccountPageEffects';
 
 const DynamicSignOutButton = dynamic(() => import('./_components/SignOutButton'), { ssr: false });
 const DynamicDeleteAccountButton = dynamic(() => import('./_components/DeleteAccountButton'), { ssr: false });
@@ -38,9 +38,9 @@ const AccountPage = async () => {
 
 	return (
 		<>
-			<AccountPageEffects />
-			<div className="grid grid-cols-3">
-				<div className="col-span-2 flex flex-col gap-8">
+			<PageTitle><User /> Account</PageTitle>
+			<div className="grid grid-cols-1 xl:grid-cols-3">
+				<div className="xl:col-span-2 flex flex-col gap-y-8 mb-8">
 					<DynamicUpdateAvatarForm csrfToken={ csrfToken } />
 					<DynamicUpdateUsernameForm csrfToken={ csrfToken } />
 					<DynamicUpdatePhoneNumberForm csrfToken={ csrfToken } />
@@ -56,14 +56,14 @@ const AccountPage = async () => {
 							should_contain_unique_chars: passwordUniqueCharsSetting?.value !== undefined && passwordUniqueCharsSetting?.data_type === 'boolean' ? passwordUniqueCharsSetting?.value : false,
 						} }
 					/>
-					<div className="mr-auto flex gap-4">
-						<DynamicSignOutButton />
-						{
-							canDeleteAccount && currentUser.role !== 'owner' ?
-								<DynamicDeleteAccountButton csrfToken={ csrfToken } />
-								: null
-						}
-					</div>
+				</div>
+				<div className="flex gap-4">
+					<DynamicSignOutButton />
+					{
+						canDeleteAccount && currentUser.role !== 'owner' ?
+							<DynamicDeleteAccountButton csrfToken={ csrfToken } />
+							: null
+					}
 				</div>
 			</div>
 		</>
