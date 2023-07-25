@@ -39,8 +39,8 @@ const AccountPage = async () => {
 	return (
 		<>
 			<PageTitle><User /> Account</PageTitle>
-			<div className="grid grid-cols-3">
-				<div className="col-span-2 flex flex-col gap-8">
+			<div className="grid grid-cols-1 xl:grid-cols-3">
+				<div className="xl:col-span-2 flex flex-col gap-y-8 mb-8">
 					<DynamicUpdateAvatarForm csrfToken={ csrfToken } />
 					<DynamicUpdateUsernameForm csrfToken={ csrfToken } />
 					<DynamicUpdatePhoneNumberForm csrfToken={ csrfToken } />
@@ -56,15 +56,15 @@ const AccountPage = async () => {
 							should_contain_unique_chars: passwordUniqueCharsSetting?.value !== undefined && passwordUniqueCharsSetting?.data_type === 'boolean' ? passwordUniqueCharsSetting?.value : false,
 						} }
 					/>
-					<div className="mr-auto flex gap-4">
-						<DynamicSignOutButton />
-						{
-							canDeleteAccount && currentUser.role !== 'owner' ?
-								<DynamicDeleteAccountButton csrfToken={ csrfToken } />
-								: null
-						}
-					</div>
 				</div>
+			</div>
+			<div className="flex gap-4">
+				<DynamicSignOutButton />
+				{
+					canDeleteAccount && currentUser.role !== 'owner' ?
+						<DynamicDeleteAccountButton csrfToken={ csrfToken } />
+						: null
+				}
 			</div>
 		</>
 	);

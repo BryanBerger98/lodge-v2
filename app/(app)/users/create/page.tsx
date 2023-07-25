@@ -21,8 +21,8 @@ const CreateUserPage = async () => {
 				<ChevronLeft /> Back
 			</BackButton>
 			<UsersProvider>
-				<div className="grid grid-cols-3">
-					<div className="col-span-2 flex flex-col gap-8">
+				<div className="grid gird-cols-1 lg:grid-cols-3">
+					<div className="lg:col-span-2 flex flex-col gap-8">
 						<DynamicEditUserForm csrfToken={ csrfToken } />
 					</div>
 				</div>
