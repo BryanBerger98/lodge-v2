@@ -103,7 +103,7 @@ const SignUpForm = ({ csrfToken, userVerifyEmailSetting, passwordRules }: SignUp
 
 	return (
 		<div className="flex flex-col gap-4 items-center">
-			<Card className="min-w-[420px]">
+			<Card className="lg:min-w-[420px]">
 				<Form { ...form }>
 					<form onSubmit={ form.handleSubmit(handleSubmitSignUpForm) }>
 						<CardHeader>

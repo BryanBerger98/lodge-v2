@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth';
 import { ReactNode } from 'react';
 
 import { connectToDatabase } from '@/config/database.config';
+import HeaderProvider from '@/context/layout/header';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { findUserById } from '@/database/user/user.repository';
 import authOptions from '@/utils/auth/auth-options';
@@ -42,12 +43,12 @@ const AppLayout = async ({ children }: AppLayoutProps) => {
 	const hasSettingsAccess = currentUser?.role === 'owner' || (shareWithAdminSetting?.data_type === 'boolean' && shareWithAdminSetting?.value);
 
 	return (
-		<div>
+		<HeaderProvider>
 			<DynamicSidebar hasSettingsAccess={ hasSettingsAccess } />
-			<div className="ml-[200px] p-8">
+			<div className="ml-0 md:ml-[200px] container !w-auto p-4 lg:p-8">
 				{ children }
 			</div>
-		</div>
+		</HeaderProvider>
 	);
 };
 

@@ -27,7 +27,7 @@ const useFetchUsers = (options?: UseFetchUsersOptions) => {
 	const pageSize = options?.pageSize !== undefined ? options.pageSize : Number(searchParams.get('page_size'));
 	const search = options?.search || searchParams.get('search');
 
-	const queryString = `?sort_fields=${ sortFields || '' }&sort_directions=${ sortDirections || '' }&page_size=${ !isNaN(pageSize) ? pageSize : 10 }&page_index=${ !isNaN(pageIndex) ? pageIndex : 0 }&search=${ search || '' }`;
+	const queryString = `?sort_fields=${ sortFields || '' }&sort_directions=${ sortDirections || '' }&page_size=${ !isNaN(pageSize) && pageSize > 0 ? pageSize : 10 }&page_index=${ !isNaN(pageIndex) ? pageIndex : 0 }&search=${ search || '' }`;
 
 	const { data, error, isLoading, mutate } = useSWR<FetchUsersResponse>(`/api/users${ queryString }`, fetcher);
 
