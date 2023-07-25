@@ -90,7 +90,7 @@ const SendEmailConfirmationCard = ({ csrfToken }: SendEmailConfirmationCardProps
 	};
 
 	return (
-		<Card className="min-w-[420px]">
+		<Card className="lg:min-w-[420px]">
 			<CardHeader>
 				<CardTitle>Email verification</CardTitle>
 				<CardDescription>

@@ -45,28 +45,26 @@ const UsersDataTable = ({ csrfToken }: UsersDataTableProps) => {
 	const handleChangePagination: OnChangeFn<PaginationState> = setPagination;
 
 	return (
-		<div>
-			<DataTable
-				columnNames={ COLUMN_NAMES }
-				columns={ columns }
-				data={ users }
-				defaultSearchValue={ routeParams.search || '' }
-				pageCount={ total / pagination.pageSize }
-				searchPlaceholder="Search users..."
-				state={ {
-					sorting,
-					pagination,
-				} }
-				total={ total }
-				manualPagination
-				manualSorting
-				withCustomColumns
-				withSearch
-				onPaginationChange={ handleChangePagination }
-				onSearch={ handleSearch }
-				onSortingChange={ handleChangeSorting }
-			/>
-		</div>
+		<DataTable
+			columnNames={ COLUMN_NAMES }
+			columns={ columns }
+			data={ users }
+			defaultSearchValue={ routeParams.search || '' }
+			pageCount={ total / pagination.pageSize }
+			searchPlaceholder="Search users..."
+			state={ {
+				sorting,
+				pagination,
+			} }
+			total={ total }
+			manualPagination
+			manualSorting
+			withCustomColumns
+			withSearch
+			onPaginationChange={ handleChangePagination }
+			onSearch={ handleSearch }
+			onSortingChange={ handleChangeSorting }
+		/>
 	);
 };
 
