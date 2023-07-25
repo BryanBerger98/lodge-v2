@@ -1,3 +1,27 @@
+# [1.3.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.2.0...v1.3.0) (2023-07-24)
+
+
+### Bug Fixes
+
+* **auth:** fix auth options conflict with next routes ([#136](https://github.com/BryanBerger98/lodge-v2/issues/136)) ([ca694d7](https://github.com/BryanBerger98/lodge-v2/commit/ca694d7d1ec770c973fb422e547efd217ddc7cb1))
+
+
+### Features
+
+* **settings:** add password rules settings ([#134](https://github.com/BryanBerger98/lodge-v2/issues/134)) ([a4a6324](https://github.com/BryanBerger98/lodge-v2/commit/a4a6324a7b2b31ed1280bd06eda9d7d30cd1355b))
+
+# [1.2.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.1.0...v1.2.0) (2023-07-23)
+
+
+### Bug Fixes
+
+* commitlint config ([#106](https://github.com/BryanBerger98/lodge-v2/issues/106)) ([48350e1](https://github.com/BryanBerger98/lodge-v2/commit/48350e1bb226c3e5e9f3be414a214ac02d27d5ba))
+
+
+### Features
+
+* **settings:** add users management settings ([#126](https://github.com/BryanBerger98/lodge-v2/issues/126)) ([2c30772](https://github.com/BryanBerger98/lodge-v2/commit/2c307724e195a20b521b8273553ca1f70f5160c1))
+
 # [1.1.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.0.1...v1.1.0) (2023-07-23)
 
 
