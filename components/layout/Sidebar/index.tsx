@@ -27,8 +27,6 @@ const Sidebar = ({ className, hasSettingsAccess }: SidebarProps) => {
 	const breakPoint = useBreakPoint();
 	const pathname = usePathname();
 
-	console.log(breakPoint);
-
 	useEffect(() => {
 		if ([ 'sm', 'xs' ].includes(breakPoint.size)) {
 			setIsOpen(false);

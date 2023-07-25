@@ -9,7 +9,7 @@ const useBreakPoint = () => {
 	
 	useEffect(() => {
 		const resizeHandler = () => {
-			const currentWindowWidth = window.innerWidth;
+			const currentWindowWidth = document.documentElement.clientWidth || window.innerWidth;
 			const currentBreakPoint = getBreakPoint(currentWindowWidth);
 			setBreakPoint(currentBreakPoint);
 		};

@@ -1,7 +1,7 @@
 'use client';
 
 import { OnChangeFn, PaginationState, SortingState } from '@tanstack/react-table';
-import { Plus, User, UserPlus } from 'lucide-react';
+import { Plus, User } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
