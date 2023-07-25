@@ -84,7 +84,7 @@ const ResetPasswordForm = ({ csrfToken, verificationToken, passwordRules }: Rese
 	
 	return (
 		<div className="flex flex-col gap-4 items-center">
-			<Card className="lg:min-w-[420px]">
+			<Card className="min-w-[420px]">
 				<Form { ...form }>
 					<form onSubmit={ form.handleSubmit(handleSubmitResetPasswordForm) }>
 						<CardHeader>

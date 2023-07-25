@@ -61,15 +61,15 @@ const UpdateAvatarForm = ({ csrfToken }: UpdateAvatarFormProps) => {
 	};
 
 	return (
-		<Card className="w-full lg:flex">
-			<CardHeader className="lg:w-1/3">
+		<Card className="w-full flex">
+			<CardHeader className="w-1/3">
 				<CardTitle>Profile picture</CardTitle>
 				<CardDescription>
 					Update your profile picture.
 				</CardDescription>
 			</CardHeader>
-			<div className="lg:w-2/3">
-				<CardContent className="lg:pt-6 flex flex-col items-center gap-4">
+			<div className="w-2/3">
+				<CardContent className="pt-6 flex flex-col items-center gap-4">
 					<Avatar className="w-32 h-32">
 						<AvatarImage
 							alt="Profile"

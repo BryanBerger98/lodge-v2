@@ -2,7 +2,7 @@ import { Id } from '@/config/database.config';
 
 import { Optional } from './utils.type';
 
-export const SettingTypes = [ 'boolean', 'string', 'number', 'objectId', 'date' ] as const;
+export const SettingTypes = [ 'boolean', 'string', 'number', 'objectId' ] as const;
 export type SettingType = typeof SettingTypes[number];
 
 export interface ISetting {
