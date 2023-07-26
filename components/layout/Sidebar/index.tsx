@@ -11,6 +11,7 @@ import useAuth from '@/context/auth/useAuth';
 import HeaderButton from '@/context/layout/header/HeaderButton';
 import useHeader from '@/context/layout/header/useHeader';
 import useBreakPoint from '@/hooks/utils/useBreakPoint';
+import { isProductionEnv } from '@/utils/env.util';
 import { SETTINGS_ACTIONS, USERS_ACTIONS } from '@/utils/role.util';
 
 import { Button } from '../../ui/button';
@@ -54,7 +55,7 @@ const Sidebar = ({ className, hasSettingsAccess }: SidebarProps) => {
 				</Button>
 				<div className="flex flex-col">
 					<p className="text-xl font-medium flex gap-2 items-center">{ headerTitle ? headerTitle : <><Layers size="24" /> Lodge</> }</p>
-					{ process.env.NEXT_PUBLIC_ENVIRONMENT !== 'Production' ? <Badge variant="destructive">{ process.env.NEXT_PUBLIC_ENVIRONMENT }</Badge> : null }
+					{ !isProductionEnv(process.env.NEXT_PUBLIC_ENVIRONMENT) ? <Badge variant="destructive">{ process.env.NEXT_PUBLIC_ENVIRONMENT }</Badge> : null }
 				</div>
 				{
 					buttonProps ?
@@ -74,14 +75,14 @@ const Sidebar = ({ className, hasSettingsAccess }: SidebarProps) => {
 								<div className="flex flex-col gap-2">
 									<p className="text-3xl font-medium flex gap-2 items-center"><Layers size="32" /> Lodge</p>
 									{
-										process.env.NEXT_PUBLIC_ENVIRONMENT && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'Production' ?
+										!isProductionEnv(process.env.NEXT_PUBLIC_ENVIRONMENT) ?
 											<Badge
 												className="w-fit"
 												variant="destructive"
 											>{ process.env.NEXT_PUBLIC_ENVIRONMENT }
 											</Badge>
-																  : null
-																  }
+											: null
+									}
 								</div>
 								<Button
 									className="md:hidden"
