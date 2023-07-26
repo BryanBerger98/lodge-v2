@@ -59,7 +59,7 @@ const SignInForm = ({ newUserSignUpSetting, userVerifyEmailSetting }: SignInForm
 				if (data?.error) {
 					setError('Incorrect credentials.');
 				} else {
-					if (userVerifyEmailSetting?.data_type === 'boolean' && userVerifyEmailSetting?.value) {
+					if (!userVerifyEmailSetting || (userVerifyEmailSetting && userVerifyEmailSetting.data_type === 'boolean' && userVerifyEmailSetting.value)) {
 						if (verificationToken) {
 							router.replace(`/verify-email/${ verificationToken }`);
 						} else {
@@ -136,7 +136,7 @@ const SignInForm = ({ newUserSignUpSetting, userVerifyEmailSetting }: SignInForm
 							<Separator orientation="horizontal" />
 							<div className="flex justify-center w-full">
 								{
-									newUserSignUpSetting && newUserSignUpSetting.data_type === 'boolean' && newUserSignUpSetting.value ?
+									(newUserSignUpSetting && newUserSignUpSetting.data_type === 'boolean' && newUserSignUpSetting.value) || !newUserSignUpSetting ?
 										<Button
 											className="gap-2 items-center"
 											variant="link"
