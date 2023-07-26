@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import CurrentUserAvatar from '@/components/features/users/CurrentUserAvatar';
+import { Badge } from '@/components/ui/badge';
 import useAuth from '@/context/auth/useAuth';
 import HeaderButton from '@/context/layout/header/HeaderButton';
 import useHeader from '@/context/layout/header/useHeader';
@@ -51,7 +52,10 @@ const Sidebar = ({ className, hasSettingsAccess }: SidebarProps) => {
 				>
 					<Menu size="24" />
 				</Button>
-				<p className="text-xl font-medium flex gap-2 items-center">{ headerTitle ? headerTitle : <><Layers size="24" /> Lodge</> }</p>
+				<div className="flex flex-col">
+					<p className="text-xl font-medium flex gap-2 items-center">{ headerTitle ? headerTitle : <><Layers size="24" /> Lodge</> }</p>
+					{ process.env.NEXT_PUBLIC_ENVIRONMENT !== 'Production' ? <Badge variant="destructive">{ process.env.NEXT_PUBLIC_ENVIRONMENT }</Badge> : null }
+				</div>
 				{
 					buttonProps ?
 						<HeaderButton
@@ -67,7 +71,18 @@ const Sidebar = ({ className, hasSettingsAccess }: SidebarProps) => {
 					<div className={ `w-screen md:w-[200px] py-8 bg-white h-screen fixed top-0 left-0 bottom-0 z-50 ${ className }` }>
 						<div className="h-full border-r-[1px] border-slate-200 px-6 flex flex-col gap-8">
 							<div className="flex gap-4 justify-between items-center">
-								<p className="text-3xl font-medium flex gap-2 items-center"><Layers size="32" /> Lodge</p>
+								<div className="flex flex-col gap-2">
+									<p className="text-3xl font-medium flex gap-2 items-center"><Layers size="32" /> Lodge</p>
+									{
+										process.env.NEXT_PUBLIC_ENVIRONMENT && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'Production' ?
+											<Badge
+												className="w-fit"
+												variant="destructive"
+											>{ process.env.NEXT_PUBLIC_ENVIRONMENT }
+											</Badge>
+																  : null
+																  }
+								</div>
 								<Button
 									className="md:hidden"
 									variant="ghost"
