@@ -2,13 +2,15 @@ import { createTransport } from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
+import { isProductionEnv } from '@/utils/env.util';
+
 export type MailOptions = Mail.Options;
 export { SMTPTransport };
 
 const options: SMTPTransport.Options = {
 	host: process.env.EMAIL_HOST,
 	port: Number(process.env.EMAIL_PORT),
-	secure: false,
+	secure: isProductionEnv(process.env.ENVIRONMENT) ? true : false,
 	auth: {
 		user: process.env.EMAIL_USER,
 		pass: process.env.EMAIL_PASS,
