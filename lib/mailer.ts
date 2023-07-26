@@ -10,13 +10,16 @@ export { SMTPTransport };
 const options: SMTPTransport.Options = {
 	host: process.env.EMAIL_HOST,
 	port: Number(process.env.EMAIL_PORT),
-	secure: isProductionEnv(process.env.ENVIRONMENT) ? true : false,
 	auth: {
 		user: process.env.EMAIL_USER,
 		pass: process.env.EMAIL_PASS,
 	},
 	tls: { rejectUnauthorized: false },
 };
+
+if (!isProductionEnv(process.env.ENVIRONMENT)) {
+	options.secure = false;
+}
 
 const transporter = createTransport(options);
 
