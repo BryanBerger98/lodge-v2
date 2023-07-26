@@ -12,7 +12,7 @@ const appName = process.env.NEXT_PUBLIC_APP_NAME;
 export const sendEmail = async (to: string, cc: string[], bcc: string[], subject: string, plainText: string, htmlBody: string): Promise<SMTPTransport.SentMessageInfo> => {
 
 	const mailOptions: MailOptions = {
-		from: `"${ appName } - Do not reply" <${ process.env.EMAIL_USER }>`,
+		from: `"${ appName } - Do not reply" <${ process.env.EMAIL_FROM }>`,
 		to,
 		cc,
 		bcc,
