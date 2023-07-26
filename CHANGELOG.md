@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/BryanBerger98/lodge-v2/compare/v1.4.1...v1.4.2) (2023-07-26)
+
+
+### Bug Fixes
+
+* email transport config ([#153](https://github.com/BryanBerger98/lodge-v2/issues/153)) ([f70234b](https://github.com/BryanBerger98/lodge-v2/commit/f70234b58de84dd45955c1383cf4bccaaa7bbdca))
+
 ## [1.4.1](https://github.com/BryanBerger98/lodge-v2/compare/v1.4.0...v1.4.1) (2023-07-26)
 
 
