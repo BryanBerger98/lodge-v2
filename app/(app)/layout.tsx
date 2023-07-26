@@ -34,7 +34,7 @@ const AppLayout = async ({ children }: AppLayoutProps) => {
 
 	const userVerifyEmailSetting = await findSettingByName(USER_VERIFY_EMAIL_SETTING);
 
-	if (userVerifyEmailSetting && userVerifyEmailSetting.data_type === 'boolean' && userVerifyEmailSetting.value && !currentUser?.has_email_verified) {
+	if ((!userVerifyEmailSetting && !currentUser?.has_email_verified) || (userVerifyEmailSetting && userVerifyEmailSetting.data_type === 'boolean' && userVerifyEmailSetting.value && !currentUser?.has_email_verified)) {
 		redirect('/verify-email');
 	}
 

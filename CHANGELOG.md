@@ -1,3 +1,21 @@
+# [1.4.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.3.0...v1.4.0) (2023-07-25)
+
+
+### Bug Fixes
+
+* **settings:** fix database connection on ssr ([16cb160](https://github.com/BryanBerger98/lodge-v2/commit/16cb160ad037644b7f932edc0102d1fc0e972bdb))
+* **settings:** fix database connection on ssr ([e71b1b9](https://github.com/BryanBerger98/lodge-v2/commit/e71b1b987af677b1decaedd295fdaa597166fbde))
+* **settings:** fix invalid settings layout type ([#145](https://github.com/BryanBerger98/lodge-v2/issues/145)) ([ccc4694](https://github.com/BryanBerger98/lodge-v2/commit/ccc469457addf62f7753b092bdb174d8c042f586))
+* **users:** fix users request limit on fetch users hook ([#143](https://github.com/BryanBerger98/lodge-v2/issues/143)) ([7115c62](https://github.com/BryanBerger98/lodge-v2/commit/7115c62fdec9be705e85223010c6cb42b61a7490))
+
+
+### Features
+
+* add responsive design ([ebaf10f](https://github.com/BryanBerger98/lodge-v2/commit/ebaf10fcd71c70bd3076ff95ded0892d6df35bdc))
+* **layout:** add pages responsive design ([1db78c4](https://github.com/BryanBerger98/lodge-v2/commit/1db78c4d182dac513556be3be84e876b0c1d8d80))
+* **layout:** add responsive design on auth pages ([9e43d37](https://github.com/BryanBerger98/lodge-v2/commit/9e43d378fae4393a4b6d1f4be806cfa913498b58))
+* **layout:** add sidebar and header responsive design ([11bfa00](https://github.com/BryanBerger98/lodge-v2/commit/11bfa0049253bbdc0c38ad05d0813565a55be985))
+
 # [1.3.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.2.0...v1.3.0) (2023-07-24)
 
 

@@ -77,7 +77,7 @@ const SignUpForm = ({ csrfToken, userVerifyEmailSetting, passwordRules }: SignUp
 			if (signInData?.error) {
 				setError('Incorrect credentials.');
 			} else {
-				if (userVerifyEmailSetting?.data_type === 'boolean' && userVerifyEmailSetting?.value) {
+				if (!userVerifyEmailSetting || (userVerifyEmailSetting && userVerifyEmailSetting.data_type === 'boolean' && userVerifyEmailSetting.value)) {
 					router.replace('/verify-email');
 					return;
 				}
