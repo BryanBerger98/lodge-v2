@@ -16,7 +16,7 @@ type AuthContextValue = {
 	currentUser: IUser | null;
 	fetchCurrentUser: () => Promise<IUser>,
 	updateCurrentUser: (user: IUser) => Promise<void>,
-	updateSession: (sessionData: Partial<Session>) => Promise<Session | null>;
+	updateSession: () => Promise<Session | null>;
 	can: (action: Permission) => boolean;
 	loading: LoadingState,
 	error: string | null,
@@ -45,7 +45,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const [ , basePathname ] = pathname.split('/');
-	const { status, data: session, update } = useSession();
+	const { status, update } = useSession();
 
 	useEffect(() => {
 		if (status === 'loading') {
@@ -107,26 +107,16 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 			...user,
 		});
 		try {
-			await update({
-				...session,
-				user: {
-					...currentUser,
-					...user,
-					photo_url: undefined,
-				},
-			});
+			await update();
 			return;
 		} catch (error) {
 			throw error;
 		}
-	}, [ setCurrentUser, currentUser, session, update ]);
+	}, [ setCurrentUser, currentUser, update ]);
 
-	const updateSession = useCallback(async (sessionData: Partial<Session>) => {
-		return await update({
-			...session,
-			...sessionData,
-		});
-	}, [ session, update ]);
+	const updateSession = useCallback(async () => {
+		return await update();
+	}, [ update ]);
 
 	const can = useCallback((action: Permission) => currentUser ? action[ currentUser.role ] : false, [ currentUser ]);
 

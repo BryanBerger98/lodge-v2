@@ -3,7 +3,7 @@ import { NextAuthOptions } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 
 import { connectToDatabase } from '@/config/database.config';
-import { findUserWithPasswordByEmail, updateUser } from '@/database/user/user.repository';
+import { findUserById, findUserWithPasswordByEmail, updateUser } from '@/database/user/user.repository';
 import { IUserWithPassword } from '@/types/user.type';
 import { Optional } from '@/types/utils.type';
 import { buildError } from '@/utils/error';
@@ -88,28 +88,24 @@ const authOptions: NextAuthOptions = {
 		}),
 	],
 	callbacks: {
-		async jwt ({ user, token, session, trigger }) {
-			if (trigger === 'update' && session) {
-				token.id = session.user.id;
-				token.role = session.user.role;
-				token.has_email_verified = session.user.has_email_verified;
-				token.photo_url = session.user.photo_url;
-				token.photo_key = session.user.photo_key;
-				token.phone_number = session.user.phone_number;
-				token.username = session.user.username;
-				token.email = session.user.email;
+		async jwt ({ user, token, trigger }) {
+			if (trigger === 'update') {
+				await connectToDatabase();
+				const updatedUser = await findUserById(token.id);
+				if (updatedUser) {
+					return {
+						...token,
+						...updatedUser,
+					};
+				}
 			}
 			if (user) {
-				token.id = user.id;
-				token.role = user.role;
-				token.has_email_verified = user.has_email_verified;
-				token.photo_url = user.photo_url;
-				token.photo_key = user.photo_key;
-				token.phone_number = user.phone_number;
-				token.username = user.username;
-				token.email = user.email;
+				return {
+					...token,
+					...user,
+				};
 			}
-			return token;
+			return { ...token };
 		},
 		session ({ session, token }) {
 			session.user = {
@@ -119,6 +115,11 @@ const authOptions: NextAuthOptions = {
 			return session;
 		},
 	},
+	session: {
+		strategy: 'jwt',
+		maxAge: 7 * 24 * 60 * 60, 
+	},
+	jwt: { maxAge: 7 * 24 * 60 * 60 },
 	secret: process.env.JWT_SECRET,
 };
 
