@@ -1,3 +1,16 @@
+# [1.5.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.4.2...v1.5.0) (2023-07-26)
+
+
+### Bug Fixes
+
+* email transport config ([#152](https://github.com/BryanBerger98/lodge-v2/issues/152)) ([6bd74e9](https://github.com/BryanBerger98/lodge-v2/commit/6bd74e9d0d51706b3f0496e546fef455b13ebbf5))
+* email transport config ([#154](https://github.com/BryanBerger98/lodge-v2/issues/154)) ([fedc717](https://github.com/BryanBerger98/lodge-v2/commit/fedc7176ad276bf027383efb755daf76c03cbc7a))
+
+
+### Features
+
+* **auth:** add refresh token fetch interval ([#156](https://github.com/BryanBerger98/lodge-v2/issues/156)) ([83d7155](https://github.com/BryanBerger98/lodge-v2/commit/83d7155978c554b3e3807b56e78e46ec1aca0148))
+
 ## [1.4.2](https://github.com/BryanBerger98/lodge-v2/compare/v1.4.1...v1.4.2) (2023-07-26)
 
 
