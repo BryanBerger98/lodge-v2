@@ -3,6 +3,20 @@ import mongoose, { Types } from 'mongoose';
 export type Id = Types.ObjectId;
 export const newId = (idString?: string | Id) => new Types.ObjectId(idString);
 
+export type UpdateQueryOptions = {
+	newDocument?: boolean;
+	upsert?: boolean;
+}
+
+// export type SortParams<D> = Record<keyof D, -1 | 1>;
+export type SortParams<D> = Partial<Record<keyof D, -1 | 1>>
+
+export type QueryOptions<D> = {
+	sort?: SortParams<D>,
+	skip?: number,
+	limit?: number,
+};
+
 const { DB_USER, DB_PASSWORD, DB_CLUSTER, DB_NAME, DB_PORT } = process.env;
 
 const getMongoDBURI = () => {

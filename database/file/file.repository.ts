@@ -1,4 +1,4 @@
-import { Id, newId } from '@/config/database.config';
+import { Id, newId } from '@/lib/database';
 import { CreateLodgeFileDTO, IFile } from '@/types/file.type';
 
 import FileModel from './file.model';

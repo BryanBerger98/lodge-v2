@@ -1,21 +1,13 @@
 import { FilterQuery } from 'mongoose';
 
-import { Id, newId } from '@/config/database.config';
+import { Id, newId, UpdateQueryOptions, QueryOptions } from '@/lib/database';
 import { IUser, IUserWithPassword } from '@/types/user.type';
 import { Optional } from '@/types/utils.type';
 
 import { CreateUserDTO, SignupUserDTO, UpdateUserDTO } from './user.dto';
 import UserModel from './user.model';
 
-export type SortParams = Record<string, -1 | 1>;
-
-export type QueryOptions = {
-	sort?: SortParams,
-	skip?: number,
-	limit?: number,
-};
-
-export const findUsers = async (searchRequest: FilterQuery<IUser>, options?: QueryOptions): Promise<IUser[]> => {
+export const findUsers = async (searchRequest: FilterQuery<IUser>, options?: QueryOptions<IUser>): Promise<IUser[]> => {
 	try {
 		const users = await UserModel.find(searchRequest, { password: 0 })
 			.skip(options?.skip || 0)
@@ -99,11 +91,7 @@ export const createUser = async (userToCreate: CreateUserDTO | SignupUserDTO): P
 	}
 };
 
-type UpdateUserOptions = {
-	newDocument?: boolean;
-}
-
-export const updateUser = async (userToUpdate: UpdateUserDTO, options?: UpdateUserOptions): Promise<IUser | null> => {
+export const updateUser = async (userToUpdate: UpdateUserDTO, options?: UpdateQueryOptions): Promise<IUser | null> => {
 	try {
 		const updatedUserDoc = await UserModel.findByIdAndUpdate(userToUpdate.id, { $set: { ...userToUpdate } }, { new: options?.newDocument || false });
 		const updatedUser: Optional<IUserWithPassword, 'password'> | null = updatedUserDoc?.toObject() || null;

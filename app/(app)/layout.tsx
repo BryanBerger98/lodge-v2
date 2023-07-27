@@ -3,10 +3,10 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { ReactNode } from 'react';
 
-import { connectToDatabase } from '@/config/database.config';
 import HeaderProvider from '@/context/layout/header';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { findUserById } from '@/database/user/user.repository';
+import { connectToDatabase } from '@/lib/database';
 import authOptions from '@/utils/auth/auth-options';
 import { SHARE_WITH_ADMIN_SETTING, USER_VERIFY_EMAIL_SETTING } from '@/utils/settings';
 

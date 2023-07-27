@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 
-import { connectToDatabase } from '@/config/database.config';
 import { deleteFileById, findFileByKey } from '@/database/file/file.repository';
 import { deleteUserById, findUserById } from '@/database/user/user.repository';
 import { deleteFileFromKey } from '@/lib/bucket';
+import { connectToDatabase } from '@/lib/database';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { FORBIDDEN_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';

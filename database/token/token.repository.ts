@@ -1,4 +1,4 @@
-import { Id, newId } from '@/config/database.config';
+import { Id, newId } from '@/lib/database';
 import { IToken, TokenAction } from '@/types/token.type';
 
 import { CreateTokenDTO } from './token.dto';

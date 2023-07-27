@@ -2,8 +2,8 @@
 import { NextAuthOptions } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 
-import { connectToDatabase } from '@/config/database.config';
 import { findUserById, findUserWithPasswordByEmail, updateUser } from '@/database/user/user.repository';
+import { connectToDatabase } from '@/lib/database';
 import { IUserWithPassword } from '@/types/user.type';
 import { Optional } from '@/types/utils.type';
 import { buildError } from '@/utils/error';

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError, object, string } from 'zod';
 
-import { connectToDatabase } from '@/config/database.config';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { createToken, deleteTokenById, getTokenFromTargetId, getTokenFromTokenString } from '@/database/token/token.repository';
 import { findUserByEmail, findUserById, updateUserPassword } from '@/database/user/user.repository';
+import { connectToDatabase } from '@/lib/database';
 import { IToken } from '@/types/token.type';
 import { Optional } from '@/types/utils.type';
 import { sendResetPasswordEmail } from '@/utils/email';

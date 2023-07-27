@@ -1,6 +1,6 @@
 import { object, string, z } from 'zod';
 
-import { Id } from '@/config/database.config';
+import { Id } from '@/lib/database';
 import { AuthProvider, UserRoleWithOwner, UserRoles } from '@/types/user.type';
 
 export const FetchUsersSchema = object({
