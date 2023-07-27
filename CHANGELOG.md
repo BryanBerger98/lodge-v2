@@ -1,3 +1,12 @@
+# [1.6.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.5.0...v1.6.0) (2023-07-27)
+
+
+### Features
+
+* **ui/forms:** add optional inner button to search select ([bf90c40](https://github.com/BryanBerger98/lodge-v2/commit/bf90c40e1671cf0e0188acd050f1926b0e73399b))
+* **ui/forms:** add optional inner button to search select ([1374eaa](https://github.com/BryanBerger98/lodge-v2/commit/1374eaae9fa5b0c32a52f9004e80369bd49f404c))
+* **ui:** add cell align props in data-table column meta data ([c03f530](https://github.com/BryanBerger98/lodge-v2/commit/c03f5306681fc006f571c0ef24a9facc910fda37))
+
 # [1.5.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.4.2...v1.5.0) (2023-07-26)
 
 
