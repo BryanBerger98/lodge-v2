@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import { ZodError, boolean, object, string, z } from 'zod';
 
-import InputPhone from '@/components/forms/inputs/InputPhone';
+import InputPhone from '@/components/forms/Input/InputPhone';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import BackButton from '@/components/ui/Button/BackButton';

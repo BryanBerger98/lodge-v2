@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from './button';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from './dropdown-menu';
 
-const DynamicInputSearch = dynamic(() => import('../forms/inputs/InputSearch'), { ssr: false });
+const DynamicInputSearch = dynamic(() => import('../forms/Input/InputSearch'), { ssr: false });
 
 interface DataTableProps<TData, TValue> extends Omit<TableOptions<TData>, 'getCoreRowModel'> {
 	columns: ColumnDef<TData, TValue>[]
