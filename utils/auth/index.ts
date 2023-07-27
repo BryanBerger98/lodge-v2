@@ -1,8 +1,8 @@
 import { redirect as nextRedirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 
-import { connectToDatabase } from '@/config/database.config';
 import { findUserById, findUserWithPasswordById } from '@/database/user/user.repository';
+import { connectToDatabase } from '@/lib/database';
 import { IUser, UserRoleWithOwner } from '@/types/user.type';
 
 import { buildError } from '../error';

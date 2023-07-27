@@ -2,8 +2,8 @@ import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { connectToDatabase } from '@/config/database.config';
 import { findSettingByName } from '@/database/setting/setting.repository';
+import { connectToDatabase } from '@/lib/database';
 import { getCsrfToken } from '@/utils/csrf.util';
 import { NEW_USERS_SIGNUP_SETTING, PASSWORD_LOWERCASE_MIN_SETTING, PASSWORD_MIN_LENGTH_SETTING, PASSWORD_NUMBERS_MIN_SETTING, PASSWORD_SYMBOLS_MIN_SETTING, PASSWORD_UNIQUE_CHARS_SETTING, PASSWORD_UPPERCASE_MIN_SETTING, USER_VERIFY_EMAIL_SETTING } from '@/utils/settings';
 

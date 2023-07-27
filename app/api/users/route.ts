@@ -3,11 +3,11 @@ import { parse } from 'url';
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 
-import { connectToDatabase } from '@/config/database.config';
 import { createFile, deleteFileById, findFileByKey } from '@/database/file/file.repository';
 import { CreateUserSchema, FetchUsersSchema, UpdateUserSchema } from '@/database/user/user.dto';
 import { createUser, findUserByEmail, findUserById, findUsers, findUsersCount, updateUser } from '@/database/user/user.repository';
 import { deleteFileFromKey, getFileFromKey, uploadImageToS3 } from '@/lib/bucket';
+import { connectToDatabase } from '@/lib/database';
 import { IUser } from '@/types/user.type';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';

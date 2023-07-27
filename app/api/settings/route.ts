@@ -3,9 +3,9 @@ import { parse } from 'url';
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 
-import { connectToDatabase } from '@/config/database.config';
 import { FetchSettingsSchema, UpdateSettingsSchema } from '@/database/setting/setting.dto';
 import { findSettingByName, findSettings, updateSetting } from '@/database/setting/setting.repository';
+import { connectToDatabase } from '@/lib/database';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { INTERNAL_ERROR, INVALID_INPUT_ERROR } from '@/utils/error/error-codes';

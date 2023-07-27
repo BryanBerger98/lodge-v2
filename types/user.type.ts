@@ -1,4 +1,4 @@
-import { Id } from '@/config/database.config';
+import { Id } from '@/lib/database';
 
 export const UserRoles = [ 'admin', 'user' ] as const;
 export type UserRole = typeof UserRoles[number];

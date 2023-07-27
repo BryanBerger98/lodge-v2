@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError, object, string } from 'zod';
 
-import { connectToDatabase } from '@/config/database.config';
 import { deleteFileById, findFileByKey } from '@/database/file/file.repository';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { deleteUserById, findUserWithPasswordById } from '@/database/user/user.repository';
 import { deleteFileFromKey } from '@/lib/bucket';
+import { connectToDatabase } from '@/lib/database';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { FORBIDDEN_ERROR, INTERNAL_ERROR, PASSWORD_REQUIRED_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';

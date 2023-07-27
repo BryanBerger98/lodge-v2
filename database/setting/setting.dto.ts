@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { Id } from '@/config/database.config';
+import { Id } from '@/lib/database';
 import { SettingTypes } from '@/types/setting.type';
 
 export const FetchSettingsSchema = z.object({ name: z.coerce.string().optional().transform(value => value ? value.split(',') : []) });

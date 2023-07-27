@@ -1,5 +1,6 @@
 import { FilterQuery } from 'mongoose';
 
+import { UpdateQueryOptions } from '@/lib/database';
 import { ISetting } from '@/types/setting.type';
 
 import { CreateSettingDTO, UpdateSettingDTO } from './setting.dto';
@@ -32,12 +33,7 @@ export const createSetting = async (settingToCreate: CreateSettingDTO): Promise<
 	}
 };
 
-type UpdateSettingOptions = {
-	newDocument?: boolean;
-	upsert?: boolean;
-}
-
-export const updateSetting = async (settingToUpdate: UpdateSettingDTO, options?: UpdateSettingOptions): Promise<ISetting | null> => {
+export const updateSetting = async (settingToUpdate: UpdateSettingDTO, options?: UpdateQueryOptions): Promise<ISetting | null> => {
 	try {
 		const updatedSetting = await SettingModel.findOneAndUpdate({ name: settingToUpdate.name }, { $set: { ...settingToUpdate } }, {
 			new: options?.newDocument || false,

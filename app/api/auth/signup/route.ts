@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError, z } from 'zod';
 
-import { connectToDatabase } from '@/config/database.config';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { createToken } from '@/database/token/token.repository';
 import { SignUpUserSchema } from '@/database/user/user.dto';
 import { createUser, findUserByEmail } from '@/database/user/user.repository';
+import { connectToDatabase } from '@/lib/database';
 import { sendAccountVerificationEmail } from '@/utils/email';
 import { buildError, sendError } from '@/utils/error';
 import { FORBIDDEN_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_ALREADY_EXISTS_ERROR } from '@/utils/error/error-codes';

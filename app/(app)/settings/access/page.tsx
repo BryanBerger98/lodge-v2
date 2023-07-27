@@ -2,8 +2,8 @@ import { Unlock } from 'lucide-react';
 import { default as nextDynamic } from 'next/dynamic';
 import { headers } from 'next/headers';
 
-import { connectToDatabase } from '@/config/database.config';
 import { findOwnerUser } from '@/database/user/user.repository';
+import { connectToDatabase } from '@/lib/database';
 import { getCsrfToken } from '@/utils/csrf.util';
 
 const DynamicShareSettings = nextDynamic(() => import('../_components/ShareSettings'));

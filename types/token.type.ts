@@ -1,4 +1,4 @@
-import { Id } from '@/config/database.config';
+import { Id } from '@/lib/database';
 
 export type TokenAction = 'reset_password' | 'email_verification';
 
