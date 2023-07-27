@@ -21,9 +21,10 @@ interface DataTableProps<TData, TValue> extends Omit<TableOptions<TData>, 'getCo
 	withCustomColumns?: boolean;
 	defaultSearchValue?: string;
 	columnNames?: Record<string, string>;
+	noResultsMessage?: string;
 }
 
-const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = false, defaultSearchValue = '', total = 0, onSearch: handleSearch, searchPlaceholder, withCustomColumns = false, ...options }: DataTableProps<TData, TValue>) => {
+const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = false, defaultSearchValue = '', total = 0, onSearch: handleSearch, searchPlaceholder, withCustomColumns = false, noResultsMessage = 'No results.', ...options }: DataTableProps<TData, TValue>) => {
 
 	const table = useReactTable({
 		data,
@@ -91,7 +92,10 @@ const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = fal
 						<TableRow key={ headerGroup.id }>
 							{ headerGroup.headers.map((header) => {
 								return (
-									<TableHead key={ header.id }>
+									<TableHead
+										key={ header.id }
+										align={ (header.column.columnDef.meta as any)?.header?.align }
+									>
 										{ header.isPlaceholder
 											? null
 											: flexRender(
@@ -112,7 +116,10 @@ const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = fal
 								data-state={ row.getIsSelected() && 'selected' }
 							>
 								{ row.getVisibleCells().map((cell) => (
-									<TableCell key={ cell.id }>
+									<TableCell
+										key={ cell.id }
+										align={ (cell.column.columnDef.meta as any)?.cell?.align }
+									>
 										{ flexRender(cell.column.columnDef.cell, cell.getContext()) }
 									</TableCell>
 								)) }
@@ -124,7 +131,7 @@ const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = fal
 								className="h-24 text-center"
 								colSpan={ columns.length }
 							>
-								No results.
+								{ noResultsMessage }
 							</TableCell>
 						</TableRow>
 					) }
