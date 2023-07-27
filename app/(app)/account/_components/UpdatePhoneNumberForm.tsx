@@ -16,7 +16,7 @@ import useAuth from '@/context/auth/useAuth';
 import { updateAccount } from '@/services/auth.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
-const DynamicInputPhone = dynamic(() => import('@/components/forms/inputs/InputPhone'));
+const DynamicInputPhone = dynamic(() => import('@/components/forms/Input/InputPhone'));
 
 type UpdatePhoneNumberFormProps = {
 	csrfToken: string;

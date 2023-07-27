@@ -8,10 +8,10 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import PasswordModal, { PasswordModalOpenChangeEvent } from '@/components/features/auth/PasswordModal';
+import SearchSelect, { SelectOption } from '@/components/forms/Select/SearchSelect';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
-import SearchSelect, { SelectOption } from '@/components/ui/Select/SearchSelect';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
