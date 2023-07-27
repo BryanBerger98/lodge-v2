@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 
-import { connectToDatabase } from '@/config/database.config';
 import { createToken, deleteTokenById, getTokenFromTargetId } from '@/database/token/token.repository';
 import { findUserById } from '@/database/user/user.repository';
+import { connectToDatabase } from '@/lib/database';
 import { IToken } from '@/types/token.type';
 import { Optional } from '@/types/utils.type';
 import { setServerAuthGuard } from '@/utils/auth';

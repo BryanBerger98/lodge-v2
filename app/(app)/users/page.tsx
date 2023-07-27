@@ -6,10 +6,10 @@ import Link from 'next/link';
 import PageTitle from '@/components/layout/PageTitle';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { connectToDatabase } from '@/config/database.config';
 import UsersProvider from '@/context/users';
 import { FetchUsersSchema } from '@/database/user/user.dto';
 import { findUsers, findUsersCount } from '@/database/user/user.repository';
+import { connectToDatabase } from '@/lib/database';
 import { getCsrfToken } from '@/utils/csrf.util';
 
 const DynamicUsersDataTable = dynamic(() => import('./_components/UsersDataTable'));

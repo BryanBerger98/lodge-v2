@@ -7,9 +7,9 @@ import PageTitle from '@/components/layout/PageTitle';
 import Tabs from '@/components/ui/Tabs';
 import TabButton from '@/components/ui/Tabs/TabButton';
 import TabsList from '@/components/ui/Tabs/TabsList';
-import { connectToDatabase } from '@/config/database.config';
 import SettingsProvider from '@/context/settings';
 import { findSettingByName } from '@/database/setting/setting.repository';
+import { connectToDatabase } from '@/lib/database';
 import { setServerAuthGuard } from '@/utils/auth';
 import { SHARE_WITH_ADMIN_SETTING } from '@/utils/settings';
 

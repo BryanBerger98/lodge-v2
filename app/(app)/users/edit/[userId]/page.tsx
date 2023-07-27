@@ -5,11 +5,11 @@ import { redirect } from 'next/navigation';
 
 import PageTitle from '@/components/layout/PageTitle';
 import BackButton from '@/components/ui/Button/BackButton';
-import { Id } from '@/config/database.config';
 import UsersProvider from '@/context/users';
 import { findFileByKey } from '@/database/file/file.repository';
 import { findUserById } from '@/database/user/user.repository';
 import { getFileFromKey } from '@/lib/bucket';
+import { Id } from '@/lib/database';
 import { getCsrfToken } from '@/utils/csrf.util';
 
 

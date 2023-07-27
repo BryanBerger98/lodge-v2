@@ -4,7 +4,7 @@ import { ArrowDown, ArrowUp, ArrowUpDown, BadgeCheck, BadgeX } from 'lucide-reac
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Id } from '@/config/database.config';
+import { Id } from '@/lib/database';
 import { UserRoleWithOwner } from '@/types/user.type';
 
 import Menu from './Menu';

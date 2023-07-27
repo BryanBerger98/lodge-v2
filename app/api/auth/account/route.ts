@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 
-import { connectToDatabase } from '@/config/database.config';
 import { findFileByKey } from '@/database/file/file.repository';
 import { UpdateUserAccountSchema } from '@/database/user/user.dto';
 import { findUserById, updateUser } from '@/database/user/user.repository';
 import { getFileFromKey } from '@/lib/bucket';
+import { connectToDatabase } from '@/lib/database';
 import { IUser } from '@/types/user.type';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';

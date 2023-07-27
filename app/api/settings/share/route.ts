@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 
-import { connectToDatabase } from '@/config/database.config';
 import { UpdateShareSettingsSchema } from '@/database/setting/setting.dto';
 import { findSettingByName, updateSetting } from '@/database/setting/setting.repository';
 import { findOwnerUser, findUserById, updateUser } from '@/database/user/user.repository';
+import { connectToDatabase } from '@/lib/database';
 import { authenticateUserWithPassword, setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
