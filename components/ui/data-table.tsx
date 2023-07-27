@@ -1,6 +1,6 @@
 'use client';
 
-import { ColumnDef, useReactTable, getCoreRowModel, flexRender, TableOptions, getSortedRowModel, getPaginationRowModel, Column } from '@tanstack/react-table';
+import { ColumnDef, useReactTable, getCoreRowModel, flexRender, TableOptions, getSortedRowModel, getPaginationRowModel, Column, Row, Cell } from '@tanstack/react-table';
 import { ChevronDown } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -22,9 +22,11 @@ interface DataTableProps<TData, TValue> extends Omit<TableOptions<TData>, 'getCo
 	defaultSearchValue?: string;
 	columnNames?: Record<string, string>;
 	noResultsMessage?: string;
+	onRowClick?: (row: Row<TData>) => void;
+	onCellClick?: (row: Cell<TData, TValue>) => void;
 }
 
-const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = false, defaultSearchValue = '', total = 0, onSearch: handleSearch, searchPlaceholder, withCustomColumns = false, noResultsMessage = 'No results.', ...options }: DataTableProps<TData, TValue>) => {
+const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = false, defaultSearchValue = '', total = 0, onSearch: handleSearch, searchPlaceholder, withCustomColumns = false, noResultsMessage = 'No results.', onRowClick, onCellClick, ...options }: DataTableProps<TData, TValue>) => {
 
 	const table = useReactTable({
 		data,
@@ -39,6 +41,18 @@ const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = fal
 
 	  const handleNextPage = () => table.nextPage();
 	  const handlePreviousPage = () => table.previousPage();
+
+	  const handleRowClick = (row: Row<TData>) => () => {
+		if (onRowClick) {
+			onRowClick(row);
+		}
+	  };
+
+	  const handleCellClick = (cell: Cell<TData, TValue>) => () => {
+		if (onCellClick) {
+			onCellClick(cell);
+		}
+	  };
 
 	return (
 		<>
@@ -114,11 +128,13 @@ const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = fal
 							<TableRow
 								key={ row.id }
 								data-state={ row.getIsSelected() && 'selected' }
+								onClick={ handleRowClick(row) }
 							>
 								{ row.getVisibleCells().map((cell) => (
 									<TableCell
 										key={ cell.id }
 										align={ (cell.column.columnDef.meta as any)?.cell?.align }
+										onClick={ handleCellClick(cell) }
 									>
 										{ flexRender(cell.column.columnDef.cell, cell.getContext()) }
 									</TableCell>
