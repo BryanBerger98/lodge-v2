@@ -130,3 +130,12 @@ export const deleteUserById = async (userId: string | Id): Promise<IUser | null>
 		throw error;
 	}
 };
+
+export const deleteMultipleUsersById = async (userIds: (string | Id)[]): Promise<number> => {
+	try {
+		const { deletedCount } = await UserModel.deleteMany({ _id: { $in: userIds.map(id => newId(id)) } });
+		return deletedCount;
+	} catch (error) {
+		throw error;
+	}
+};
