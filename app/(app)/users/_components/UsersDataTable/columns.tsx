@@ -1,13 +1,15 @@
+import { CheckedState } from '@radix-ui/react-checkbox';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, ArrowUpDown, BadgeCheck, BadgeX } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Id } from '@/lib/database';
 import { UserRoleWithOwner } from '@/types/user.type';
 
-import Menu from './Menu';
+import RowMenu from './RowMenu';
 
 export type UserColumn = {
   id: string | Id;
@@ -29,6 +31,32 @@ export const COLUMN_NAMES = {
 };
 
 export const columns: ColumnDef<UserColumn>[] = [
+	{
+		id: 'select',
+		header: ({ table }) => {
+			const handleCheckedChange = (value: CheckedState) => table.toggleAllPageRowsSelected(!!value);
+			return (
+				<Checkbox
+					aria-label="Select all"
+					checked={ table.getIsAllPageRowsSelected() }
+					onCheckedChange={ handleCheckedChange }
+				/>
+			);
+		},
+		cell: ({ row }) => {
+			const handleCheckedChange = (value: CheckedState) => row.toggleSelected(!!value);
+			return (
+				<Checkbox
+					aria-label="Select row"
+					checked={ row.getIsSelected() }
+					data-emit-row-click="false"
+					onCheckedChange={ handleCheckedChange }
+				/>
+			);
+		},
+		enableSorting: false,
+		enableHiding: false,
+	},
 	{
 		id: 'username',
 		accessorKey: 'username',
@@ -155,6 +183,6 @@ export const columns: ColumnDef<UserColumn>[] = [
 	{
 		id: 'actions',
     	enableHiding: false,
-		cell: ({ row }) => <Menu rowData={ row.original } />,
+		cell: ({ row }) => <RowMenu rowData={ row.original } />,
 	},
 ];

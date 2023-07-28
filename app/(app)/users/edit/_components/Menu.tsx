@@ -20,11 +20,18 @@ type MenuProps = {
 	csrfToken: string;
 }
 
-type ModalState = {
+type ModalState<T extends ('form' | 'simple')> = T extends 'form' ? {
 	isOpen: boolean;
-	modalType: 'form' | 'simple';
-	action: 'delete' | 'reset-password' | 'verify-email';
-}
+	modalType: T;
+	action: 'delete';
+	inputLabel?: string;
+	inputType?: 'text' | 'email' | 'password';
+	valueToValidate: string;
+} : {
+	isOpen: boolean;
+	modalType: T;
+	action: 'reset-password' | 'verify-email';
+};
 
 const getModalContent = (userData: IUser) => ({
 	delete: {
@@ -45,10 +52,13 @@ const Menu = ({ userData, csrfToken }: MenuProps) => {
 
 	const { refetchUsers } = useUsers();
 
-	const [ confirmationModalState, setConfirmationModalState ] = useState<ModalState>({
+	const [ confirmationModalState, setConfirmationModalState ] = useState<ModalState<'form' | 'simple'>>({
 		isOpen: false,
 		modalType: 'form',
-		action: 'delete', 
+		action: 'delete',
+		valueToValidate: userData.email,
+		inputLabel: 'Email',
+		inputType: 'email',
 	});
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 
@@ -60,6 +70,9 @@ const Menu = ({ userData, csrfToken }: MenuProps) => {
 			isOpen: true,
 			modalType: 'form',
 			action: 'delete', 
+			valueToValidate: userData.email,
+			inputLabel: 'Email',
+			inputType: 'email',
 		});
 	};
 
@@ -170,12 +183,13 @@ const Menu = ({ userData, csrfToken }: MenuProps) => {
 				</DropdownMenuContent>
 			</DropdownMenu>
 			<ConfirmationFormModal
-				data={ userData }
 				description={ getModalContent(userData)[ confirmationModalState.action ].description }
+				inputLabel={ confirmationModalState.modalType === 'form' ? confirmationModalState.inputLabel : '' }
+				inputType={ confirmationModalState.modalType === 'form' ? confirmationModalState.inputType : 'text' }
 				isLoading={ isLoading }
 				isOpen={ confirmationModalState.modalType === 'form' && confirmationModalState.isOpen }
-				keyToValidate="email"
 				title={ getModalContent(userData)[ confirmationModalState.action ].title }
+				valueToValidate={ confirmationModalState.modalType === 'form' ? confirmationModalState.valueToValidate : '' }
 				variant="destructive"
 				onOpenChange={ handleConfirmationModalOpenChange }
 			/>

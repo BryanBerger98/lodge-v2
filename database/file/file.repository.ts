@@ -30,6 +30,15 @@ export const deleteFileById = async (fileId: Id | string): Promise<IFile | null>
 	}
 };
 
+export const deleteMultipleFilesById = async (fileIds: (Id | string)[]): Promise<number> => {
+	try {
+		const file = await FileModel.deleteMany({ id: { $in: fileIds.map(id => newId(id)) } });
+		return file.deletedCount;
+	} catch (error) {
+		throw error;
+	}
+};
+
 export const createFile = async (fileToCreate: CreateLodgeFileDTO): Promise<IFile | null> => {
 	try {
 		const createdFile = await FileModel.create(fileToCreate);
