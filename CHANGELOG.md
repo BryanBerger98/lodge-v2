@@ -1,3 +1,17 @@
+# [1.7.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.6.0...v1.7.0) (2023-07-28)
+
+
+### Bug Fixes
+
+* **users:** quick actions menu in user edit page ([#175](https://github.com/BryanBerger98/lodge-v2/issues/175)) ([e17aa54](https://github.com/BryanBerger98/lodge-v2/commit/e17aa54f74fae3fa1827731def88774e844eed53))
+
+
+### Features
+
+* **components/ui:** add data table click events ([c962d12](https://github.com/BryanBerger98/lodge-v2/commit/c962d12dea97d5d6b4789527df903fce1dcb1d0a))
+* **components/ui:** improve data table click events ([1d5fa3d](https://github.com/BryanBerger98/lodge-v2/commit/1d5fa3dfc66ab0a7dd3cbe8656c41f707927ac76))
+* **users:** add grouped deletion on select multiple users ([516cb0b](https://github.com/BryanBerger98/lodge-v2/commit/516cb0bbb9d9a88ebef584d50e70a7d915fc93fa))
+
 # [1.6.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.5.0...v1.6.0) (2023-07-27)
 
 
