@@ -48,8 +48,7 @@ const UsersDataTable = ({ csrfToken }: UsersDataTableProps) => {
 	const handleSelectRows = (rows: Row<UserColumn>[]) => setSelectedRows(rows);
 
 	const handleRowClick = (row: Row<UserColumn>) => {
-		console.log('HANDLE ROW CLICK >>>', row.original.username, row.original.email);
-		// router.push(`/users/edit/${ row.original.id }`);
+		router.push(`/users/edit/${ row.original.id }`);
 	};
 
 	return (

@@ -36,14 +36,10 @@ export const DELETE = async (_: any, { params }: { params: { userIds: string } }
 
 		await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
 
-		console.log('IDS >>>', userIdsArr);
-
 		const usersData = await findUsers({
 			_id: { $in: userIdsArr.map(id => newId(id)) },
 			role: { $ne: 'owner' },
 		});
-
-		console.log('USERS >>>', usersData);
 
 		if (!usersData || usersData.length === 0) {
 			return sendError(buildError({
