@@ -12,27 +12,22 @@ import { Input } from '@/components/ui/input';
 
 export type ConfirmationModalOpenChangeEvent = ({ openState, isConfirmed }: { openState: boolean, isConfirmed: boolean }) => void;
 
-type ConfirmationFormModalProps<D> = {
+type ConfirmationFormModalProps = {
 	isOpen: boolean;
 	onOpenChange: ConfirmationModalOpenChangeEvent;
 	title?: ReactNode;
 	description?: ReactNode;
-	keyToValidate: keyof D & string;
-	keyLabel?: string;
-	data: D;
+	valueToValidate: string;
+	inputLabel?: string;
+	inputPlaceholder?: string;
 	variant?: 'default' | 'destructive' | 'outline' | 'ghost' | 'secondary' | 'link';
 	isLoading?: boolean;
+	inputType?: 'text' | 'password' | 'email';
 }
 
-const ConfirmationFormModal = <D extends {}>({ isOpen, onOpenChange, title, description, keyToValidate, keyLabel, variant = 'default', data, isLoading = false }: ConfirmationFormModalProps<D>) => {
+const ConfirmationFormModal = ({ isOpen, onOpenChange, title, description, valueToValidate, inputLabel, variant = 'default', inputType = 'text', isLoading = false, inputPlaceholder = '' }: ConfirmationFormModalProps) => {
 
-	const keyValueToValidate = data[ keyToValidate ];
-
-	if (typeof keyValueToValidate !== 'string') {
-		throw new Error('The value to validate must be a string.');
-	}
-
-	const confirmationFormSchema = object({ keyToValidate: string().refine(value => value === keyValueToValidate, { message: 'Invalid input.' }) });
+	const confirmationFormSchema = object({ keyToValidate: string().refine(value => value === valueToValidate, { message: 'Invalid input.' }) });
 
 	const form = useForm<z.infer<typeof confirmationFormSchema>>({
 		resolver: zodResolver(confirmationFormSchema),
@@ -77,10 +72,11 @@ const ConfirmationFormModal = <D extends {}>({ isOpen, onOpenChange, title, desc
 							name="keyToValidate"
 							render={ ({ field }) => (
 								<FormItem>
-									<FormLabel className="capitalize">{ keyLabel || keyToValidate }</FormLabel>
+									{ inputLabel ? <FormLabel className="capitalize">{ inputLabel }</FormLabel> : null }
 									<FormControl>
 										<Input
-											type={ keyToValidate === 'password' ? 'password' : keyToValidate === 'email' ? 'email' : 'text' }
+											placeholder={ inputPlaceholder }
+											type={ inputType }
 											{ ...field }
 										/>
 									</FormControl>
@@ -91,7 +87,7 @@ const ConfirmationFormModal = <D extends {}>({ isOpen, onOpenChange, title, desc
 						<DialogFooter className="mt-4">
 							<Button
 								className="gap-2"
-								disabled={ isLoading }
+								disabled={ isLoading || !form.formState.isValid }
 								type="submit"
 								variant={ variant }
 							>

@@ -61,6 +61,21 @@ export const updateUser = async (userToUpdate: UpdateUserDTO, csrfToken: string,
 	}
 };
 
+export const updateMultipleUsers = async (usersToUpdate: UpdateUserDTO[], csrfToken: string, options?: FetcherOptions): Promise<IUser> => {
+	try {
+		const data = await fetcher('/api/users/bulk', {
+			method: 'PUT',
+			body: JSON.stringify(usersToUpdate),
+			headers: { 'Content-Type': 'application/json' },
+			...options,
+			csrfToken,
+		});
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
 export type FetchUsersOptions = {
 	sort?: SortingState,
 	skip?: number;
@@ -98,6 +113,20 @@ export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: 
 export const deleteUser = async (userId: string | Id, csrfToken: string, options?: FetcherOptions): Promise<void> => {
 	try {
 		await fetcher(`/api/users/${ userId }`, {
+			method: 'DELETE',
+			...options,
+			csrfToken,
+		});
+		return;
+	} catch (error) {
+		throw error;
+	}
+};
+
+
+export const deleteMultipleUsers = async (userIds: (string | Id)[], csrfToken: string, options?: FetcherOptions): Promise<void> => {
+	try {
+		await fetcher(`/api/users/bulk/${ userIds.join(',') }`, {
 			method: 'DELETE',
 			...options,
 			csrfToken,

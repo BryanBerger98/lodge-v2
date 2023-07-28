@@ -11,6 +11,7 @@ import useUpdateEffect from '@/hooks/utils/useUpdateEffect';
 import { getSortingFromURLParams } from '@/utils/table.utils';
 
 import { COLUMN_NAMES, UserColumn, columns } from './columns';
+import Menu from './Menu';
 
 type UsersDataTableProps = {
 	csrfToken: string;
@@ -20,6 +21,7 @@ const UsersDataTable = ({ csrfToken }: UsersDataTableProps) => {
 
 	const { dispatchCsrfToken } = useCsrf();
 	const { users, total, routeParams } = useUsers();
+	const [ selectedRows, setSelectedRows ] = useState<Row<UserColumn>[]>([]);
 
 	const router = useRouter();
 
@@ -43,9 +45,11 @@ const UsersDataTable = ({ csrfToken }: UsersDataTableProps) => {
 	const handleSearch = (value: string) => setSearchValue(value);
 	const handleChangeSorting: OnChangeFn<SortingState> = setSorting;
 	const handleChangePagination: OnChangeFn<PaginationState> = setPagination;
+	const handleSelectRows = (rows: Row<UserColumn>[]) => setSelectedRows(rows);
 
 	const handleRowClick = (row: Row<UserColumn>) => {
-		router.push(`/users/edit/${ row.original.id }`);
+		console.log('HANDLE ROW CLICK >>>', row.original.username, row.original.email);
+		// router.push(`/users/edit/${ row.original.id }`);
 	};
 
 	return (
@@ -55,12 +59,14 @@ const UsersDataTable = ({ csrfToken }: UsersDataTableProps) => {
 			data={ users }
 			defaultSearchValue={ routeParams.search || '' }
 			pageCount={ total / pagination.pageSize }
+			quickActionsMenu={ <Menu rowsData={ selectedRows } /> }
 			searchPlaceholder="Search users..."
 			state={ {
 				sorting,
 				pagination,
 			} }
 			total={ total }
+			enableRowSelection
 			manualPagination
 			manualSorting
 			withCustomColumns
@@ -68,6 +74,7 @@ const UsersDataTable = ({ csrfToken }: UsersDataTableProps) => {
 			onPaginationChange={ handleChangePagination }
 			onRowClick={ handleRowClick }
 			onSearch={ handleSearch }
+			onSelectRows={ handleSelectRows }
 			onSortingChange={ handleChangeSorting }
 		/>
 	);

@@ -16,17 +16,24 @@ import useUsers from '@/context/users/useUsers';
 import { deleteUser, sendResetPasswordTokenToUser, sendVerificationTokenToUser, updateUser as updateUserQuery } from '@/services/users.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
-import { UserColumn } from '../columns';
+import { UserColumn } from './columns';
 
-type MenuProps = {
+type RowMenuProps = {
 	rowData: UserColumn;
 }
 
-type ModalState = {
+type ModalState<T extends ('form' | 'simple')> = T extends 'form' ? {
 	isOpen: boolean;
-	modalType: 'form' | 'simple';
-	action: 'delete' | 'suspend' | 'activate' | 'reset-password' | 'verify-email';
-}
+	modalType: T;
+	action: 'delete' | 'suspend' | 'activate';
+	inputLabel?: string;
+	inputType?: 'text' | 'email' | 'password';
+	valueToValidate: string;
+} : {
+	isOpen: boolean;
+	modalType: T;
+	action: 'suspend' | 'activate' | 'reset-password' | 'verify-email';
+};
 
 const getModalContent = (rowData: UserColumn) => ({
 	delete: {
@@ -51,15 +58,18 @@ const getModalContent = (rowData: UserColumn) => ({
 	},
 });
 
-const Menu = ({ rowData }: MenuProps) => {
+const RowMenu = ({ rowData }: RowMenuProps) => {
 
 	const { csrfToken } = useCsrf();
 	const { updateUsers, refetchUsers } = useUsers();
 
-	const [ confirmationModalState, setConfirmationModalState ] = useState<ModalState>({
+	const [ confirmationModalState, setConfirmationModalState ] = useState<ModalState<'form' | 'simple'>>({
 		isOpen: false,
 		modalType: 'form',
-		action: 'delete', 
+		action: 'delete',
+		valueToValidate: rowData.email,
+		inputLabel: 'Email',
+		inputType: 'email',
 	});
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 
@@ -70,7 +80,10 @@ const Menu = ({ rowData }: MenuProps) => {
 		setConfirmationModalState({
 			isOpen: true,
 			modalType: 'form',
-			action: 'delete', 
+			action: 'delete',
+			valueToValidate: rowData.email,
+			inputLabel: 'Email',
+			inputType: 'email',
 		});
 	};
 
@@ -78,7 +91,10 @@ const Menu = ({ rowData }: MenuProps) => {
 		setConfirmationModalState({
 			isOpen: true,
 			modalType: 'form',
-			action: 'suspend', 
+			action: 'suspend',
+			valueToValidate: rowData.email,
+			inputLabel: 'Email',
+			inputType: 'email',
 		});
 	};
 
@@ -154,7 +170,7 @@ const Menu = ({ rowData }: MenuProps) => {
 				...confirmationModalState,
 				isOpen: openState,
 			});
-			if (currentUser && rowData.id.toString() === currentUser.id.toString() && [ 'delete', 'suspend' ].includes(confirmationModalState.action)) {
+			if (currentUser && rowData.id.toString() === currentUser.id.toString() && currentUser?.role !== 'owner' && [ 'delete', 'suspend' ].includes(confirmationModalState.action)) {
 				await signOut({ redirect: false });
 				return;
 			}
@@ -243,12 +259,13 @@ const Menu = ({ rowData }: MenuProps) => {
 				</DropdownMenuContent>
 			</DropdownMenu>
 			<ConfirmationFormModal
-				data={ rowData }
 				description={ getModalContent(rowData)[ confirmationModalState.action ].description }
+				inputLabel={ confirmationModalState.modalType === 'form' ? confirmationModalState.inputLabel : '' }
+				inputType={ confirmationModalState.modalType === 'form' ? confirmationModalState.inputType : 'text' }
 				isLoading={ isLoading }
 				isOpen={ confirmationModalState.modalType === 'form' && confirmationModalState.isOpen }
-				keyToValidate="email"
 				title={ getModalContent(rowData)[ confirmationModalState.action ].title }
+				valueToValidate={ confirmationModalState.modalType === 'form' ? confirmationModalState.valueToValidate : '' }
 				variant="destructive"
 				onOpenChange={ handleConfirmationModalOpenChange }
 			/>
@@ -263,4 +280,4 @@ const Menu = ({ rowData }: MenuProps) => {
 	);
 };
 
-export default Menu;
+export default RowMenu;

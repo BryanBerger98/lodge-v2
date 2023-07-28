@@ -1,4 +1,4 @@
-import { S3Client, GetObjectCommand, DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, GetObjectCommand, DeleteObjectCommand, PutObjectCommand, DeleteObjectsCommand } from '@aws-sdk/client-s3';
 
 import { IFile } from '@/types/file.type';
 import { generateUniqueNameFromFileName } from '@/utils/file.util';
@@ -45,6 +45,19 @@ export const deleteFileFromKey = async (key: string) => {
 		const command = new DeleteObjectCommand({
 			Bucket: process.env.BUCKET_NAME as string,
 			Key: key,
+		});
+		await bucket.send(command);
+		return;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const deleteMultipleFilesFromKey = async (keys: string[]) => {
+	try {
+		const command = new DeleteObjectsCommand({
+			Bucket: process.env.BUCKET_NAME as string,
+			Delete: { Objects: keys.map(key => ({ Key: key })) },
 		});
 		await bucket.send(command);
 		return;
