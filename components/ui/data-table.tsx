@@ -23,7 +23,7 @@ interface DataTableProps<TData, TValue> extends Omit<TableOptions<TData>, 'getCo
 	columnNames?: Record<string, string>;
 	noResultsMessage?: string;
 	onRowClick?: (row: Row<TData>) => void;
-	onCellClick?: (row: Cell<TData, TValue>) => void;
+	onCellClick?: (row: Cell<TData, unknown>) => void;
 }
 
 const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = false, defaultSearchValue = '', total = 0, onSearch: handleSearch, searchPlaceholder, withCustomColumns = false, noResultsMessage = 'No results.', onRowClick, onCellClick, ...options }: DataTableProps<TData, TValue>) => {
@@ -48,7 +48,7 @@ const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = fal
 		}
 	  };
 
-	  const handleCellClick = (cell: Cell<TData, TValue>) => () => {
+	  const handleCellClick = (cell: Cell<TData, unknown>) => () => {
 		if (onCellClick) {
 			onCellClick(cell);
 		}
@@ -127,6 +127,7 @@ const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = fal
 						table.getRowModel().rows.map((row) => (
 							<TableRow
 								key={ row.id }
+								className={ onRowClick ? 'hover:cursor-pointer' : '' }
 								data-state={ row.getIsSelected() && 'selected' }
 								onClick={ handleRowClick(row) }
 							>
@@ -134,6 +135,7 @@ const DataTable = <TData, TValue>({ columns, columnNames, data, withSearch = fal
 									<TableCell
 										key={ cell.id }
 										align={ (cell.column.columnDef.meta as any)?.cell?.align }
+										className={ onCellClick ? 'hover:cursor-pointer' : '' }
 										onClick={ handleCellClick(cell) }
 									>
 										{ flexRender(cell.column.columnDef.cell, cell.getContext()) }

@@ -1,6 +1,6 @@
 'use client';
 
-import { OnChangeFn, PaginationState, SortingState } from '@tanstack/react-table';
+import { OnChangeFn, PaginationState, Row, SortingState } from '@tanstack/react-table';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -10,7 +10,7 @@ import useUsers from '@/context/users/useUsers';
 import useUpdateEffect from '@/hooks/utils/useUpdateEffect';
 import { getSortingFromURLParams } from '@/utils/table.utils';
 
-import { COLUMN_NAMES, columns } from './columns';
+import { COLUMN_NAMES, UserColumn, columns } from './columns';
 
 type UsersDataTableProps = {
 	csrfToken: string;
@@ -44,6 +44,10 @@ const UsersDataTable = ({ csrfToken }: UsersDataTableProps) => {
 	const handleChangeSorting: OnChangeFn<SortingState> = setSorting;
 	const handleChangePagination: OnChangeFn<PaginationState> = setPagination;
 
+	const handleRowClick = (row: Row<UserColumn>) => {
+		router.push(`/users/edit/${ row.original.id }`);
+	};
+
 	return (
 		<DataTable
 			columnNames={ COLUMN_NAMES }
@@ -62,6 +66,7 @@ const UsersDataTable = ({ csrfToken }: UsersDataTableProps) => {
 			withCustomColumns
 			withSearch
 			onPaginationChange={ handleChangePagination }
+			onRowClick={ handleRowClick }
 			onSearch={ handleSearch }
 			onSortingChange={ handleChangeSorting }
 		/>
