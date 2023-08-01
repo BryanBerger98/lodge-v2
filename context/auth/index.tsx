@@ -10,7 +10,7 @@ import { LoadingState } from '@/types/loading.type';
 import { IUser } from '@/types/user.type';
 import { ApiError } from '@/utils/error';
 import { USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
-import { Permission } from '@/utils/role.util';
+import { Permission } from '@/utils/roles';
 
 type AuthContextValue = {
 	currentUser: IUser | null;
