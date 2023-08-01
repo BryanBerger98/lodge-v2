@@ -19,7 +19,7 @@ export type QueryOptions<D> = {
 
 const { DB_USER, DB_PASSWORD, DB_CLUSTER, DB_NAME, DB_PORT } = process.env;
 
-const getMongoDBURI = () => {
+export const getMongoDBURI = () => {
 	if (!DB_CLUSTER && !DB_USER && !DB_PASSWORD) {
 		if (!DB_NAME) {
 			throw new Error('Please define the DB_NAME environment variable inside .env.local');

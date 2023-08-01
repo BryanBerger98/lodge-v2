@@ -1,8 +1,8 @@
 import { JWT } from 'next-auth/jwt';
 
+import { Id } from '@/lib/database';
 import { AuthProvider, IUser } from '@/types/user.type';
 
-import { Id } from './config/database.config';
 import { TokenAction } from './types/token.type';
 
 declare module 'next-auth' {

@@ -2,7 +2,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, Loader2, LogIn } from 'lucide-react';
+import { AlertCircle, Loader2, LogIn, Wand2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
@@ -130,34 +130,58 @@ const SignInForm = ({ newUserSignUpSetting, userVerifyEmailSetting }: SignInForm
 								disabled={ isLoading }
 								type="submit"
 							>
-								{ isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn /> }
-								Sign in
+								{ isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn size="16" /> }
+								Sign in with password
 							</Button>
-							<Separator orientation="horizontal" />
-							<div className="flex justify-center w-full">
-								{
-									(newUserSignUpSetting && newUserSignUpSetting.data_type === 'boolean' && newUserSignUpSetting.value) || !newUserSignUpSetting ?
-										<Button
-											className="gap-2 items-center"
-											variant="link"
-											asChild
-										>
-											<Link href="/signup">
-												<LogIn /> Sign Up
-											</Link>
-										</Button>
-										: null
-								}
-								<Button
-									className="gap-2 items-center"
-									variant="link"
-									asChild
-								>
-									<Link href="/forgot-password">
-										Forgot password ?
-									</Link>
-								</Button>
+							<Button
+								className="gap-2 items-center"
+								variant="link"
+								asChild
+							>
+								<Link href="/forgot-password">
+									Forgot password ?
+								</Link>
+							</Button>
+							<div className="flex gap-4 items-center justify-center w-full">
+								<Separator
+									className="flex-1"
+									orientation="horizontal"
+								/>
+								<p className="text-sm text-slate-500 m-0">OR</p>
+								<Separator
+									className="flex-1"
+									orientation="horizontal"
+								/>
 							</div>
+							<p className="text-slate-900 text-sm">
+								Don&apos;t have a password ? Don&apos;t want to type your password ?
+							</p>
+							<Button
+								className="gap-2"
+								disabled={ isLoading }
+								type="submit"
+							>
+								{ isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 size="16" /> }
+								Sign in with magic link
+							</Button>
+							{
+								(newUserSignUpSetting && newUserSignUpSetting.data_type === 'boolean' && newUserSignUpSetting.value) || !newUserSignUpSetting ?
+									<>
+										<Separator orientation="horizontal" />
+										<div className="flex justify-center w-full">
+											<Button
+												className="gap-2 items-center"
+												variant="link"
+												asChild
+											>
+												<Link href="/signup">
+													<LogIn /> Sign Up
+												</Link>
+											</Button>
+										</div>
+									</>
+									: null
+							}
 						</CardFooter>
 					</form>
 				</Form>

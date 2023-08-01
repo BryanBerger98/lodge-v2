@@ -15,6 +15,17 @@ const SignInPage = async () => {
 
 	return (
 		<div className="min-h-screen flex justify-center items-center">
+			{ /* 
+			
+				// TODO:
+				IF only one signin option is activated, display directly this option
+				For example: if only signin with email/password is activated, directly show the email/password form
+
+				If both of signin with email/password and with magic link are activavted, show EmailForm, then PasswordOrMagicLinkForm
+
+				Show external providers signin on top
+
+			*/ }
 			<DynamicSignInForm
 				newUserSignUpSetting={ newUserSignUpSetting }
 				userVerifyEmailSetting={ userVerifyEmailSetting }
