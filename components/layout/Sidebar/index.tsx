@@ -12,7 +12,8 @@ import HeaderButton from '@/context/layout/header/HeaderButton';
 import useHeader from '@/context/layout/header/useHeader';
 import useBreakPoint from '@/hooks/utils/useBreakPoint';
 import { isProductionEnv } from '@/utils/env.util';
-import { SETTINGS_ACTIONS, USERS_ACTIONS } from '@/utils/role.util';
+import { SETTINGS_ACTIONS } from '@/utils/roles/settings.permissions';
+import { USERS_ACTIONS } from '@/utils/roles/users.permissions';
 
 import { Button } from '../../ui/button';
 

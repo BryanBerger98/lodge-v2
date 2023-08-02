@@ -1,17 +1,60 @@
 /* eslint-disable require-await */
+import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
 import { NextAuthOptions } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import Email from 'next-auth/providers/email';
 
-import { findUserById, findUserWithPasswordByEmail, updateUser } from '@/database/user/user.repository';
+import { findSettingByName } from '@/database/setting/setting.repository';
+import { findUserByEmail, findUserById, findUserWithPasswordByEmail, updateUser } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
+import clientPromise from '@/lib/mongodb';
 import { IUserWithPassword } from '@/types/user.type';
 import { Optional } from '@/types/utils.type';
 import { buildError } from '@/utils/error';
 import { ACCOUNT_DISABLED_ERROR, INTERNAL_ERROR, MISSING_CREDENTIALS_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
 import { verifyPassword } from '@/utils/password.util';
 
+import { sendMagicLinkSignInEmail } from '../email';
+import { MAGIC_LINK_SIGNIN_SETTING, findDefaultSettingByName } from '../settings';
+
 const authOptions: NextAuthOptions = {
+	adapter: MongoDBAdapter(clientPromise),
 	providers: [
+		Email({
+			sendVerificationRequest: async ({ url, identifier }) => {
+				try {
+					await connectToDatabase();
+					const user = await findUserByEmail(identifier);
+
+					if (!user) {
+						throw buildError({
+							code: USER_NOT_FOUND_ERROR,
+							message: 'User not found.',
+							status: 404,
+						});
+					}
+
+					if (user.is_disabled) {
+						throw buildError({
+							code: ACCOUNT_DISABLED_ERROR,
+							message: 'Account disabled.',
+							status: 403,
+						});
+					}
+
+					await sendMagicLinkSignInEmail(user, url);
+					return;
+				} catch (error: any) {
+					console.error(error);
+					throw buildError({
+						code: INTERNAL_ERROR,
+						message: error.message || 'An error occured.',
+						status: 500,
+						data: error,
+					});
+				}
+			},
+		}),
 		Credentials({
 			credentials: {
 				email: {
@@ -87,6 +130,7 @@ const authOptions: NextAuthOptions = {
 			},
 		}),
 	],
+	pages: { signIn: '/signin' },
 	callbacks: {
 		async jwt ({ user, token, trigger }) {
 			if (trigger === 'update') {
@@ -113,6 +157,32 @@ const authOptions: NextAuthOptions = {
 				...token, 
 			};
 			return session;
+		},
+		signIn: async ({ user, credentials, email }) => {
+			await connectToDatabase();
+
+			const userExists = await findUserByEmail(user.email);
+
+			if (userExists && credentials) {
+				return true;
+			}
+
+			const registeredMagicLinkSignInSetting = await findSettingByName(MAGIC_LINK_SIGNIN_SETTING);
+			const defaultMagicLinkSignInSetting = findDefaultSettingByName(MAGIC_LINK_SIGNIN_SETTING);
+
+			const magicLinkSignInSetting = registeredMagicLinkSignInSetting || defaultMagicLinkSignInSetting || null;
+
+			if (
+				email?.verificationRequest
+				&& (magicLinkSignInSetting && magicLinkSignInSetting.data_type === 'boolean' && magicLinkSignInSetting.value)
+				&& userExists
+			) {
+				return true;
+			}
+			if (userExists) {
+				return true;
+			}
+			return '/signup';
 		},
 	},
 	session: {
