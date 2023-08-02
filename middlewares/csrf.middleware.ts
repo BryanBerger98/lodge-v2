@@ -8,8 +8,10 @@ import { MiddlewareFactory } from './middleware.type';
 
 const WHITELIST_PATHNAMES = [
 	'/api/auth/callback/credentials',
+	'/api/auth/callback/email',
 	'/api/auth/session',
 	'/api/auth/signout',
+	'/api/auth/signin/email',
 	'/api/auth/_log',
 ];
 

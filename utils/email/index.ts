@@ -5,6 +5,7 @@ import { IToken } from '@/types/token.type';
 import { IUser } from '@/types/user.type';
 
 import EmailVerification from './templates/EmailVerification';
+import MagicLinkSignIn from './templates/MagicLinkSignIn';
 import ResetPassword from './templates/ResetPassword';
 
 const appName = process.env.NEXT_PUBLIC_APP_NAME;
@@ -27,6 +28,19 @@ export const sendEmail = async (to: string, cc: string[], bcc: string[], subject
 	} catch (error) {
 		throw error;
 	}
+};
+
+export const sendMagicLinkSignInEmail = (user: IUser, url: string) => {
+	return new Promise((resolve, reject) => {
+		const htmlBody = render(MagicLinkSignIn({
+			url,
+			appName,
+		}));
+		const emailSubject = `${ appName } - Sign in`;
+		const emailPlainText = `${ appName } - Sign in`;
+		sendEmail(user.email, [], [], emailSubject, emailPlainText, htmlBody)
+			.then(resolve).catch(reject);
+	});
 };
 
 export const sendAccountVerificationEmail = (user: IUser, token: IToken) => {
