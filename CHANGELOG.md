@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.7.0...v1.8.0) (2023-08-02)
+
+
+### Features
+
+* **auth:** add email magic link authentication ([#177](https://github.com/BryanBerger98/lodge-v2/issues/177)) ([ca1aeae](https://github.com/BryanBerger98/lodge-v2/commit/ca1aeaea8003384569dbbe6cfd6717a8e8d61de6))
+
 # [1.7.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.6.0...v1.7.0) (2023-07-28)
 
 
