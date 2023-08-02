@@ -14,8 +14,9 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { ISetting, UnregisteredSetting } from '@/types/setting.type';
 
-import AppleAuthButton from './ProvidersButtons/AppleAuthButton';
-import GoogleAuthButton from './ProvidersButtons/GoogleAuthButton';
+import AppleAuthButton from '../../_components/ProvidersButtons/AppleAuthButton';
+import GoogleAuthButton from '../../_components/ProvidersButtons/GoogleAuthButton';
+
 import { useSignInContext } from './SignInCard';
 
 type EmailSignInFormProps = {

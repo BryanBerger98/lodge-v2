@@ -1,17 +1,18 @@
+'use client';
+
 import { Loader2 } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 
 import GoogleIcon from '@/components/icons/google';
 import { Button } from '@/components/ui/button';
-
-import { useSignInContext } from '../SignInCard';
-
+import { useToast } from '@/components/ui/use-toast';
 
 const GoogleAuthButton = () => {
 
 	const [ isLoading, setIsLoading ] = useState(false);
-	const { setError } = useSignInContext();
+
+	const { toast } = useToast();
 
 	const handleSignInWithGoogle = async () => {
 		try {
@@ -19,13 +20,21 @@ const GoogleAuthButton = () => {
 			const data = await signIn('google', { callbackUrl: '/' });
 			if (data?.error) {
 				console.error(data.error);
-				setError('An error occured.');
+				toast({
+					title: 'Error',
+					description: 'An error occured.',
+					variant: 'destructive',
+				});
 			} else {
 				console.log(data);
 			}
 		} catch (error) {
 			console.error(error);
-			setError('An error occured.');
+			toast({
+				title: 'Error',
+				description: 'An error occured.',
+				variant: 'destructive',
+			});
 		} finally {
 			setIsLoading(false);
 		}
