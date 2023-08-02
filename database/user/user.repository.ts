@@ -1,7 +1,7 @@
 import { FilterQuery } from 'mongoose';
 
 import { Id, newId, UpdateQueryOptions, QueryOptions } from '@/lib/database';
-import { IUser, IUserWithPassword } from '@/types/user.type';
+import { IUser, IUserWithPassword, UserRole } from '@/types/user.type';
 import { Optional } from '@/types/utils.type';
 
 import { CreateUserDTO, SignupUserDTO, UpdateUserDTO } from './user.dto';
@@ -80,12 +80,16 @@ export const findUserWithPasswordById = async (userId: string | Id): Promise<IUs
 	}
 };
 
-export const createUser = async (userToCreate: CreateUserDTO | SignupUserDTO): Promise<IUser | null> => {
+interface ICreatedUser extends IUser {
+	role: UserRole;
+}
+
+export const createUser = async (userToCreate: CreateUserDTO | SignupUserDTO): Promise<ICreatedUser> => {
 	try {
 		const createdUserDoc = await UserModel.create({ ...userToCreate });
 		const createdUser: Optional<IUserWithPassword, 'password'> = createdUserDoc.toObject();
 		delete createdUser.password;
-		return createdUser;
+		return createdUser as ICreatedUser;
 	} catch (error) {
 		throw error;
 	}

@@ -1,7 +1,9 @@
+import type { Awaitable } from 'next-auth';
+import type { AdapterUser as NextAuthAdapterUser, Adapter as NextAuthAdapter } from 'next-auth/adapters';
 import { JWT } from 'next-auth/jwt';
 
 import { Id } from '@/lib/database';
-import { AuthProvider, IUser } from '@/types/user.type';
+import { AuthProvider, IUser, UserRole } from '@/types/user.type';
 
 import { TokenAction } from './types/token.type';
 
@@ -34,5 +36,17 @@ declare module 'next-auth/jwt' {
 		action?: TokenAction;
 		provider_data: AuthProvider;
 		email: string;
+	}
+}
+
+declare module 'next-auth/adapters' {
+
+	interface AdapterUser extends NextAuthAdapterUser {
+		emailVerified?: Date | null;
+		role: UserRole;
+	}
+
+	interface Adapter extends NextAuthAdapter {
+		createUser: (user: Omit<AdapterUser, 'id'>) => Awaitable<AdapterUser>;
 	}
 }

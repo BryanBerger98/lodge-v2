@@ -16,10 +16,7 @@ const userSchema = new Schema<IUserWithPassword>({
 		type: Boolean,
 		default: false,
 	},
-	password: {
-		type: String,
-		required: true,
-	},
+	password: { type: String },
 	role: {
 		type: String,
 		enum: UserRolesWithOwner,

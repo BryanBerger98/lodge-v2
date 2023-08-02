@@ -2,7 +2,7 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 
-import authOptions from '@/utils/auth/auth-options';
+import authOptions from '@/lib/auth';
 import { getCsrfToken } from '@/utils/csrf.util';
 
 import ConfirmEmailCard from '../_components/ConfirmEmailCard';
