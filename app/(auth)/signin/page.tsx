@@ -2,34 +2,34 @@ import dynamic from 'next/dynamic';
 
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
-import { NEW_USERS_SIGNUP_SETTING, USER_VERIFY_EMAIL_SETTING } from '@/utils/settings';
+import { MAGIC_LINK_SIGNIN_SETTING, NEW_USERS_SIGNUP_SETTING, USER_VERIFY_EMAIL_SETTING, findDefaultSettingByName } from '@/utils/settings';
 
-const DynamicSignInForm = dynamic(() => import('./_components/SignInForm'));
+const DynamicSignInCard = dynamic(() => import('./_components/SignInCard'));
+const DynamicEmailSignInForm = dynamic(() => import('./_components/EmailSignInForm'));
+const DynamicPasswordSignInForm = dynamic(() => import('./_components/PasswordSignInForm'));
+const DynamicMagicEmailSent = dynamic(() => import('./_components/MagicEmailSent'));
 
 const SignInPage = async () => {
 
 	await connectToDatabase();
 
 	const newUserSignUpSetting = await findSettingByName(NEW_USERS_SIGNUP_SETTING);
+	const defaultNewUserSignUpSetting = findDefaultSettingByName(NEW_USERS_SIGNUP_SETTING);
 	const userVerifyEmailSetting = await findSettingByName(USER_VERIFY_EMAIL_SETTING);
+	const defaultUserVerifyEmailSetting = findDefaultSettingByName(USER_VERIFY_EMAIL_SETTING);
+	const magicLinkSignInSetting = await findSettingByName(MAGIC_LINK_SIGNIN_SETTING);
+	const defaultMagicLinkSignInSetting = findDefaultSettingByName(MAGIC_LINK_SIGNIN_SETTING);
 
 	return (
 		<div className="min-h-screen flex justify-center items-center">
-			{ /* 
-			
-				// TODO:
-				IF only one signin option is activated, display directly this option
-				For example: if only signin with email/password is activated, directly show the email/password form
-
-				If both of signin with email/password and with magic link are activavted, show EmailForm, then PasswordOrMagicLinkForm
-
-				Show external providers signin on top
-
-			*/ }
-			<DynamicSignInForm
-				newUserSignUpSetting={ newUserSignUpSetting }
-				userVerifyEmailSetting={ userVerifyEmailSetting }
-			/>
+			<DynamicSignInCard>
+				<DynamicEmailSignInForm newUserSignUpSetting={ newUserSignUpSetting || defaultNewUserSignUpSetting || null } />
+				<DynamicPasswordSignInForm
+					magicLinkSignInSetting={ magicLinkSignInSetting || defaultMagicLinkSignInSetting || null }
+					userVerifyEmailSetting={ userVerifyEmailSetting || defaultUserVerifyEmailSetting || null }
+				/>
+				<DynamicMagicEmailSent />
+			</DynamicSignInCard>
 		</div>
 	);
 };

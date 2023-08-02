@@ -19,6 +19,10 @@ export const PASSWORD_SYMBOLS_MIN_SETTING = 'password_symbols_min';
 export const PASSWORD_MIN_LENGTH_SETTING = 'password_min_length';
 export const PASSWORD_UNIQUE_CHARS_SETTING = 'password_unique_chars';
 
+// Sign up / Signin settings
+export const MAGIC_LINK_SIGNIN_SETTING = 'magic_link_signin';
+export const MAGIC_LINK_SIGNUP_SETTING = 'magic_link_signup';
+
 export const DEFAULT_SETTINGS: UnregisteredSetting[] = [
 	{
 		name: SHARE_WITH_ADMIN_SETTING,
@@ -45,4 +49,13 @@ export const DEFAULT_SETTINGS: UnregisteredSetting[] = [
 		value: true,
 		data_type: 'boolean',
 	},
+	{
+		name: MAGIC_LINK_SIGNIN_SETTING,
+		value: true,
+		data_type: 'boolean',
+	},
 ];
+
+export const findDefaultSettingByName = (settingName: string) => {
+	return DEFAULT_SETTINGS.find(({ name }) => name === settingName);
+};

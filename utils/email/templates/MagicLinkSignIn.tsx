@@ -8,11 +8,11 @@ import { Text } from '@react-email/text';
 import * as React from 'react';
 
 type MagicLinkSignInProps = {
-	tokenLink: string;
+	url: string;
 	appName?: string;
 };
 
-const MagicLinkSignIn = ({ tokenLink = 'https://lodge.weberger.net', appName = 'Lodge' }: MagicLinkSignInProps) => {
+const MagicLinkSignIn = ({ url = 'https://lodge.weberger.net', appName = 'Lodge' }: MagicLinkSignInProps) => {
 	return (
 		<Tailwind>
 			<Html
@@ -26,7 +26,7 @@ const MagicLinkSignIn = ({ tokenLink = 'https://lodge.weberger.net', appName = '
 					<Text>Hi!</Text>
 					<Text>To access the app, we need you to sign in by clicking the link below.</Text>
 					<Button
-						href={ tokenLink }
+						href={ url }
 						pX={ 20 }
 						pY={ 12 }
 						style={ {

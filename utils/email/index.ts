@@ -30,11 +30,10 @@ export const sendEmail = async (to: string, cc: string[], bcc: string[], subject
 	}
 };
 
-export const sendMagicLinkSignInEmail = (user: IUser, token: IToken) => {
+export const sendMagicLinkSignInEmail = (user: IUser, url: string) => {
 	return new Promise((resolve, reject) => {
-		const tokenLink = `${ process.env.FRONT_URL }/signin/${ token.token }`;
 		const htmlBody = render(MagicLinkSignIn({
-			tokenLink,
+			url,
 			appName,
 		}));
 		const emailSubject = `${ appName } - Sign in`;

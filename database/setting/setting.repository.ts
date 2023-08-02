@@ -8,8 +8,9 @@ import SettingModel from './setting.model';
 
 export const findSettingByName = async (name: string): Promise<ISetting | null> => {
 	try {
-		const setting = await SettingModel.findOne({ name });
-		return setting;
+		const settingDocument = await SettingModel.findOne({ name });
+		const setting = settingDocument?.toObject() || null;
+		return JSON.parse(JSON.stringify(setting));
 	} catch (error) {
 		throw error;
 	}

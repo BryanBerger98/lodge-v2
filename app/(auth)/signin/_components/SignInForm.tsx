@@ -21,6 +21,7 @@ import { ISetting } from '@/types/setting.type';
 type SignInFormProps = {
 	newUserSignUpSetting: ISetting | null;
 	userVerifyEmailSetting: ISetting | null;
+	magicLinkSignInSetting: ISetting | null;
 };
 
 const SignInForm = ({ newUserSignUpSetting, userVerifyEmailSetting }: SignInFormProps) => {

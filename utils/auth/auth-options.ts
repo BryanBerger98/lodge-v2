@@ -4,6 +4,7 @@ import { NextAuthOptions } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import Email from 'next-auth/providers/email';
 
+import { findSettingByName } from '@/database/setting/setting.repository';
 import { findUserByEmail, findUserById, findUserWithPasswordByEmail, updateUser } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
 import clientPromise from '@/lib/mongodb';
@@ -14,21 +15,13 @@ import { ACCOUNT_DISABLED_ERROR, INTERNAL_ERROR, MISSING_CREDENTIALS_ERROR, USER
 import { verifyPassword } from '@/utils/password.util';
 
 import { sendMagicLinkSignInEmail } from '../email';
+import { MAGIC_LINK_SIGNIN_SETTING, findDefaultSettingByName } from '../settings';
 
 const authOptions: NextAuthOptions = {
 	adapter: MongoDBAdapter(clientPromise),
 	providers: [
 		Email({
-			// server: {
-			// 	host: process.env.EMAIL_HOST,
-			// 	port: process.env.EMAIL_PORT,
-			// 	auth: {
-			// 		user: process.env.EMAIL_USER,
-			// 		pass: process.env.EMAIL_PASS,
-			// 	},
-			//   },
-			//   from: process.env.EMAIL_FROM,
-			sendVerificationRequest: async ({ url, identifier, provider }) => {
+			sendVerificationRequest: async ({ url, identifier }) => {
 				try {
 					await connectToDatabase();
 					const user = await findUserByEmail(identifier);
@@ -49,12 +42,7 @@ const authOptions: NextAuthOptions = {
 						});
 					}
 
-					console.log(url);
-
-					const result = await sendMagicLinkSignInEmail(user, { token: url });
-
-					console.log(result);
-
+					await sendMagicLinkSignInEmail(user, url);
 					return;
 				} catch (error: any) {
 					console.error(error);
@@ -142,6 +130,7 @@ const authOptions: NextAuthOptions = {
 			},
 		}),
 	],
+	pages: { signIn: '/signin' },
 	callbacks: {
 		async jwt ({ user, token, trigger }) {
 			if (trigger === 'update') {
@@ -172,18 +161,28 @@ const authOptions: NextAuthOptions = {
 		signIn: async ({ user, credentials, email }) => {
 			await connectToDatabase();
 
-			if (credentials) {
-				console.log('CREDENTIALS', credentials);
+			const userExists = await findUserByEmail(user.email);
+
+			if (userExists && credentials) {
 				return true;
 			}
 
-			return '/signin';
-			
-			//   if (userExists) {
-			// 	return true;   //if the email exists in the User collection, email them a magic login link
-			//   } else {
-			// 	return "/register"; 
-			//   }
+			const registeredMagicLinkSignInSetting = await findSettingByName(MAGIC_LINK_SIGNIN_SETTING);
+			const defaultMagicLinkSignInSetting = findDefaultSettingByName(MAGIC_LINK_SIGNIN_SETTING);
+
+			const magicLinkSignInSetting = registeredMagicLinkSignInSetting || defaultMagicLinkSignInSetting || null;
+
+			if (
+				email?.verificationRequest
+				&& (magicLinkSignInSetting && magicLinkSignInSetting.data_type === 'boolean' && magicLinkSignInSetting.value)
+				&& userExists
+			) {
+				return true;
+			}
+			if (userExists) {
+				return true;
+			}
+			return '/signup';
 		},
 	},
 	session: {
