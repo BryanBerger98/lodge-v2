@@ -28,11 +28,11 @@ const GoogleAuthButton = () => {
 			} else {
 				console.log(data);
 			}
-		} catch (error) {
+		} catch (error: any) {
 			console.error(error);
 			toast({
 				title: 'Error',
-				description: 'An error occured.',
+				description: error.message || 'An error occured.',
 				variant: 'destructive',
 			});
 		} finally {

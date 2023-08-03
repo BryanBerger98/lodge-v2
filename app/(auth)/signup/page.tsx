@@ -38,9 +38,9 @@ const SignUpPage = async () => {
 	return (
 		<div className="min-h-screen flex justify-center items-center">
 			<DynamicSignUpForm
-				appleAuthSetting={ appleAuthSetting }
+				appleAuthSetting={ appleAuthSetting || defaultAppleAuthSetting || null }
 				csrfToken={ csrfToken }
-				googleAuthSetting={ googleAuthSetting }
+				googleAuthSetting={ googleAuthSetting || defaultGoogleAuthSetting || null }
 				passwordRules={ {
 					uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,
 					lowercase_min: passwordLowercaseMinSetting?.value !== undefined && passwordLowercaseMinSetting?.data_type === 'number' ? passwordLowercaseMinSetting?.value : 0,

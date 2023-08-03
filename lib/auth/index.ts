@@ -2,6 +2,8 @@ import { NextAuthOptions } from 'next-auth';
 
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { findUserByEmail, findUserById } from '@/database/user/user.repository';
+import { buildError } from '@/utils/error';
+import { FORBIDDEN_ERROR } from '@/utils/error/error-codes';
 import { MAGIC_LINK_SIGNIN_SETTING, findDefaultSettingByName } from '@/utils/settings';
 
 import { connectToDatabase } from '../database';
@@ -20,7 +22,10 @@ const authOptions: NextAuthOptions = {
 		EmailProvider,
 		CredentialsProvider,
 	],
-	pages: { signIn: '/signin' },
+	pages: {
+		signIn: '/signin',
+		error: '/error', 
+	},
 	callbacks: {
 		async jwt ({ user, token, trigger }) {
 			if (trigger === 'update') {
@@ -82,6 +87,14 @@ const authOptions: NextAuthOptions = {
 					if (googleUserExists?.provider_data === 'google') {
 						return true;
 					}
+					if (!googleUserExists) {
+						return true;
+					}
+					throw buildError({
+						code: FORBIDDEN_ERROR,
+						message: `Account already registered with ${ googleUserExists?.provider_data }`,
+						status: 403,
+					});
 				}
 
 				return '/signup';
