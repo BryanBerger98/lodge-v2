@@ -10,7 +10,6 @@ export const getMongoDBURI = () => {
 		}
 		return `mongodb://localhost:${ DB_PORT || '27017' }/${ DB_NAME }?retryWrites=true&w=majority`;
 	}
-	console.info('Connecting to MongoDB server...');
 	return `mongodb+srv://${ DB_USER }:${ DB_PASSWORD }@${ DB_CLUSTER }.mongodb.net/${ DB_NAME }?retryWrites=true&w=majority`;
 };
 

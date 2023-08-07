@@ -1,7 +1,7 @@
 /* eslint-disable require-await */
 import NextAuth from 'next-auth';
 
-import authOptions from '@/utils/auth/auth-options';
+import authOptions from '@/lib/auth';
 
 const authHandler = NextAuth(authOptions);
 

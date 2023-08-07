@@ -5,7 +5,7 @@ export type UserRole = typeof UserRoles[number];
 export const UserRolesWithOwner = [ 'owner', 'admin', 'user' ] as const;
 export type UserRoleWithOwner = typeof UserRolesWithOwner[number];
 
-export const AuthProviders = [ 'email', 'google', 'facebook', 'github', 'microsoft' ] as const;
+export const AuthProviders = [ 'email', 'google', 'facebook', 'github', 'microsoft', 'apple' ] as const;
 export type AuthProvider = typeof AuthProviders[number];
 
 export interface IUser {
@@ -24,6 +24,7 @@ export interface IUser {
 	created_by: Id | string | null;
 	updated_by: Id | string | null;
 	last_login_date: Date | null;
+	has_password: boolean;
 }
 
 export interface IUserWithPassword extends IUser {
