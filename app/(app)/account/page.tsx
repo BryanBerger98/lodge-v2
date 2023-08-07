@@ -1,8 +1,11 @@
 import { User } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
+import Link from 'next/link';
 
 import PageTitle from '@/components/layout/PageTitle';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
 import { setServerAuthGuard } from '@/utils/auth';
@@ -44,18 +47,59 @@ const AccountPage = async () => {
 					<DynamicUpdateAvatarForm csrfToken={ csrfToken } />
 					<DynamicUpdateUsernameForm csrfToken={ csrfToken } />
 					<DynamicUpdatePhoneNumberForm csrfToken={ csrfToken } />
-					<DynamicUpdateEmailForm csrfToken={ csrfToken } />
-					<DynamicUpdatePasswordForm
-						csrfToken={ csrfToken }
-						passwordRules={ {
-							uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,
-							lowercase_min: passwordLowercaseMinSetting?.value !== undefined && passwordLowercaseMinSetting?.data_type === 'number' ? passwordLowercaseMinSetting?.value : 0,
-							numbers_min: passwordNumbersMinSetting?.value !== undefined && passwordNumbersMinSetting?.data_type === 'number' ? passwordNumbersMinSetting?.value : 0,
-							symbols_min: passwordSymbolsMinSetting?.value !== undefined && passwordSymbolsMinSetting?.data_type === 'number' ? passwordSymbolsMinSetting?.value : 0,
-							min_length: passwordMinLengthSetting?.value !== undefined && passwordMinLengthSetting?.data_type === 'number' ? passwordMinLengthSetting?.value : 8,
-							should_contain_unique_chars: passwordUniqueCharsSetting?.value !== undefined && passwordUniqueCharsSetting?.data_type === 'boolean' ? passwordUniqueCharsSetting?.value : false,
-						} }
-					/>
+					{
+						currentUser.provider_data === 'email' ?
+							<DynamicUpdateEmailForm csrfToken={ csrfToken } />
+							: null
+					}
+					{
+						!currentUser.has_password ?
+							<Card>
+								<CardHeader>
+									<CardTitle>Password</CardTitle>
+									<CardDescription>
+										Setup a password.
+									</CardDescription>
+								</CardHeader>
+								<CardContent>
+									<span className="text-base">To setup a password you need to follow the </span>
+									<Button
+										className="px-0 text-base text-blue-500"
+										variant="link"
+										asChild
+									>
+										<Link href="/forgot-password">forgot password</Link>
+									</Button>
+									<span> process.</span>
+								</CardContent>
+							</Card>
+							: <DynamicUpdatePasswordForm
+								csrfToken={ csrfToken }
+								passwordRules={ {
+									uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,
+									lowercase_min: passwordLowercaseMinSetting?.value !== undefined && passwordLowercaseMinSetting?.data_type === 'number' ? passwordLowercaseMinSetting?.value : 0,
+									numbers_min: passwordNumbersMinSetting?.value !== undefined && passwordNumbersMinSetting?.data_type === 'number' ? passwordNumbersMinSetting?.value : 0,
+									symbols_min: passwordSymbolsMinSetting?.value !== undefined && passwordSymbolsMinSetting?.data_type === 'number' ? passwordSymbolsMinSetting?.value : 0,
+									min_length: passwordMinLengthSetting?.value !== undefined && passwordMinLengthSetting?.data_type === 'number' ? passwordMinLengthSetting?.value : 8,
+									should_contain_unique_chars: passwordUniqueCharsSetting?.value !== undefined && passwordUniqueCharsSetting?.data_type === 'boolean' ? passwordUniqueCharsSetting?.value : false,
+								} }
+							  />
+					}
+					{
+						currentUser.provider_data === 'google' ?
+							<Card>
+								<CardHeader>
+									<CardTitle>Signed in with Google</CardTitle>
+									<CardDescription>
+										You created your account using Google authentication. You cannot change your email address.
+									</CardDescription>
+								</CardHeader>
+								<CardContent>
+									Signed in as <span className="font-bold">{ currentUser.email }</span>.
+								</CardContent>
+							</Card>
+							: null
+					}
 				</div>
 			</div>
 			<div className="flex gap-4">

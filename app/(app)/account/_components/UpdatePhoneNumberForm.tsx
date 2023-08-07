@@ -98,7 +98,10 @@ const UpdatePhoneNumberForm = ({ csrfToken }: UpdatePhoneNumberFormProps) => {
 											<FormControl>
 												<DynamicInputPhone
 													defaultCountry="FR"
-													{ ...field }
+													name={ field.name }
+													value={ field.value }
+													onBlur={ field.onBlur }
+													onChange={ field.onChange }
 												/>
 											</FormControl>
 											<FormMessage />

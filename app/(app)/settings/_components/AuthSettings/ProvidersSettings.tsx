@@ -16,32 +16,41 @@ import useSettings from '@/context/settings/useSettings';
 import { updateSettings } from '@/services/settings.service';
 import { UnregisteredSetting } from '@/types/setting.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
-import { MAGIC_LINK_SIGNIN_SETTING } from '@/utils/settings';
+import { GOOGLE_AUTH_SETTING, MAGIC_LINK_SIGNIN_SETTING } from '@/utils/settings';
 
-const providersSettingsFormSchema = z.object({ magic_link_signin: z.boolean().default(false).optional() });
+const providersSettingsFormSchema = z.object({
+	magic_link_signin: z.boolean().default(true).optional(),
+	google_auth: z.boolean().default(false).optional(), 
+});
 
 type ProvidersSettingsProps = {
 	csrfToken: string;
+	isGoogleAuthEnvProvided: boolean;
 };
 
-const ProvidersSettings = ({ csrfToken }: ProvidersSettingsProps) => {
+const ProvidersSettings = ({ csrfToken, isGoogleAuthEnvProvided }: ProvidersSettingsProps) => {
 
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 
 	const { getSetting, loading, refetchSettings } = useSettings();;
 
 	const magicLinkSigninSetting = getSetting(MAGIC_LINK_SIGNIN_SETTING);
+	const googleAuthSetting = getSetting(GOOGLE_AUTH_SETTING);
 
 	const { toast } = useToast();
 
 	const form = useForm<z.infer<typeof providersSettingsFormSchema>>({
 		resolver: zodResolver(providersSettingsFormSchema),
-		defaultValues: { magic_link_signin: true },
+		defaultValues: {
+			magic_link_signin: true,
+			google_auth: true, 
+		},
 		mode: 'onTouched',
 	});
 
 	const handleSetDefaultValues = () => {
 		form.setValue('magic_link_signin', magicLinkSigninSetting?.value !== undefined ? magicLinkSigninSetting.value : true);
+		form.setValue('google_auth', googleAuthSetting?.value !== undefined ? googleAuthSetting.value : false);
 	};
 
 	useEffect(() => {
@@ -49,7 +58,7 @@ const ProvidersSettings = ({ csrfToken }: ProvidersSettingsProps) => {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ magicLinkSigninSetting?.value ]);
 
-	const handleSubmitProvidersForm = async ({ magic_link_signin }: z.infer<typeof providersSettingsFormSchema>) => {
+	const handleSubmitProvidersForm = async ({ magic_link_signin, google_auth }: z.infer<typeof providersSettingsFormSchema>) => {
 		try {
 			setIsLoading(true);
 			const settingsValues: (UnregisteredSetting & { settingName: string, settingValue: boolean | string | number | undefined })[] = [
@@ -58,6 +67,13 @@ const ProvidersSettings = ({ csrfToken }: ProvidersSettingsProps) => {
 					settingValue: magicLinkSigninSetting?.value,
 					name: 'magic_link_signin',
 					value: magic_link_signin,
+					data_type: 'boolean',
+				},
+				{
+					settingName: googleAuthSetting?.name || GOOGLE_AUTH_SETTING,
+					settingValue: googleAuthSetting?.value,
+					name: 'google_auth',
+					value: google_auth,
 					data_type: 'boolean',
 				},
 			];
@@ -109,6 +125,31 @@ const ProvidersSettings = ({ csrfToken }: ProvidersSettingsProps) => {
 											<Switch
 												checked={ field.value }
 												disabled={ loading === 'pending' }
+												onBlur={ field.onBlur }
+												onCheckedChange={ field.onChange }
+											/>
+										</FormControl>
+									</FormItem>
+								) }
+							/>
+							<FormField
+								control={ form.control }
+								name="google_auth"
+								render={ ({ field }) => (
+									<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 mb-4">
+										<div className="space-y-0.5">
+											<FormLabel className="text-base">
+												Authentication with Google
+											</FormLabel>
+											<FormDescription>
+												Allow users to authenticate with Google.
+												{ !isGoogleAuthEnvProvided && <p className="text-destructive">Needs environment variables to be enabled.</p> }
+											</FormDescription>
+										</div>
+										<FormControl>
+											<Switch
+												checked={ field.value }
+												disabled={ !isGoogleAuthEnvProvided || loading === 'pending' }
 												onBlur={ field.onBlur }
 												onCheckedChange={ field.onChange }
 											/>

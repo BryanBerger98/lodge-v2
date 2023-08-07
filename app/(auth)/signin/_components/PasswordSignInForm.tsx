@@ -90,7 +90,6 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 					console.error(data.error);
 					setError('Incorrect credentials.');
 				} else {
-					console.log(data);
 					setStep('magic-email-sent');
 				}
 			})

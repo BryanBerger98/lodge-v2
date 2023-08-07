@@ -13,11 +13,16 @@ const AuthSettingsPage = async () => {
 
 	const csrfToken = await getCsrfToken(headers());
 
+	const isGoogleAuthEnvProvided = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET ? true : false;
+
 	return (
 		<div className="flex flex-col gap-8 mt-0">
 			<h2 className="text-xl font-semibold flex gap-2 items-center"><KeyRound size="16" /> Authentication settings</h2>
 			<DynamicPasswordSettings csrfToken={ csrfToken } />
-			<DynamicProvidersSettings csrfToken={ csrfToken } />
+			<DynamicProvidersSettings
+				csrfToken={ csrfToken }
+				isGoogleAuthEnvProvided={ isGoogleAuthEnvProvided }
+			/>
 		</div>
 	);
 };

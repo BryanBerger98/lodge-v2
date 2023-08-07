@@ -65,6 +65,7 @@ export const POST = async (request: NextRequest) => {
 			password: hashedPassword,
 			provider_data: 'email',
 			role: 'user',
+			has_password: true,
 		});
 
 		if (!createdUser) {

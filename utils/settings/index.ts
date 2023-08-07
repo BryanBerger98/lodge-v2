@@ -21,7 +21,8 @@ export const PASSWORD_UNIQUE_CHARS_SETTING = 'password_unique_chars';
 
 // Sign up / Signin settings
 export const MAGIC_LINK_SIGNIN_SETTING = 'magic_link_signin';
-export const MAGIC_LINK_SIGNUP_SETTING = 'magic_link_signup';
+export const GOOGLE_AUTH_SETTING = 'google_auth';
+export const APPLE_AUTH_SETTING = 'apple_auth';
 
 export const DEFAULT_SETTINGS: UnregisteredSetting[] = [
 	{
@@ -52,6 +53,16 @@ export const DEFAULT_SETTINGS: UnregisteredSetting[] = [
 	{
 		name: MAGIC_LINK_SIGNIN_SETTING,
 		value: true,
+		data_type: 'boolean',
+	},
+	{
+		name: GOOGLE_AUTH_SETTING,
+		value: false,
+		data_type: 'boolean',
+	},
+	{
+		name: APPLE_AUTH_SETTING,
+		value: false,
 		data_type: 'boolean',
 	},
 ];
