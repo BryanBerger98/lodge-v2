@@ -31,6 +31,7 @@ export type CreateUserDTO = z.infer<typeof CreateUserSchema> & {
 	provider_data: AuthProvider,
 	created_by: Id | string | null;
 	photo_key: string | null;
+	has_password: boolean;
 };
 
 export const UpdateUserSchema = object({

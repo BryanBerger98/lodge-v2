@@ -24,6 +24,7 @@ export interface IUser {
 	created_by: Id | string | null;
 	updated_by: Id | string | null;
 	last_login_date: Date | null;
+	has_password: boolean;
 }
 
 export interface IUserWithPassword extends IUser {

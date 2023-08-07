@@ -53,6 +53,7 @@ const userSchema = new Schema<IUserWithPassword>({
 		type: Date,
 		default: null,
 	},
+	has_password: { type: Boolean },
 }, {
 	timestamps: {
 		createdAt: 'created_at',

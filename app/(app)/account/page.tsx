@@ -1,8 +1,10 @@
 import { User } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
+import Link from 'next/link';
 
 import PageTitle from '@/components/layout/PageTitle';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
@@ -51,8 +53,27 @@ const AccountPage = async () => {
 							: null
 					}
 					{
-						currentUser.provider_data === 'email' ?
-							<DynamicUpdatePasswordForm
+						!currentUser.has_password ?
+							<Card>
+								<CardHeader>
+									<CardTitle>Password</CardTitle>
+									<CardDescription>
+										Setup a password.
+									</CardDescription>
+								</CardHeader>
+								<CardContent>
+									<span className="text-base">To setup a password you need to follow the </span>
+									<Button
+										className="px-0 text-base text-blue-500"
+										variant="link"
+										asChild
+									>
+										<Link href="/forgot-password">forgot password</Link>
+									</Button>
+									<span> process.</span>
+								</CardContent>
+							</Card>
+							: <DynamicUpdatePasswordForm
 								csrfToken={ csrfToken }
 								passwordRules={ {
 									uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,
@@ -62,8 +83,7 @@ const AccountPage = async () => {
 									min_length: passwordMinLengthSetting?.value !== undefined && passwordMinLengthSetting?.data_type === 'number' ? passwordMinLengthSetting?.value : 8,
 									should_contain_unique_chars: passwordUniqueCharsSetting?.value !== undefined && passwordUniqueCharsSetting?.data_type === 'boolean' ? passwordUniqueCharsSetting?.value : false,
 								} }
-							/>
-							: null
+							  />
 					}
 					{
 						currentUser.provider_data === 'google' ?
@@ -71,7 +91,7 @@ const AccountPage = async () => {
 								<CardHeader>
 									<CardTitle>Signed in with Google</CardTitle>
 									<CardDescription>
-										You created your account using Google. You cannot change your email address or setup a password.
+										You created your account using Google authentication. You cannot change your email address.
 									</CardDescription>
 								</CardHeader>
 								<CardContent>

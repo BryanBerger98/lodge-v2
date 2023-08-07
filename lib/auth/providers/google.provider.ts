@@ -21,6 +21,7 @@ const GoogleProvider = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT
 				updated_by: null,
 				photo_key: null,
 				last_login_date: new Date(),
+				has_password: false,
 			};
 		},
 	}) : null;

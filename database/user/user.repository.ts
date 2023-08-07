@@ -113,6 +113,7 @@ export const updateUserPassword = async (userId: string | Id, newHashedPassword:
 		await UserModel.findByIdAndUpdate(userId, {
 			$set: {
 				password: newHashedPassword,
+				has_password: true,
 				updated_on: new Date(),
 				updated_by,
 			},
