@@ -25,8 +25,6 @@ const GoogleAuthButton = () => {
 					description: 'An error occured.',
 					variant: 'destructive',
 				});
-			} else {
-				console.log(data);
 			}
 		} catch (error: any) {
 			console.error(error);

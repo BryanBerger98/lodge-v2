@@ -27,8 +27,6 @@ const AppleAuthButton = () => {
 					description: 'An error occured.',
 					variant: 'destructive',
 				});
-			} else {
-				console.log(data);
 			}
 		} catch (error) {
 			console.error(error);
