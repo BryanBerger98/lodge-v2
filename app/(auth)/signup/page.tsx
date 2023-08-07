@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
 import { getCsrfToken } from '@/utils/csrf.util';
-import { NEW_USERS_SIGNUP_SETTING, PASSWORD_LOWERCASE_MIN_SETTING, PASSWORD_MIN_LENGTH_SETTING, PASSWORD_NUMBERS_MIN_SETTING, PASSWORD_SYMBOLS_MIN_SETTING, PASSWORD_UNIQUE_CHARS_SETTING, PASSWORD_UPPERCASE_MIN_SETTING, USER_VERIFY_EMAIL_SETTING } from '@/utils/settings';
+import { APPLE_AUTH_SETTING, GOOGLE_AUTH_SETTING, NEW_USERS_SIGNUP_SETTING, PASSWORD_LOWERCASE_MIN_SETTING, PASSWORD_MIN_LENGTH_SETTING, PASSWORD_NUMBERS_MIN_SETTING, PASSWORD_SYMBOLS_MIN_SETTING, PASSWORD_UNIQUE_CHARS_SETTING, PASSWORD_UPPERCASE_MIN_SETTING, USER_VERIFY_EMAIL_SETTING, findDefaultSettingByName } from '@/utils/settings';
 
 
 const DynamicSignUpForm = dynamic(() => import('./_components/SignUpForm'));
@@ -30,10 +30,17 @@ const SignUpPage = async () => {
 	const passwordMinLengthSetting = await findSettingByName(PASSWORD_MIN_LENGTH_SETTING);
 	const passwordUniqueCharsSetting = await findSettingByName(PASSWORD_UNIQUE_CHARS_SETTING);
 
+	const googleAuthSetting = await findSettingByName(GOOGLE_AUTH_SETTING);
+	const defaultGoogleAuthSetting = await findDefaultSettingByName(GOOGLE_AUTH_SETTING);
+	const appleAuthSetting = await findSettingByName(APPLE_AUTH_SETTING);
+	const defaultAppleAuthSetting = await findDefaultSettingByName(APPLE_AUTH_SETTING);
+
 	return (
 		<div className="min-h-screen flex justify-center items-center">
 			<DynamicSignUpForm
+				appleAuthSetting={ appleAuthSetting || defaultAppleAuthSetting || null }
 				csrfToken={ csrfToken }
+				googleAuthSetting={ googleAuthSetting || defaultGoogleAuthSetting || null }
 				passwordRules={ {
 					uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,
 					lowercase_min: passwordLowercaseMinSetting?.value !== undefined && passwordLowercaseMinSetting?.data_type === 'number' ? passwordLowercaseMinSetting?.value : 0,

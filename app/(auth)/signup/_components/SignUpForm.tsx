@@ -19,9 +19,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { signUpUser } from '@/services/auth.service';
-import { ISetting } from '@/types/setting.type';
+import { ISetting, UnregisteredSetting } from '@/types/setting.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules } from '@/utils/password.util';
+
+import AppleAuthButton from '../../_components/ProvidersButtons/AppleAuthButton';
+import GoogleAuthButton from '../../_components/ProvidersButtons/GoogleAuthButton';
 
 type SignUpFormProperties = {
 	csrfToken: string;
@@ -34,9 +37,11 @@ type SignUpFormProperties = {
 		min_length: number;
 		should_contain_unique_chars: boolean;
 	};
+	googleAuthSetting: ISetting | UnregisteredSetting | null;
+	appleAuthSetting: ISetting | UnregisteredSetting | null;
 };
 
-const SignUpForm = ({ csrfToken, userVerifyEmailSetting, passwordRules }: SignUpFormProperties) => {
+const SignUpForm = ({ csrfToken, userVerifyEmailSetting, passwordRules, googleAuthSetting, appleAuthSetting }: SignUpFormProperties) => {
 
 	const [ error, setError ] = useState<string | null>(null);
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
@@ -101,6 +106,10 @@ const SignUpForm = ({ csrfToken, userVerifyEmailSetting, passwordRules }: SignUp
 		}
 	};
 
+	const areProvidersEnabled =
+		(googleAuthSetting && googleAuthSetting.data_type === 'boolean' && googleAuthSetting.value)
+		|| (appleAuthSetting && appleAuthSetting.data_type === 'boolean' && appleAuthSetting.value);
+
 	return (
 		<div className="flex flex-col gap-4 items-center">
 			<Card className="lg:min-w-[420px]">
@@ -113,6 +122,26 @@ const SignUpForm = ({ csrfToken, userVerifyEmailSetting, passwordRules }: SignUp
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
+							
+							{ areProvidersEnabled ?
+								<>
+									<div className="flex flex-col gap-4 mb-4">
+										{ googleAuthSetting && googleAuthSetting.data_type === 'boolean' && googleAuthSetting.value ? <GoogleAuthButton /> : null }
+										{ appleAuthSetting && appleAuthSetting.data_type === 'boolean' && appleAuthSetting.value ? <AppleAuthButton /> : null }
+									</div>
+									<div className="flex gap-4 items-center justify-center w-full mb-2">
+										<Separator
+											className="flex-1"
+											orientation="horizontal"
+										/>
+										<p className="text-sm text-slate-500 m-0">OR</p>
+										<Separator
+											className="flex-1"
+											orientation="horizontal"
+										/>
+									</div>
+								</>
+							 : null }
 							<FormField
 								control={ form.control }
 								name="email"

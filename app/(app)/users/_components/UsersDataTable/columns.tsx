@@ -1,33 +1,39 @@
 import { CheckedState } from '@radix-ui/react-checkbox';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowDown, ArrowUp, ArrowUpDown, BadgeCheck, BadgeX } from 'lucide-react';
+import { AppleIcon, ArrowDown, ArrowUp, ArrowUpDown, BadgeCheck, BadgeX, KeyRound, Mail } from 'lucide-react';
 
+import GoogleIcon from '@/components/icons/google';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Id } from '@/lib/database';
-import { UserRoleWithOwner } from '@/types/user.type';
+import { AuthProvider, IUser } from '@/types/user.type';
 
 import RowMenu from './RowMenu';
 
-export type UserColumn = {
-  id: string | Id;
-  username: string;
-  email: string;
-  is_disabled: boolean;
-  has_email_verified: boolean;
-  role: UserRoleWithOwner;
-  created_at: Date;
-}
+export type UserColumn = IUser;
 
 export const COLUMN_NAMES = {
 	username: 'username',
 	email: 'email',
+	provider_data: 'provider',
 	is_disabled: 'status',
 	has_email_verified: 'email verified',
 	role: 'role',
 	created_at: 'created at',
+};
+
+const getProviderIcon = (provider: AuthProvider) => {
+	switch (provider) {
+		case 'email':
+			return <Mail size="16" />;
+		case 'google':
+			return <GoogleIcon size="16" />;
+		case 'apple':
+			return <AppleIcon size="16" />;
+		default:
+			return <KeyRound size="16" />;
+	}
 };
 
 export const columns: ColumnDef<UserColumn>[] = [
@@ -115,6 +121,41 @@ export const columns: ColumnDef<UserColumn>[] = [
 					</TooltipTrigger>
 					<TooltipContent>
 						{ row.original.has_email_verified ? 'Email verified' : 'Email not verified' }
+					</TooltipContent>
+				</Tooltip>
+			</TooltipProvider>
+		),
+	},
+	{
+		id: 'provider_data',
+		accessorKey: 'provider_data',
+		header: ({ column }) => {
+			const handleSort = () => column.toggleSorting(column.getIsSorted() === 'asc');
+			const sortState = column.getIsSorted();
+			return (
+				<Button
+					variant="ghost"
+					onClick={ handleSort }
+				>
+					Provider
+					{ sortState === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> : sortState === 'desc' ? <ArrowDown className="ml-2 h-4 w-4" /> : <ArrowUpDown className="ml-2 h-4 w-4 text-slate-500" /> }
+				</Button>
+			);
+		},
+		meta: {
+			cell: { align: 'center' },
+			header: { align: 'center' }, 
+		},
+		cell: ({ row }) => (
+			<TooltipProvider>
+				<Tooltip>
+					<TooltipTrigger>
+						<span className="flex gap-2 items-center">
+							{ getProviderIcon(row.original.provider_data) }
+						</span>
+					</TooltipTrigger>
+					<TooltipContent className="capitalize">
+						{ row.original.provider_data }
 					</TooltipContent>
 				</Tooltip>
 			</TooltipProvider>

@@ -7,8 +7,6 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import AppleIcon from '@/components/icons/apple';
-import GoogleIcon from '@/components/icons/google';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -16,13 +14,18 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { ISetting, UnregisteredSetting } from '@/types/setting.type';
 
+import AppleAuthButton from '../../_components/ProvidersButtons/AppleAuthButton';
+import GoogleAuthButton from '../../_components/ProvidersButtons/GoogleAuthButton';
+
 import { useSignInContext } from './SignInCard';
 
 type EmailSignInFormProps = {
 	newUserSignUpSetting: ISetting | UnregisteredSetting | null;
+	googleAuthSetting: ISetting | UnregisteredSetting | null;
+	appleAuthSetting: ISetting | UnregisteredSetting | null;
 };
 
-const EmailSignInForm = ({ newUserSignUpSetting } :EmailSignInFormProps) => {
+const EmailSignInForm = ({ newUserSignUpSetting, googleAuthSetting, appleAuthSetting } :EmailSignInFormProps) => {
 	
 	const { isLoading, step, setStep, setEmail, email } = useSignInContext();
 
@@ -41,7 +44,11 @@ const EmailSignInForm = ({ newUserSignUpSetting } :EmailSignInFormProps) => {
 
 	if (step !== 'email') {
 		return null;
-	}	
+	}
+
+	const areProvidersEnabled =
+		(googleAuthSetting && googleAuthSetting.data_type === 'boolean' && googleAuthSetting.value)
+		|| (appleAuthSetting && appleAuthSetting.data_type === 'boolean' && appleAuthSetting.value);
 
 	return (
 		<Form { ...form }>
@@ -53,37 +60,27 @@ const EmailSignInForm = ({ newUserSignUpSetting } :EmailSignInFormProps) => {
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<div className="flex flex-col gap-4 mb-4">
-						<Button
-							className="gap-2 w-full"
-							disabled={ isLoading }
-							type="button"
-							variant="outline"
-						>
-							{ isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon size="16" /> }
-							Sign in with Google
-						</Button>
-						<Button
-							className="gap-2 w-full"
-							disabled={ isLoading }
-							type="button"
-							variant="outline"
-						>
-							{ isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <AppleIcon size="16" /> }
-							Sign in with Apple
-						</Button>
-					</div>
-					<div className="flex gap-4 items-center justify-center w-full mb-2">
-						<Separator
-							className="flex-1"
-							orientation="horizontal"
-						/>
-						<p className="text-sm text-slate-500 m-0">OR</p>
-						<Separator
-							className="flex-1"
-							orientation="horizontal"
-						/>
-					</div>
+					{
+						areProvidersEnabled ?
+							<>
+								<div className="flex flex-col gap-4 mb-4">
+									{ googleAuthSetting && googleAuthSetting.data_type === 'boolean' && googleAuthSetting.value ? <GoogleAuthButton /> : null }
+									{ appleAuthSetting && appleAuthSetting.data_type === 'boolean' && appleAuthSetting.value ? <AppleAuthButton /> : null }
+								</div>
+								<div className="flex gap-4 items-center justify-center w-full mb-2">
+									<Separator
+										className="flex-1"
+										orientation="horizontal"
+									/>
+									<p className="text-sm text-slate-500 m-0">OR</p>
+									<Separator
+										className="flex-1"
+										orientation="horizontal"
+									/>
+								</div>
+							</>
+							: null
+					}
 					<FormField
 						control={ form.control }
 						name="email"
