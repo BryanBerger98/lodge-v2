@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 
-import PageTitle from '@/components/layout/PageTitle';
+import PageTitle from '@/components/layout/Header/PageTitle';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { findSettingByName } from '@/database/setting/setting.repository';

@@ -4,8 +4,8 @@ import { SessionProvider } from 'next-auth/react';
 import { ReactNode, useState } from 'react';
 
 import RefreshTokenHandler from '@/components/utils/auth/RefetchTokenHandler';
-import AuthProvider from '@/context/auth';
-import CsrfProvider from '@/context/csrf';
+import AuthProvider from '@/context/auth/auth.provider';
+import CsrfProvider from '@/context/csrf/csrf.provider';
 
 type ProvidersProps = {
 	children: ReactNode;

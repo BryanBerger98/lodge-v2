@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { CsrfContext } from '.';
+import CsrfContext from '.';
 
 const useCsrf = () => {
 	const context = useContext(CsrfContext);

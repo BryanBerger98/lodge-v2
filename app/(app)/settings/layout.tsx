@@ -3,11 +3,11 @@ import { headers } from 'next/headers';
 import Link from 'next/link';
 import { ReactNode } from 'react';
 
-import PageTitle from '@/components/layout/PageTitle';
+import PageTitle from '@/components/layout/Header/PageTitle';
 import Tabs from '@/components/ui/Tabs';
 import TabButton from '@/components/ui/Tabs/TabButton';
 import TabsList from '@/components/ui/Tabs/TabsList';
-import SettingsProvider from '@/context/settings';
+import SettingsProvider from '@/context/settings/settings.provider';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
 import { setServerAuthGuard } from '@/utils/auth';

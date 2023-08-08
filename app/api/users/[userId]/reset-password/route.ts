@@ -5,7 +5,7 @@ import { findUserById } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
 import { generateToken } from '@/lib/jwt';
 import { IToken } from '@/types/token.type';
-import { Optional } from '@/types/utils.type';
+import { Optional } from '@/types/utils';
 import { setServerAuthGuard } from '@/utils/auth';
 import { sendResetPasswordEmail } from '@/utils/email';
 import { buildError, sendError } from '@/utils/error';

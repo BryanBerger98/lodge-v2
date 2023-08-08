@@ -6,7 +6,7 @@ import { findUserByEmail, findUserById, updateUser } from '@/database/user/user.
 import { connectToDatabase } from '@/lib/database';
 import { generateToken, verifyToken } from '@/lib/jwt';
 import { IToken } from '@/types/token.type';
-import { Optional } from '@/types/utils.type';
+import { Optional } from '@/types/utils';
 import { setServerAuthGuard } from '@/utils/auth';
 import { sendAccountVerificationEmail } from '@/utils/email';
 import { buildError, sendError } from '@/utils/error';

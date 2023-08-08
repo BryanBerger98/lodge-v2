@@ -3,7 +3,8 @@
 import { HTMLAttributes, RefAttributes, useEffect } from 'react';
 
 import { ButtonProps } from '@/components/ui/button';
-import useHeader from '@/context/layout/header/useHeader';
+
+import useHeader from './useHeader';
 
 type PageTitleProps = HTMLAttributes<HTMLHeadingElement> & {
 	headerButton?: ButtonProps & RefAttributes<HTMLButtonElement>;

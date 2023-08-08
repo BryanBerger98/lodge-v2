@@ -2,9 +2,9 @@ import { ChevronLeft, UserPlus } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 
-import PageTitle from '@/components/layout/PageTitle';
+import PageTitle from '@/components/layout/Header/PageTitle';
 import BackButton from '@/components/ui/Button/BackButton';
-import UsersProvider from '@/context/users';
+import UsersProvider from '@/context/users/users.provider';
 import { getCsrfToken } from '@/lib/csrf';
 
 

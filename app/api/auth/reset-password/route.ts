@@ -7,7 +7,7 @@ import { findUserByEmail, findUserById, updateUserPassword } from '@/database/us
 import { connectToDatabase } from '@/lib/database';
 import { generateToken, verifyToken } from '@/lib/jwt';
 import { IToken } from '@/types/token.type';
-import { Optional } from '@/types/utils.type';
+import { Optional } from '@/types/utils';
 import { sendResetPasswordEmail } from '@/utils/email';
 import { buildError, sendError } from '@/utils/error';
 import { INTERNAL_ERROR, INVALID_INPUT_ERROR, INVALID_TOKEN_ERROR, TOKEN_ALREADY_SENT_ERROR, TOKEN_NOT_FOUND_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';

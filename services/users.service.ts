@@ -123,7 +123,6 @@ export const deleteUser = async (userId: string | Id, csrfToken: string, options
 	}
 };
 
-
 export const deleteMultipleUsers = async (userIds: (string | Id)[], csrfToken: string, options?: FetcherOptions): Promise<void> => {
 	try {
 		await fetcher(`/api/users/bulk/${ userIds.join(',') }`, {

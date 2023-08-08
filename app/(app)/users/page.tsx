@@ -3,10 +3,10 @@ import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 
-import PageTitle from '@/components/layout/PageTitle';
+import PageTitle from '@/components/layout/Header/PageTitle';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import UsersProvider from '@/context/users';
+import UsersProvider from '@/context/users/users.provider';
 import { FetchUsersSchema } from '@/database/user/user.dto';
 import { findUsers, findUsersCount } from '@/database/user/user.repository';
 import { getCsrfToken } from '@/lib/csrf';
