@@ -1,7 +1,7 @@
 import { Reducer } from 'react';
 
-import { LoadingState } from '@/types/loading.type';
 import { UnregisteredSetting } from '@/types/setting.type';
+import { LoadingState } from '@/types/utils/loading.type';
 
 import { SETTINGS_ERROR_ACTION, SETTINGS_IDLE_ACTION, SETTINGS_PENDING_ACTION, SETTINGS_SET_STATE_ACTION, SETTINGS_UPDATE_ACTION, SettingsReducerAction } from './settings.actions';
 

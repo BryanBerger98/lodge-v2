@@ -2,10 +2,12 @@ import { FilterQuery } from 'mongoose';
 
 import { Id, newId, UpdateQueryOptions, QueryOptions } from '@/lib/database';
 import { IUser, IUserWithPassword, UserRole } from '@/types/user.type';
-import { Optional } from '@/types/utils.type';
+import { Optional } from '@/types/utils';
 
 import { CreateUserDTO, SignupUserDTO, UpdateUserDTO } from './user.dto';
 import UserModel from './user.model';
+
+export interface IUserDocument extends IUser, Document {}
 
 export const findUsers = async (searchRequest: FilterQuery<IUser>, options?: QueryOptions<IUser>): Promise<IUser[]> => {
 	try {

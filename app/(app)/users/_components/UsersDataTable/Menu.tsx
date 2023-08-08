@@ -1,7 +1,7 @@
 'use client';
 
 import { Row } from '@tanstack/react-table';
-import { BadgeCheck, KeyRound, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react';
+import { Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
 
@@ -13,7 +13,7 @@ import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
 import useCsrf from '@/context/csrf/useCsrf';
 import useUsers from '@/context/users/useUsers';
-import { deleteMultipleUsers, deleteUser, sendResetPasswordTokenToUser, sendVerificationTokenToUser, updateMultipleUsers, updateUser } from '@/services/users.service';
+import { deleteMultipleUsers, updateMultipleUsers } from '@/services/users.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
 import { UserColumn } from './columns';

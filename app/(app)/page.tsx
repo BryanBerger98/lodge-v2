@@ -1,6 +1,6 @@
 import { Home } from 'lucide-react';
 
-import PageTitle from '@/components/layout/PageTitle';
+import PageTitle from '@/components/layout/Header/PageTitle';
 
 const AppPage = () => {
 

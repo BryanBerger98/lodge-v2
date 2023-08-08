@@ -1,7 +1,7 @@
 import { headers } from 'next/headers';
 
 import { findSettingByName } from '@/database/setting/setting.repository';
-import { getCsrfToken } from '@/utils/csrf.util';
+import { getCsrfToken } from '@/lib/csrf';
 import { PASSWORD_LOWERCASE_MIN_SETTING, PASSWORD_MIN_LENGTH_SETTING, PASSWORD_NUMBERS_MIN_SETTING, PASSWORD_SYMBOLS_MIN_SETTING, PASSWORD_UNIQUE_CHARS_SETTING, PASSWORD_UPPERCASE_MIN_SETTING } from '@/utils/settings';
 
 import ResetPasswordForm from '../_components/ResetPasswordForm';

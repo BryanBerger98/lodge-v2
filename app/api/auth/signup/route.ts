@@ -6,12 +6,12 @@ import { createToken } from '@/database/token/token.repository';
 import { SignUpUserSchema } from '@/database/user/user.dto';
 import { createUser, findUserByEmail } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
+import { generateToken } from '@/lib/jwt';
 import { sendAccountVerificationEmail } from '@/utils/email';
 import { buildError, sendError } from '@/utils/error';
 import { FORBIDDEN_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_ALREADY_EXISTS_ERROR } from '@/utils/error/error-codes';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules, hashPassword } from '@/utils/password.util';
 import { NEW_USERS_SIGNUP_SETTING, PASSWORD_LOWERCASE_MIN_SETTING, PASSWORD_MIN_LENGTH_SETTING, PASSWORD_NUMBERS_MIN_SETTING, PASSWORD_SYMBOLS_MIN_SETTING, PASSWORD_UNIQUE_CHARS_SETTING, PASSWORD_UPPERCASE_MIN_SETTING } from '@/utils/settings';
-import { generateToken } from '@/utils/token.util';
 
 export const POST = async (request: NextRequest) => {
 

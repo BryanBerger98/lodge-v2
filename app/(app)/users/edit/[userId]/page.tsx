@@ -3,14 +3,14 @@ import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import PageTitle from '@/components/layout/PageTitle';
+import PageTitle from '@/components/layout/Header/PageTitle';
 import BackButton from '@/components/ui/Button/BackButton';
-import UsersProvider from '@/context/users';
+import UsersProvider from '@/context/users/users.provider';
 import { findFileByKey } from '@/database/file/file.repository';
 import { findUserById } from '@/database/user/user.repository';
 import { getFileFromKey } from '@/lib/bucket';
+import { getCsrfToken } from '@/lib/csrf';
 import { Id } from '@/lib/database';
-import { getCsrfToken } from '@/utils/csrf.util';
 
 
 const DynamicEditUserForm = dynamic(() => import('../../_components/EditUserForm'));

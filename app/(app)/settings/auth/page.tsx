@@ -2,7 +2,7 @@ import { KeyRound } from 'lucide-react';
 import { default as nextDynamic } from 'next/dynamic';
 import { headers } from 'next/headers';
 
-import { getCsrfToken } from '@/utils/csrf.util';
+import { getCsrfToken } from '@/lib/csrf';
 
 const DynamicPasswordSettings = nextDynamic(() => import('../_components/AuthSettings/PasswordSettings'));
 const DynamicProvidersSettings = nextDynamic(() => import('../_components/AuthSettings/ProvidersSettings'));

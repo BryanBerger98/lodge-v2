@@ -1,6 +1,6 @@
 'use client';
 
-import { OnChangeFn, PaginationState, Row, SortingState } from '@tanstack/react-table';
+import { Cell, OnChangeFn, PaginationState, Row, SortingState } from '@tanstack/react-table';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -47,8 +47,10 @@ const UsersDataTable = ({ csrfToken }: UsersDataTableProps) => {
 	const handleChangePagination: OnChangeFn<PaginationState> = setPagination;
 	const handleSelectRows = (rows: Row<UserColumn>[]) => setSelectedRows(rows);
 
-	const handleRowClick = (row: Row<UserColumn>) => {
-		router.push(`/users/edit/${ row.original.id }`);
+	const handleClickCell = (cell: Cell<UserColumn, unknown>) => {
+		if (cell.column.id !== 'actions' && cell.column.id !== 'select') {
+			router.push(`/users/edit/${ cell.row.original.id }`);
+		}
 	};
 
 	return (
@@ -70,8 +72,8 @@ const UsersDataTable = ({ csrfToken }: UsersDataTableProps) => {
 			manualSorting
 			withCustomColumns
 			withSearch
+			onCellClick={ handleClickCell }
 			onPaginationChange={ handleChangePagination }
-			onRowClick={ handleRowClick }
 			onSearch={ handleSearch }
 			onSelectRows={ handleSelectRows }
 			onSortingChange={ handleChangeSorting }

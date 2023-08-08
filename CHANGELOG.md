@@ -1,3 +1,15 @@
+# [1.9.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.8.0...v1.9.0) (2023-08-07)
+
+
+### Bug Fixes
+
+* **auth:** fix providers auth button display ([0ed2313](https://github.com/BryanBerger98/lodge-v2/commit/0ed2313364650240b483ff7027e14e991a6cb3c0))
+
+
+### Features
+
+* **auth:** google authentication ([#181](https://github.com/BryanBerger98/lodge-v2/issues/181)) ([afe2326](https://github.com/BryanBerger98/lodge-v2/commit/afe2326f398060a221657b3662ff0d5f41596150))
+
 # [1.8.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.7.0...v1.8.0) (2023-08-02)
 
 

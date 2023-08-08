@@ -1,6 +1,6 @@
 import { Id } from '@/lib/database';
 
-import { Optional } from './utils.type';
+import { Optional } from './utils';
 
 export const SettingTypes = [ 'boolean', 'string', 'number', 'objectId', 'date' ] as const;
 export type SettingType = typeof SettingTypes[number];

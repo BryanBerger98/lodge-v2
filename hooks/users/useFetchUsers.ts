@@ -1,8 +1,8 @@
 import { useSearchParams } from 'next/navigation';
 import useSWR from 'swr';
 
+import fetcher from '@/lib/fetcher';
 import { IUser } from '@/types/user.type';
-import fetcher from '@/utils/fetcher.util';
 
 export type FetchUsersResponse = {
 	users: IUser[],
