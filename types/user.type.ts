@@ -34,3 +34,8 @@ export interface IUserWithPassword extends IUser {
 export interface IUpdateUser extends Partial<IUser> {
 	id: Id | string;
 }
+
+export interface IUserPopulated extends Omit<IUser, 'created_by' | 'updated_by'> {
+	created_by: IUser;
+	updated_by: IUser;
+}

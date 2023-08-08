@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 
 import authOptions from '@/lib/auth';
-import { getCsrfToken } from '@/utils/csrf.util';
+import { getCsrfToken } from '@/lib/csrf';
 
 import SendEmailConfirmationCard from './_components/SendEmailConfirmationCard';
 

@@ -6,16 +6,16 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import CurrentUserAvatar from '@/components/features/users/CurrentUserAvatar';
+import HeaderButton from '@/components/layout/Header/HeaderButton';
 import { Badge } from '@/components/ui/badge';
 import useAuth from '@/context/auth/useAuth';
-import HeaderButton from '@/context/layout/header/HeaderButton';
-import useHeader from '@/context/layout/header/useHeader';
 import useBreakPoint from '@/hooks/utils/useBreakPoint';
 import { isProductionEnv } from '@/utils/env.util';
 import { SETTINGS_ACTIONS } from '@/utils/roles/settings.permissions';
 import { USERS_ACTIONS } from '@/utils/roles/users.permissions';
 
 import { Button } from '../../ui/button';
+import useHeader from '../Header/useHeader';
 
 
 type SidebarProps = {

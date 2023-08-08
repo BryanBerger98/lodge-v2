@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
 
-import { getCsrfToken } from '@/utils/csrf.util';
+import { getCsrfToken } from '@/lib/csrf';
 
 import EmailForm from './_components/EmailForm';
 

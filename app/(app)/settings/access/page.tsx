@@ -3,8 +3,8 @@ import { default as nextDynamic } from 'next/dynamic';
 import { headers } from 'next/headers';
 
 import { findOwnerUser } from '@/database/user/user.repository';
+import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
-import { getCsrfToken } from '@/utils/csrf.util';
 
 const DynamicShareSettings = nextDynamic(() => import('../_components/ShareSettings'));
 

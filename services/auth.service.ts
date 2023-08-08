@@ -1,5 +1,5 @@
+import fetcher from '@/lib/fetcher';
 import { SafeTokenData } from '@/types/token.type';
-import fetcher from '@/utils/fetcher.util';
 
 import { IUser } from '../types/user.type';
 

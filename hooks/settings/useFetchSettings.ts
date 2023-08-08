@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 
+import fetcher from '@/lib/fetcher';
 import { ISetting } from '@/types/setting.type';
-import fetcher from '@/utils/fetcher.util';
 
 export type FetchSettingsResponse = {
 	settings: ISetting[],
