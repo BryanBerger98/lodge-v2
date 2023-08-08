@@ -1,6 +1,6 @@
+import fetcher, { FetcherOptions } from '@/lib/fetcher';
 import { ISetting, UnregisteredSetting } from '@/types/setting.type';
 import { IUser } from '@/types/user.type';
-import fetcher, { FetcherOptions } from '@/utils/fetcher.util';
 import { buildQueryUrl } from '@/utils/url.util';
 
 export type ShareSettings = {

@@ -3,13 +3,13 @@ import { NextResponse } from 'next/server';
 import { createToken, deleteTokenById, getTokenFromTargetId } from '@/database/token/token.repository';
 import { findUserById } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
+import { generateToken } from '@/lib/jwt';
 import { IToken } from '@/types/token.type';
 import { Optional } from '@/types/utils.type';
 import { setServerAuthGuard } from '@/utils/auth';
 import { sendResetPasswordEmail } from '@/utils/email';
 import { buildError, sendError } from '@/utils/error';
 import { INTERNAL_ERROR, INVALID_INPUT_ERROR, TOKEN_ALREADY_SENT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
-import { generateToken } from '@/utils/token.util';
 
 export const POST = async (_: any, { params }: { params: { userId: string } }) => {
 

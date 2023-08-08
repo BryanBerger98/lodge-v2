@@ -1,9 +1,9 @@
 import { SortingState } from '@tanstack/react-table';
 
 import { Id } from '@/lib/database';
+import fetcher, { FetcherOptions } from '@/lib/fetcher';
 import { SafeTokenData } from '@/types/token.type';
 import { IUser, UserRole, UserRoleWithOwner } from '@/types/user.type';
-import fetcher, { FetcherOptions } from '@/utils/fetcher.util';
 import { objectToFormData } from '@/utils/object.utils';
 import { buildQueryUrl } from '@/utils/url.util';
 

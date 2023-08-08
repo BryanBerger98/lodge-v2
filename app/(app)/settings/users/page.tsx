@@ -2,7 +2,7 @@ import { Users } from 'lucide-react';
 import { default as nextDynamic } from 'next/dynamic';
 import { headers } from 'next/headers';
 
-import { getCsrfToken } from '@/utils/csrf.util';
+import { getCsrfToken } from '@/lib/csrf';
 
 const DynamicUsersSettings = nextDynamic(() => import('../_components/UsersManagementSettings'));
 

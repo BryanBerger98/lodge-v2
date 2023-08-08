@@ -9,8 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import UsersProvider from '@/context/users';
 import { FetchUsersSchema } from '@/database/user/user.dto';
 import { findUsers, findUsersCount } from '@/database/user/user.repository';
+import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
-import { getCsrfToken } from '@/utils/csrf.util';
 
 const DynamicUsersDataTable = dynamic(() => import('./_components/UsersDataTable'));
 

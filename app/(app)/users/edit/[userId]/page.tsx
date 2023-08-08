@@ -9,8 +9,8 @@ import UsersProvider from '@/context/users';
 import { findFileByKey } from '@/database/file/file.repository';
 import { findUserById } from '@/database/user/user.repository';
 import { getFileFromKey } from '@/lib/bucket';
+import { getCsrfToken } from '@/lib/csrf';
 import { Id } from '@/lib/database';
-import { getCsrfToken } from '@/utils/csrf.util';
 
 
 const DynamicEditUserForm = dynamic(() => import('../../_components/EditUserForm'));
