@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 import { createFile, deleteFileById, findFileByKey } from '@/database/file/file.repository';
 import { findUserById, updateUser } from '@/database/user/user.repository';
-import { deleteFileFromKey, getFileFromKey, uploadImageToS3 } from '@/lib/bucket';
+import { deleteFileFromKey, getFieldSignedURL, uploadImageToS3 } from '@/lib/bucket';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { FILE_NOT_FOUND_ERROR, FILE_TOO_LARGE_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
@@ -33,7 +33,7 @@ export const GET = async () => {
 			}));
 		}
 
-		const photoUrl = await getFileFromKey(photoFileObject);
+		const photoUrl = await getFieldSignedURL(photoFileObject.key, 24 * 60 * 60);
 
 		return NextResponse.json({ photo_url: photoUrl });
 	} catch (error: any) {
@@ -114,7 +114,7 @@ export const PUT = async (request: NextRequest) => {
 			updated_by: currentUser.id,
 		}, { newDocument: true });
 
-		const photoUrl = savedFile ? await getFileFromKey(savedFile) : null;
+		const photoUrl = savedFile ? await getFieldSignedURL(savedFile.key, 24 * 60 * 60) : null;
 
 		if (updatedCurrentUser) {
 			updatedCurrentUser.photo_url = photoUrl;
