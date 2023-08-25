@@ -6,7 +6,7 @@ import { ZodError } from 'zod';
 import { createFile, deleteFileById, findFileByKey } from '@/database/file/file.repository';
 import { CreateUserSchema, FetchUsersSchema, UpdateUserSchema } from '@/database/user/user.dto';
 import { createUser, findUserByEmail, findUserById, findUsers, findUsersCount, updateUser } from '@/database/user/user.repository';
-import { deleteFileFromKey, getFileFromKey, uploadImageToS3 } from '@/lib/bucket';
+import { deleteFileFromKey, getFieldSignedURL, uploadImageToS3 } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
 import { IUser } from '@/types/user.type';
 import { setServerAuthGuard } from '@/utils/auth';
@@ -56,7 +56,7 @@ const uploadPhotoFile = async (currentUser: IUser, photoFile?: Blob | null, user
 	
 			const savedFile = await createFile(parsedFile);
 	
-			const photoUrl = savedFile ? await getFileFromKey(savedFile) : null;
+			const photoUrl = savedFile ? await getFieldSignedURL(savedFile.key, 24 * 60 * 60) : null;
 			fileData.photo_key = savedFile?.key || null,
 			fileData.photo_url = photoUrl;
 		}
