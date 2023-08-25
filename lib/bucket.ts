@@ -1,4 +1,5 @@
 import { S3Client, GetObjectCommand, DeleteObjectCommand, PutObjectCommand, DeleteObjectsCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 import { IFile } from '@/types/file.type';
 import { generateUniqueNameFromFileName } from '@/utils/file.util';
@@ -83,6 +84,15 @@ export const uploadImageToS3 = async (file: Blob, folderPath = ''): Promise<stri
 	await bucket.send(command);
   
 	return `${ folderPath }${ generatedFileName }`;
+};
+
+export const getFieldSignedURL = async (key: string, expires = 60 * 60 * 24 * 7) => {
+	const command = new GetObjectCommand({
+		Bucket: process.env.BUCKET_NAME as string,
+		Key: key, 
+	});
+	const url = await getSignedUrl(bucket, command, { expiresIn: expires });
+	return url;
 };
 
 export default bucket;
