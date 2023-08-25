@@ -4,7 +4,7 @@ import { ZodError } from 'zod';
 import { findFileByKey } from '@/database/file/file.repository';
 import { UpdateUserAccountSchema } from '@/database/user/user.dto';
 import { findUserById, updateUser } from '@/database/user/user.repository';
-import { getFileFromKey } from '@/lib/bucket';
+import { getFieldSignedURL } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
 import { IUser } from '@/types/user.type';
 import { setServerAuthGuard } from '@/utils/auth';
@@ -31,8 +31,9 @@ export const GET = async () => {
 		const photoFileObject = userData.photo_key ? await findFileByKey(userData.photo_key) : null;
 
 		if (photoFileObject) {
-			const photoUrl = await getFileFromKey(photoFileObject);
+			const photoUrl = await getFieldSignedURL(photoFileObject.key, 24 * 60 * 60);
 			userData.photo_url = photoUrl ? photoUrl : '';
+			console.log(photoUrl);
 		}
 
 		return NextResponse.json(userData);

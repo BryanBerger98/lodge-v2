@@ -8,10 +8,9 @@ import BackButton from '@/components/ui/Button/BackButton';
 import UsersProvider from '@/context/users/users.provider';
 import { findFileByKey } from '@/database/file/file.repository';
 import { findUserById } from '@/database/user/user.repository';
-import { getFileFromKey } from '@/lib/bucket';
+import { getFieldSignedURL } from '@/lib/bucket';
 import { getCsrfToken } from '@/lib/csrf';
 import { Id } from '@/lib/database';
-
 
 const DynamicEditUserForm = dynamic(() => import('../../_components/EditUserForm'));
 const DynamicMenu = dynamic(() => import('../_components/Menu'));
@@ -40,7 +39,7 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
 
 	if (userData.photo_key) {
 		const photoFileObject = await findFileByKey(userData.photo_key);
-		userData.photo_url = photoFileObject ? await getFileFromKey(photoFileObject) : null;
+		userData.photo_url = photoFileObject ? await getFieldSignedURL(photoFileObject.key, 24 * 60 * 60) : null;
 	}
 
 	return (
