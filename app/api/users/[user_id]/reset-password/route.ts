@@ -7,20 +7,21 @@ import { generateToken } from '@/lib/jwt';
 import { IToken } from '@/types/token.type';
 import { Optional } from '@/types/utils';
 import { setServerAuthGuard } from '@/utils/auth';
-import { sendAccountVerificationEmail } from '@/utils/email';
+import { sendResetPasswordEmail } from '@/utils/email';
 import { buildError, sendError } from '@/utils/error';
-import { EMAIL_ALREADY_VERIFIED_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, TOKEN_ALREADY_SENT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
+import { INTERNAL_ERROR, INVALID_INPUT_ERROR, TOKEN_ALREADY_SENT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
 
-export const POST = async (_: any, { params }: { params: { userId: string } }) => {
+export const POST = async (_: any, { params }: { params: { user_id: string } }) => {
+
 	try {
-		
+
 		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
 
 		await connectToDatabase();
 
-		const { userId } = params;
+		const { user_id } = params;
 
-		if (!userId) {
+		if (!user_id) {
 			return sendError(buildError({
 				code: INVALID_INPUT_ERROR,
 				message: 'User id is missing.',
@@ -28,7 +29,7 @@ export const POST = async (_: any, { params }: { params: { userId: string } }) =
 			}));
 		}
 
-		const userData = await findUserById(userId);
+		const userData = await findUserById(user_id);
 
 		if (!userData) {
 			return sendError(buildError({
@@ -38,15 +39,7 @@ export const POST = async (_: any, { params }: { params: { userId: string } }) =
 			}));
 		}
 
-		if (userData.has_email_verified) {
-			return sendError(buildError({
-				code: EMAIL_ALREADY_VERIFIED_ERROR,
-				message: 'Email already verified.',
-				status: 500,
-			}));
-		}
-
-		const oldToken = await getTokenFromTargetId(userData.id, { action: 'email_verification' });
+		const oldToken = await getTokenFromTargetId(userData.id, { action: 'reset_password' });
 
 		if (oldToken) {
 			const tokenCreationTimestamp = oldToken.created_at.getTime();
@@ -62,17 +55,17 @@ export const POST = async (_: any, { params }: { params: { userId: string } }) =
 			await deleteTokenById(oldToken.id);
 		}
 
-		const expirationDate = Math.floor(Date.now() / 1000) + (60 * 60 * 24);
-		const token = generateToken(userData, expirationDate, 'email_verification');
+		const expirationDate = Math.floor(Date.now() / 1000) + (60 * 60 * 2);
+		const token = generateToken(userData, expirationDate, 'reset_password');
 		const savedToken = await createToken({
 			token,
 			expiration_date: new Date(expirationDate),
-			action: 'email_verification',
+			action: 'reset_password',
 			created_by: currentUser.id,
 			target_id: userData.id,
 		});
 
-		await sendAccountVerificationEmail(userData, savedToken);
+		await sendResetPasswordEmail(userData, savedToken);
 
 		const safeTokenData: Optional<IToken, 'token'> = savedToken;
 		delete safeTokenData.token;
@@ -87,4 +80,5 @@ export const POST = async (_: any, { params }: { params: { userId: string } }) =
 			data: error,
 		}));
 	}
+
 };

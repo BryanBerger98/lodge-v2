@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 
 import { findFileByKey } from '@/database/file/file.repository';
-import { UpdateUserAccountSchema } from '@/database/user/user.dto';
 import { findUserById, updateUser } from '@/database/user/user.repository';
 import { getFieldSignedURL } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
@@ -10,6 +9,8 @@ import { IUser } from '@/types/user.type';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
+
+import { UpdateUserAccountSchema } from './_schemas/update-user-account.schema';
 
 export const GET = async () => {
 

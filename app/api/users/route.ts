@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 
 import { createFile, deleteFileById, findFileByKey } from '@/database/file/file.repository';
-import { CreateUserSchema, FetchUsersSchema, UpdateUserSchema } from '@/database/user/user.dto';
 import { createUser, findUserByEmail, findUserById, findUsers, findUsersCount, updateUser } from '@/database/user/user.repository';
 import { deleteFileFromKey, getFieldSignedURL, uploadImageToS3 } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
@@ -14,6 +13,10 @@ import { buildError, sendError } from '@/utils/error';
 import { FILE_TOO_LARGE_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_ALREADY_EXISTS_ERROR, USER_NOT_FOUND_ERROR, USER_UNEDITABLE_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
 import { AUTHORIZED_IMAGE_MIME_TYPES, AUTHORIZED_IMAGE_SIZE, convertFileRequestObjetToModel } from '@/utils/file.util';
 import { generatePassword, hashPassword } from '@/utils/password.util';
+
+import { CreateUserSchema } from './_schemas/create-user.schema';
+import { FetchUsersSchema } from './_schemas/fetch-users.schema';
+import { UpdateUserSchema } from './_schemas/update-user.schema';
 
 const uploadPhotoFile = async (currentUser: IUser, photoFile?: Blob | null, user?: IUser) => {
 	try {

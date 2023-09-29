@@ -3,7 +3,12 @@ import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 
 import { AuthProviders, IUserWithPassword, UserRolesWithOwner } from '@/types/user.type';
 
-const userSchema = new Schema<IUserWithPassword>({
+interface IUserWithPasswordDocument extends Omit<IUserWithPassword, 'created_by' | 'updated_by'> {
+	created_by: Types.ObjectId | null;
+	updated_by: Types.ObjectId | null;
+}
+
+const userSchema = new Schema<IUserWithPasswordDocument>({
 	email: {
 		type: String,
 		required: true,
@@ -42,11 +47,11 @@ const userSchema = new Schema<IUserWithPassword>({
 		default: 'email',
 	},
 	updated_by: {
-		type: Types.ObjectId,
+		type: Schema.Types.ObjectId,
 		default: null,
 	},
 	created_by: {
-		type: Types.ObjectId,
+		type: Schema.Types.ObjectId,
 		default: null,
 	},
 	last_login_date: {
@@ -67,9 +72,10 @@ userSchema.virtual('id').get(function getVirtualId () {
 });
 
 userSchema.set('toObject', { virtuals: true });
+userSchema.set('toJSON', { virtuals: true });
 
 userSchema.plugin(mongooseLeanVirtuals);
 
-const UserModel: Model<IUserWithPassword> = models.User || model<IUserWithPassword>('User', userSchema);
+const UserModel: Model<IUserWithPasswordDocument> = models.User || model<IUserWithPasswordDocument>('User', userSchema);
 
 export default UserModel;
