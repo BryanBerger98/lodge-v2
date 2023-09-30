@@ -1,9 +1,9 @@
 import fetcher from '@/lib/fetcher';
 import { SafeTokenData } from '@/types/token.type';
 
-import { IUser } from '../types/user.type';
+import { IUser, IUserPopulated } from '../types/user.type';
 
-export const getCurrentLoggedInUser = async (): Promise<IUser> => {
+export const getCurrentLoggedInUser = async (): Promise<IUserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account');
 		return data;
@@ -143,7 +143,7 @@ export const updateUserEmail = async (email: string, password: string, csrfToken
 	}
 };
 
-export const updateUserAvatar = async (file: File, csrfToken: string): Promise<IUser | null> => {
+export const updateUserAvatar = async (file: File, csrfToken: string): Promise<IUserPopulated | null> => {
 	try {
 		const formData = new FormData();
 		formData.append('avatar', file);

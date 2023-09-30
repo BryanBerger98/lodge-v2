@@ -3,9 +3,12 @@ import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 
 import { AuthProviders, IUserWithPassword, UserRolesWithOwner } from '@/types/user.type';
 
-interface IUserWithPasswordDocument extends Omit<IUserWithPassword, 'created_by' | 'updated_by'> {
+import FileModel from '../file/file.model';
+
+interface IUserWithPasswordDocument extends Omit<IUserWithPassword, 'created_by' | 'updated_by' | 'photo'> {
 	created_by: Types.ObjectId | null;
 	updated_by: Types.ObjectId | null;
+	photo: Types.ObjectId | null;
 }
 
 const userSchema = new Schema<IUserWithPasswordDocument>({
@@ -29,13 +32,10 @@ const userSchema = new Schema<IUserWithPasswordDocument>({
 	},
 	username: { type: String },
 	phone_number: { type: String },
-	photo_url: {
-		type: String,
-		default: null, 
-	},
-	photo_key: {
-		type: String,
-		default: null, 
+	photo: {
+		type: Schema.Types.ObjectId,
+		default: null,
+		ref: FileModel,
 	},
 	is_disabled: {
 		type: Boolean,
@@ -49,10 +49,12 @@ const userSchema = new Schema<IUserWithPasswordDocument>({
 	updated_by: {
 		type: Schema.Types.ObjectId,
 		default: null,
+		ref: 'User',
 	},
 	created_by: {
 		type: Schema.Types.ObjectId,
 		default: null,
+		ref: 'User',
 	},
 	last_login_date: {
 		type: Date,

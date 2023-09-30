@@ -2,10 +2,10 @@ import { useSearchParams } from 'next/navigation';
 import useSWR from 'swr';
 
 import fetcher from '@/lib/fetcher';
-import { IUser } from '@/types/user.type';
+import { IUserPopulated } from '@/types/user.type';
 
 export type FetchUsersResponse = {
-	users: IUser[],
+	users: IUserPopulated[],
 	count: number,
 	total: number,
 };

@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 
 import PageTitle from '@/components/layout/Header/PageTitle';
 import BackButton from '@/components/ui/Button/BackButton';
-import { findFileByKey } from '@/database/file/file.repository';
+import { updateFileURL } from '@/database/file/file.repository';
 import { findUserById } from '@/database/user/user.repository';
 import { getFieldSignedURL } from '@/lib/bucket';
 import { getCsrfToken } from '@/lib/csrf';
@@ -37,11 +37,14 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
 		redirect('/users');
 	}
 
-	if (userData.photo_key) {
-		const photoFileObject = await findFileByKey(userData.photo_key);
-		userData.photo_url = photoFileObject ? await getFieldSignedURL(photoFileObject.key, 24 * 60 * 60) : null;
+	if (userData.photo && userData.photo.url_expiration_date && userData.photo.url_expiration_date < new Date()) {
+		const photoUrl = await getFieldSignedURL(userData.photo.key, 24 * 60 * 60);
+		const updatedFile = await updateFileURL({
+			id: userData.photo.id,
+			url: photoUrl,
+		});
+		userData.photo = updatedFile;
 	}
-
 	return (
 		<>
 			<PageTitle><User /> Edit user</PageTitle>

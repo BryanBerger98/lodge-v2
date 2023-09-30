@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ZodError } from 'zod';
 
-import { findFileByKey } from '@/database/file/file.repository';
+import { updateFileURL } from '@/database/file/file.repository';
 import { findUserById, updateUser } from '@/database/user/user.repository';
 import { getFieldSignedURL } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
 import { IUser } from '@/types/user.type';
 import { setServerAuthGuard } from '@/utils/auth';
-import { buildError, sendError } from '@/utils/error';
-import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
+import { buildError, sendBuiltError, sendBuiltErrorWithSchemaValidation } from '@/utils/error';
+import { USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
 
 import { UpdateUserAccountSchema } from './_schemas/update-user-account.schema';
 
@@ -22,29 +21,26 @@ export const GET = async () => {
 		const userData = await findUserById(currentUser.id);
 
 		if (!userData) {
-			return sendError(buildError({
+			throw buildError({
 				code: USER_NOT_FOUND_ERROR,
 				message: 'User not found.',
 				status: 404,
-			}));
+			});
 		}
 
-		const photoFileObject = userData.photo_key ? await findFileByKey(userData.photo_key) : null;
-
-		if (photoFileObject) {
-			const photoUrl = await getFieldSignedURL(photoFileObject.key, 24 * 60 * 60);
-			userData.photo_url = photoUrl ? photoUrl : '';
+		if (userData.photo && userData.photo.url_expiration_date && userData.photo.url_expiration_date < new Date()) {
+			const photoUrl = await getFieldSignedURL(userData.photo.key, 24 * 60 * 60);
+			const updatedFile = await updateFileURL({
+				id: userData.photo.id,
+				url: photoUrl,
+			});
+			userData.photo = updatedFile;
 		}
 
 		return NextResponse.json(userData);
 	} catch (error: any) {
 		console.error(error);
-		return sendError(buildError({
-			code: INTERNAL_ERROR,
-			message: error.message || 'An error occured.',
-			status: 500,
-			data: error,
-		}));
+		return sendBuiltError(error);
 	}
 };
 
@@ -81,20 +77,7 @@ export const PUT = async (request: NextRequest) => {
 		return NextResponse.json(updatedUser);
 	} catch (error: any) {
 		console.error(error);
-		if (error.name && error.name === 'ZodError') {
-			return sendError(buildError({
-				code: INVALID_INPUT_ERROR,
-				message: 'Invalid input.',
-				status: 422,
-				data: error as ZodError,
-			}));
-		}
-		return sendError(buildError({
-			code: INTERNAL_ERROR,
-			message: error.message || 'An error occured.',
-			status: 500,
-			data: error,
-		}));
+		return sendBuiltErrorWithSchemaValidation(error);
 	}
 
 };
