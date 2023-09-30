@@ -21,12 +21,10 @@ export const findUsers = async (searchRequest: FilterQuery<IUser>, options?: Que
 				{
 					path: 'created_by',
 					select: { password: 0 },
-					model: UserModel,
 				},
 				{
 					path: 'updated_by',
 					select: { password: 0 },
-					model: UserModel,
 				},
 				{ path: 'photo' },
 			])

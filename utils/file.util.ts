@@ -58,3 +58,14 @@ export const optimizeImage = async (fileImage: File, options?: ImageOptimization
 		throw error;
 	}
 };
+
+export const isFileURLExpired = (...files: (IFile | null)[]): IFile[] => {
+	const currentDate = new Date();
+
+	return files.filter((file) => {
+		if (file && file.url_expiration_date) {
+			return currentDate.getTime() > file.url_expiration_date.getTime();
+		}
+		return false;
+	}) as IFile[];
+};

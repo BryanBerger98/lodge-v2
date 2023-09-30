@@ -30,10 +30,6 @@ export interface IUserWithPassword extends IUser {
 	password: string;
 }
 
-export interface IUpdateUser extends Partial<IUser> {
-	id: string;
-}
-
 export interface IUserPopulated extends Omit<IUser, 'created_by' | 'updated_by' | 'photo'> {
 	created_by: IUser;
 	updated_by: IUser;
@@ -44,4 +40,8 @@ export interface IUserPopulatedWithPassword extends Omit<IUserWithPassword, 'cre
 	created_by: IUser;
 	updated_by: IUser;
 	photo: IFile | null;
+}
+
+export interface IUpdateUser extends Partial<IUserPopulated> {
+	id: string;
 }

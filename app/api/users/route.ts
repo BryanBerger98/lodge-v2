@@ -2,7 +2,7 @@ import { parse } from 'url';
 
 import { NextRequest, NextResponse } from 'next/server';
 
-import { createFile, deleteFileById, findFileById } from '@/database/file/file.repository';
+import { createFile, deleteFileById, findFileById, updateFileURL } from '@/database/file/file.repository';
 import { createUser, findUserByEmail, findUserById, findUsers, findUsersCount, updateUser } from '@/database/user/user.repository';
 import { deleteFileFromKey, getFieldSignedURL, uploadImageToS3 } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
@@ -10,7 +10,7 @@ import { IUser, IUserPopulated } from '@/types/user.type';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendBuiltErrorWithSchemaValidation } from '@/utils/error';
 import { FILE_TOO_LARGE_ERROR, USER_ALREADY_EXISTS_ERROR, USER_NOT_FOUND_ERROR, USER_UNEDITABLE_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
-import { AUTHORIZED_IMAGE_MIME_TYPES, AUTHORIZED_IMAGE_SIZE, convertFileRequestObjetToModel } from '@/utils/file.util';
+import { AUTHORIZED_IMAGE_MIME_TYPES, AUTHORIZED_IMAGE_SIZE, convertFileRequestObjetToModel, isFileURLExpired } from '@/utils/file.util';
 import { generatePassword, hashPassword } from '@/utils/password.util';
 
 import { CreateUserSchema } from './_schemas/create-user.schema';
@@ -196,7 +196,7 @@ export const GET = async (request: NextRequest) => {
 
 		const rolesRequest = { role: { $in: roles } };
 
-		const users = await findUsers({
+		let users = await findUsers({
 			...rolesRequest,
 			...searchRequest, 
 		}, {
@@ -205,8 +205,25 @@ export const GET = async (request: NextRequest) => {
 			limit: page_size,
 		});
 
-		// TODO: Get users photo and verify if url is not expired
-		// Check if AWS allows to get multiple signed urls at once
+		const expiredFiles = isFileURLExpired(...users.map(user => user.photo));
+
+		if (expiredFiles.length > 0) {
+			await Promise.all(expiredFiles.map(async (file) => {
+				const photoUrl = await getFieldSignedURL(file.key, 24 * 60 * 60);
+				await updateFileURL({
+					id: file.id,
+					url: photoUrl,
+				});
+			}));
+			users = await findUsers({
+				...rolesRequest,
+				...searchRequest, 
+			}, {
+				sort: Object.fromEntries(sort_fields.map((field, index) => [ field, sort_directions[ index ] as 1 | -1 ])),
+				skip: Math.round(page_index * page_size),
+				limit: page_size,
+			});
+		}
 
 		const count = users.length;
 		const total = await findUsersCount(searchRequest);

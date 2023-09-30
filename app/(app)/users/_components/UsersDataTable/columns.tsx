@@ -1,17 +1,18 @@
 import { CheckedState } from '@radix-ui/react-checkbox';
 import { ColumnDef } from '@tanstack/react-table';
-import { AppleIcon, ArrowDown, ArrowUp, ArrowUpDown, BadgeCheck, BadgeX, KeyRound, Mail } from 'lucide-react';
+import { AppleIcon, ArrowDown, ArrowUp, ArrowUpDown, BadgeCheck, BadgeX, KeyRound, Mail, User } from 'lucide-react';
 
 import GoogleIcon from '@/components/icons/google';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { AuthProvider, IUser } from '@/types/user.type';
+import { AuthProvider, IUserPopulated } from '@/types/user.type';
 
 import RowMenu from './RowMenu';
 
-export type UserColumn = IUser;
+export type UserColumn = IUserPopulated;
 
 export const COLUMN_NAMES = {
 	username: 'username',
@@ -80,7 +81,18 @@ export const columns: ColumnDef<UserColumn>[] = [
 				</Button>
 			);
 		},
-		cell: ({ row }) => row.original.username ? row.original.username : <span className="italic text-slate-500">No username</span>,
+		cell: ({ row }) => (
+			<span className="flex gap-2 items-center">
+				<Avatar className="w-8 h-8">
+					<AvatarImage
+						alt="Profile"
+						src={ row.original.photo?.url || undefined }
+					/>
+					<AvatarFallback><User size="16" /></AvatarFallback>
+				</Avatar>
+				{ row.original.username ? row.original.username : <span className="italic text-slate-500">No username</span> }
+			</span>
+		),
 	},
 	{
 		id: 'email',
