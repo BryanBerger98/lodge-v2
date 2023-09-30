@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 
-import { UpdateUserEmailSchema } from '@/database/user/user.dto';
 import { findUserWithPasswordById, updateUser } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
 import { verifyPassword } from '@/utils/password.util';
+
+import { UpdateUserEmailSchema } from './_schemas/update-user-email.schema';
 
 
 export const PUT = async (request: NextRequest) => {

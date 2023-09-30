@@ -8,12 +8,12 @@ import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { FORBIDDEN_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
 
-export const DELETE = async (_: any, { params }: { params: { userId: string } }) => {
+export const DELETE = async (_: any, { params }: { params: { user_id: string } }) => {
 	try {
 
-		const { userId } = params;
+		const { user_id } = params;
 
-		if (!userId) {
+		if (!user_id) {
 			return sendError(buildError({
 				code: INVALID_INPUT_ERROR,
 				message: 'User id is missing.',
@@ -25,7 +25,7 @@ export const DELETE = async (_: any, { params }: { params: { userId: string } })
 
 		await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
 
-		const userData = await findUserById(userId);
+		const userData = await findUserById(user_id);
 
 		if (!userData) {
 			return sendError(buildError({

@@ -2,7 +2,6 @@ import type { Awaitable } from 'next-auth';
 import type { AdapterUser as NextAuthAdapterUser, Adapter as NextAuthAdapter } from 'next-auth/adapters';
 import { JWT } from 'next-auth/jwt';
 
-import { Id } from '@/lib/database';
 import { AuthProvider, IUser, UserRole } from '@/types/user.type';
 
 import { TokenAction } from './types/token.type';
@@ -13,7 +12,7 @@ declare module 'next-auth' {
    */
 
 	interface User extends IUser {
-		id: string | Id;
+		id: string;
 		provider_data: AuthProvider;
 		email: string;
 	}
@@ -21,7 +20,7 @@ declare module 'next-auth' {
   interface Session {
     user: User
 	token: JWT & IUser & {
-		id: string | Id;
+		id: string;
 		action?: TokenAction;
 		provider_data: AuthProvider;
 		email: string;
@@ -32,7 +31,7 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
 	/** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
 	interface JWT extends IUser {
-		id: string | Id;
+		id: string;
 		action?: TokenAction;
 		provider_data: AuthProvider;
 		email: string;

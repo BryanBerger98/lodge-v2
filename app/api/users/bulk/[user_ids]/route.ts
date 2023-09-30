@@ -9,12 +9,12 @@ import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
 
-export const DELETE = async (_: any, { params }: { params: { userIds: string } }) => {
+export const DELETE = async (_: any, { params }: { params: { user_ids: string } }) => {
 	try {
 
-		const { userIds } = params;
+		const { user_ids } = params;
 
-		if (!userIds) {
+		if (!user_ids) {
 			throw buildError({
 				code: INVALID_INPUT_ERROR,
 				message: 'User ids are missing.',
@@ -22,7 +22,7 @@ export const DELETE = async (_: any, { params }: { params: { userIds: string } }
 			});
 		}
 
-		const userIdsArr = userIds.trim().split(',').filter(el => el);
+		const userIdsArr = user_ids.trim().split(',').filter(el => el);
 
 		if (!userIdsArr || userIdsArr.length === 0) {
 			throw buildError({

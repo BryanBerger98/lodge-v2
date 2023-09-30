@@ -1,22 +1,15 @@
 import { SortingState } from '@tanstack/react-table';
+import { z } from 'zod';
 
-import { Id } from '@/lib/database';
+import { CreateUserSchema } from '@/app/api/users/_schemas/create-user.schema';
+import { UpdateUserSchema } from '@/app/api/users/_schemas/update-user.schema';
 import fetcher, { FetcherOptions } from '@/lib/fetcher';
 import { SafeTokenData } from '@/types/token.type';
-import { IUser, UserRole, UserRoleWithOwner } from '@/types/user.type';
+import { IUser, UserRoleWithOwner } from '@/types/user.type';
 import { objectToFormData } from '@/utils/object.utils';
 import { buildQueryUrl } from '@/utils/url.util';
 
-export type CreateUserDTO = {
-	username: string;
-	email: string;
-	phone_number: string;
-	role: UserRole;
-	is_disabled: boolean;
-	avatar?: File | Blob | null;
-};
-
-export const createUser = async (userToCreate: CreateUserDTO, csrfToken: string, options?: FetcherOptions): Promise<IUser> => {
+export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema> & { avatar?: File | Blob | null }, csrfToken: string, options?: FetcherOptions): Promise<IUser> => {
 	try {
 		const formData = new FormData();
 		formData.append('username', userToCreate.username);
@@ -39,16 +32,9 @@ export const createUser = async (userToCreate: CreateUserDTO, csrfToken: string,
 	}
 };
 
-type UpdateUserDTO = Partial<CreateUserDTO> & {
-	id: Id | string;
-}
-
-export const updateUser = async (userToUpdate: UpdateUserDTO, csrfToken: string, options?: FetcherOptions): Promise<IUser> => {
+export const updateUser = async (userToUpdate: z.infer<typeof UpdateUserSchema> & { avatar?: File | Blob | null }, csrfToken: string, options?: FetcherOptions): Promise<IUser> => {
 	try {
-		const formData = objectToFormData({
-			...userToUpdate,
-			id: typeof userToUpdate.id === 'string' ? userToUpdate.id : userToUpdate.id.toHexString(),
-		});
+		const formData = objectToFormData({ ...userToUpdate });
 		const data = await fetcher('/api/users', {
 			method: 'PUT',
 			body: formData,
@@ -61,7 +47,7 @@ export const updateUser = async (userToUpdate: UpdateUserDTO, csrfToken: string,
 	}
 };
 
-export const updateMultipleUsers = async (usersToUpdate: UpdateUserDTO[], csrfToken: string, options?: FetcherOptions): Promise<IUser> => {
+export const updateMultipleUsers = async (usersToUpdate: z.infer<typeof UpdateUserSchema>[], csrfToken: string, options?: FetcherOptions): Promise<IUser> => {
 	try {
 		const data = await fetcher('/api/users/bulk', {
 			method: 'PUT',
@@ -110,9 +96,9 @@ export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: 
 	}
 };
 
-export const deleteUser = async (userId: string | Id, csrfToken: string, options?: FetcherOptions): Promise<void> => {
+export const deleteUser = async (user_id: string, csrfToken: string, options?: FetcherOptions): Promise<void> => {
 	try {
-		await fetcher(`/api/users/${ userId }`, {
+		await fetcher(`/api/users/${ user_id }`, {
 			method: 'DELETE',
 			...options,
 			csrfToken,
@@ -123,9 +109,9 @@ export const deleteUser = async (userId: string | Id, csrfToken: string, options
 	}
 };
 
-export const deleteMultipleUsers = async (userIds: (string | Id)[], csrfToken: string, options?: FetcherOptions): Promise<void> => {
+export const deleteMultipleUsers = async (user_ids: (string)[], csrfToken: string, options?: FetcherOptions): Promise<void> => {
 	try {
-		await fetcher(`/api/users/bulk/${ userIds.join(',') }`, {
+		await fetcher(`/api/users/bulk/${ user_ids.join(',') }`, {
 			method: 'DELETE',
 			...options,
 			csrfToken,
@@ -136,9 +122,9 @@ export const deleteMultipleUsers = async (userIds: (string | Id)[], csrfToken: s
 	}
 };
 
-export const sendResetPasswordTokenToUser = async (userId: string | Id, csrfToken: string): Promise<SafeTokenData> => {
+export const sendResetPasswordTokenToUser = async (user_id: string, csrfToken: string): Promise<SafeTokenData> => {
 	try {
-		const data = await fetcher(`/api/users/${ userId }/reset-password`, {
+		const data = await fetcher(`/api/users/${ user_id }/reset-password`, {
 			method: 'POST',
 			csrfToken, 
 		});
@@ -148,9 +134,9 @@ export const sendResetPasswordTokenToUser = async (userId: string | Id, csrfToke
 	}
 };
 
-export const sendVerificationTokenToUser = async (userId: string | Id, csrfToken: string): Promise<SafeTokenData> => {
+export const sendVerificationTokenToUser = async (user_id: string, csrfToken: string): Promise<SafeTokenData> => {
 	try {
-		const data = await fetcher(`/api/users/${ userId }/verify-email`, {
+		const data = await fetcher(`/api/users/${ user_id }/verify-email`, {
 			method: 'POST',
 			csrfToken, 
 		});

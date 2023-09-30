@@ -12,9 +12,10 @@ import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal';
 import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
 import useCsrf from '@/context/csrf/useCsrf';
-import useUsers from '@/context/users/useUsers';
 import { deleteMultipleUsers, updateMultipleUsers } from '@/services/users.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
+
+import useUsers from '../../_context/users/useUsers';
 
 import { UserColumn } from './columns';
 

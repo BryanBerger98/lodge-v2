@@ -1,5 +1,3 @@
-import { Id } from '@/lib/database';
-
 export const UserRoles = [ 'admin', 'user' ] as const;
 export type UserRole = typeof UserRoles[number];
 export const UserRolesWithOwner = [ 'owner', 'admin', 'user' ] as const;
@@ -9,7 +7,7 @@ export const AuthProviders = [ 'email', 'google', 'facebook', 'github', 'microso
 export type AuthProvider = typeof AuthProviders[number];
 
 export interface IUser {
-	id: Id | string;
+	id: string;
 	email: string;
 	has_email_verified: boolean;
 	role: UserRoleWithOwner;
@@ -21,8 +19,8 @@ export interface IUser {
 	provider_data: AuthProvider;
 	created_at: Date;
 	updated_at: Date | null;
-	created_by: Id | string | null;
-	updated_by: Id | string | null;
+	created_by: string | null;
+	updated_by: string | null;
 	last_login_date: Date | null;
 	has_password: boolean;
 }
@@ -32,7 +30,7 @@ export interface IUserWithPassword extends IUser {
 }
 
 export interface IUpdateUser extends Partial<IUser> {
-	id: Id | string;
+	id: string;
 }
 
 export interface IUserPopulated extends Omit<IUser, 'created_by' | 'updated_by'> {
