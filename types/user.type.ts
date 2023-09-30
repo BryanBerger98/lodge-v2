@@ -1,3 +1,5 @@
+import { IFile } from './file.type';
+
 export const UserRoles = [ 'admin', 'user' ] as const;
 export type UserRole = typeof UserRoles[number];
 export const UserRolesWithOwner = [ 'owner', 'admin', 'user' ] as const;
@@ -13,8 +15,7 @@ export interface IUser {
 	role: UserRoleWithOwner;
 	username: string;
 	phone_number: string;
-	photo_url: string | null;
-	photo_key: string | null;
+	photo: string | null;
 	is_disabled: boolean;
 	provider_data: AuthProvider;
 	created_at: Date;
@@ -29,11 +30,18 @@ export interface IUserWithPassword extends IUser {
 	password: string;
 }
 
-export interface IUpdateUser extends Partial<IUser> {
-	id: string;
+export interface IUserPopulated extends Omit<IUser, 'created_by' | 'updated_by' | 'photo'> {
+	created_by: IUser | null;
+	updated_by: IUser | null;
+	photo: IFile | null;
 }
 
-export interface IUserPopulated extends Omit<IUser, 'created_by' | 'updated_by'> {
-	created_by: IUser;
-	updated_by: IUser;
+export interface IUserPopulatedWithPassword extends Omit<IUserWithPassword, 'created_by' | 'updated_by' | 'photo'> {
+	created_by: IUser | null;
+	updated_by: IUser | null;
+	photo: IFile | null;
+}
+
+export interface IUpdateUser extends Partial<IUserPopulated> {
+	id: string;
 }

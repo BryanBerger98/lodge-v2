@@ -1,12 +1,12 @@
 import { Reducer } from 'react';
 
-import { IUser } from '@/types/user.type';
+import { IUserPopulated } from '@/types/user.type';
 import { LoadingState } from '@/types/utils/loading.type';
 
 import { USERS_ERROR_ACTION, USERS_IDLE_ACTION, USERS_PENDING_ACTION, USERS_SET_STATE_ACTION, USERS_UPDATE_ACTION, UsersReducerAction } from './users.actions';
 
 export type UsersState = {
-	users: IUser[];
+	users: IUserPopulated[];
 	total: number;
 	loading: LoadingState;
 	error?: string;

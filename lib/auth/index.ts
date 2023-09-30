@@ -1,7 +1,7 @@
 import { NextAuthOptions } from 'next-auth';
 
 import { findSettingByName } from '@/database/setting/setting.repository';
-import { findUserByEmail, findUserById } from '@/database/user/user.repository';
+import { findUserById, findUserByEmail } from '@/database/user/user.repository';
 import { buildError } from '@/utils/error';
 import { FORBIDDEN_ERROR } from '@/utils/error/error-codes';
 import { MAGIC_LINK_SIGNIN_SETTING, findDefaultSettingByName } from '@/utils/settings';

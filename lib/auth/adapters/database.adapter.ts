@@ -8,10 +8,14 @@ const DatabaseAdapter = MongoDBAdapter(clientPromise);
 
 DatabaseAdapter.createUser = async (user) => {
 	await connectToDatabase();
-	const createdUser = await createUser(user);
+	const createdUser = await createUser({
+		...user,
+		created_by: null,
+		photo: null,
+	});
 	return {
 		...createdUser,
-		id: createdUser.id.toString(), 
+		role: createdUser.role === 'owner' ? 'user' : createdUser.role,
 	};
 };
 
