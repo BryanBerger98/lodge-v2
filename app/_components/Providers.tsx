@@ -1,11 +1,13 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { SessionProvider } from 'next-auth/react';
 import { ReactNode, useState } from 'react';
 
 import RefreshTokenHandler from '@/components/utils/auth/RefetchTokenHandler';
-import AuthProvider from '@/context/auth/auth.provider';
-import CsrfProvider from '@/context/csrf/csrf.provider';
+
+const AuthProvider = dynamic(() => import('@/context/auth/auth.provider'));
+const CsrfProvider = dynamic(() => import('@/context/csrf/csrf.provider'));
 
 type ProvidersProps = {
 	children: ReactNode;

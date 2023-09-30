@@ -12,9 +12,10 @@ import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal';
 import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
 import useCsrf from '@/context/csrf/useCsrf';
-import useUsers from '@/context/users/useUsers';
 import { deleteUser, sendResetPasswordTokenToUser, sendVerificationTokenToUser, updateUser as updateUserQuery } from '@/services/users.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
+
+import useUsers from '../../_context/users/useUsers';
 
 import { UserColumn } from './columns';
 
@@ -207,7 +208,7 @@ const RowMenu = ({ rowData }: RowMenuProps) => {
 								className="gap-2 hover:cursor-pointer"
 								asChild
 							>
-								<Link href={ `/users/edit/${ rowData.id }` }>
+								<Link href={ `/users/${ rowData.id }` }>
 									<Edit size="16" />
 									Edit
 								</Link>

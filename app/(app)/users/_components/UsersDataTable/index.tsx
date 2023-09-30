@@ -1,14 +1,15 @@
 'use client';
 
 import { Cell, OnChangeFn, PaginationState, Row, SortingState } from '@tanstack/react-table';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next-nprogress-bar';
 import { useEffect, useState } from 'react';
 
 import DataTable from '@/components/ui/data-table';
 import useCsrf from '@/context/csrf/useCsrf';
-import useUsers from '@/context/users/useUsers';
 import useUpdateEffect from '@/hooks/utils/useUpdateEffect';
 import { getSortingFromURLParams } from '@/utils/table.utils';
+
+import useUsers from '../../_context/users/useUsers';
 
 import { COLUMN_NAMES, UserColumn, columns } from './columns';
 import Menu from './Menu';
@@ -49,7 +50,7 @@ const UsersDataTable = ({ csrfToken }: UsersDataTableProps) => {
 
 	const handleClickCell = (cell: Cell<UserColumn, unknown>) => {
 		if (cell.column.id !== 'actions' && cell.column.id !== 'select') {
-			router.push(`/users/edit/${ cell.row.original.id }`);
+			router.push(`users/${ cell.row.original.id }`);
 		}
 	};
 

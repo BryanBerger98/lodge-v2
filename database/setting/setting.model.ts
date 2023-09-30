@@ -3,7 +3,12 @@ import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 
 import { ISetting, SettingTypes } from '@/types/setting.type';
 
-const settingSchema = new Schema<ISetting>({
+interface ISettingDocument extends Omit<ISetting, 'created_by' | 'updated_by'> {
+	created_by: Types.ObjectId | null;
+	updated_by: Types.ObjectId | null;
+}
+
+const settingSchema = new Schema<ISettingDocument>({
 	name: {
 		type: String,
 		required: true,
@@ -33,15 +38,15 @@ const settingSchema = new Schema<ISetting>({
 	},
 });
 
-// eslint-disable-next-line func-names
-settingSchema.virtual('id').get(function () {
+settingSchema.virtual('id').get(function getVirtualId() {
 	return this._id.toHexString();
 });
 
 settingSchema.set('toObject', { virtuals: true });
+settingSchema.set('toJSON', { virtuals: true });
 
 settingSchema.plugin(mongooseLeanVirtuals);
 
-const SettingModel: Model<ISetting> = models.Setting || model<ISetting>('Setting', settingSchema);
+const SettingModel: Model<ISettingDocument> = models.Setting || model<ISettingDocument>('Setting', settingSchema);
 
 export default SettingModel;

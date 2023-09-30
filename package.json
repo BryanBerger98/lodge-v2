@@ -116,7 +116,7 @@
     "mongoose-lean-virtuals": "^0.9.1",
     "next": "^13.4.13",
     "next-auth": "^4.22.4",
-    "next-nprogress-bar": "^2.0.3",
+    "next-nprogress-bar": "^2.1.2",
     "nodemailer": "^6.9.4",
     "npm": "^9.8.1",
     "react": "^18.2.0",
