@@ -6,8 +6,8 @@ import { deleteMultipleFilesFromKey } from '@/lib/bucket';
 import { connectToDatabase, newId } from '@/lib/database';
 import { filterEmptyValues } from '@/utils/array.util';
 import { setServerAuthGuard } from '@/utils/auth';
-import { buildError, sendError } from '@/utils/error';
-import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
+import { buildError, sendBuiltError } from '@/utils/error';
+import { INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
 
 export const DELETE = async (_: any, { params }: { params: { user_ids: string } }) => {
 	try {
@@ -42,14 +42,14 @@ export const DELETE = async (_: any, { params }: { params: { user_ids: string } 
 		});
 
 		if (!usersData || usersData.length === 0) {
-			return sendError(buildError({
+			throw buildError({
 				code: USER_NOT_FOUND_ERROR,
 				message: 'Users not found.',
 				status: 404,
-			}));
+			});
 		}
 
-		const photoKeys = usersData.map(user => user.photo_key).filter(filterEmptyValues);
+		const photoKeys = usersData.map(user => user.photo?.key).filter(filterEmptyValues).filter(key => key);
 		const photoFileObjects = photoKeys.length > 0 ? await findMultipleFilesByKey(photoKeys) : null;
 		const photoFileObjectKeys = photoFileObjects ? photoFileObjects.map(photoFile => photoFile.key).filter(key => key) : [];
 
@@ -66,11 +66,6 @@ export const DELETE = async (_: any, { params }: { params: { user_ids: string } 
 		return NextResponse.json({ message: 'Users deleted.' });
 	} catch (error: any) {
 		console.error(error);
-		return sendError(buildError({
-			code: error.code || INTERNAL_ERROR,
-			message: error.message || 'An error occured.',
-			status: 500,
-			data: error,
-		}));
+		return sendBuiltError(error);
 	}
 };

@@ -11,7 +11,7 @@ export type CreateUserDTO = {
 	is_disabled: boolean;
 	provider_data: AuthProvider;
 	created_by: string | null;
-	photo_key: string | null;
+	photo: string | null;
 	has_password: boolean;
 };
 
@@ -24,6 +24,6 @@ export type UpdateUserDTO = {
 	is_disabled?: boolean;
 	updated_by: string | null;
 	has_email_verified?: boolean;
-	photo_key?: string | null;
+	photo?: string | null;
 	last_login_date?: Date | null;
 };

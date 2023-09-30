@@ -14,7 +14,7 @@ const CurrentUserAvatar = () => {
 			<AvatarImage
 				alt="Profile"
 				height="40"
-				src={ currentUser?.photo_url || undefined }
+				src={ currentUser?.photo?.url || undefined }
 				width="40"
 			/>
 			<AvatarFallback><User size="16" /></AvatarFallback>

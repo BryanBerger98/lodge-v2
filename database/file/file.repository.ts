@@ -6,6 +6,16 @@ import UserModel from '../user/user.model';
 
 import FileModel from './file.model';
 
+export const findFileById = async (file_id: string): Promise<IFile | null> => {
+	try {
+		const document = await FileModel.findById(newId(file_id));
+		if (!document) return null;
+		return document.toObject();
+	} catch (error) {
+		throw error;
+	}
+};
+
 export const findFileByKey = async (key: string): Promise<IFile | null> => {
 	try {
 		const document = await FileModel.findOne({ key });
@@ -36,6 +46,21 @@ export const findMultipleFilesByKey = async (keysArray: string[]): Promise<IFile
 		])
 			.lean({ virtuals: [ 'id' ] });
 		return files;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const updateFileURL = async (fileToUpdate: { id: string, url: string, url_expiration_date?: Date }): Promise<IFile | null> => {
+	try {
+		const document = await FileModel.findByIdAndUpdate(newId(fileToUpdate.id), {
+			$set: {
+				url: fileToUpdate.url,
+				url_expiration_date: fileToUpdate.url_expiration_date || null,
+			},
+		});
+		if (!document) return null;
+		return document.toObject();
 	} catch (error) {
 		throw error;
 	}

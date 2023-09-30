@@ -73,7 +73,7 @@ const UpdateAvatarForm = ({ csrfToken }: UpdateAvatarFormProps) => {
 					<Avatar className="w-32 h-32">
 						<AvatarImage
 							alt="Profile"
-							src={ (fileToUpload && URL.createObjectURL(fileToUpload)) || currentUser?.photo_url || undefined }
+							src={ (fileToUpload && URL.createObjectURL(fileToUpload)) || currentUser?.photo?.url || undefined }
 						/>
 						<AvatarFallback><User /></AvatarFallback>
 					</Avatar>

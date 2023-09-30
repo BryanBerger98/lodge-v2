@@ -5,11 +5,11 @@ import { CreateUserSchema } from '@/app/api/users/_schemas/create-user.schema';
 import { UpdateUserSchema } from '@/app/api/users/_schemas/update-user.schema';
 import fetcher, { FetcherOptions } from '@/lib/fetcher';
 import { SafeTokenData } from '@/types/token.type';
-import { IUser, UserRoleWithOwner } from '@/types/user.type';
+import { IUser, IUserPopulated, UserRoleWithOwner } from '@/types/user.type';
 import { objectToFormData } from '@/utils/object.utils';
 import { buildQueryUrl } from '@/utils/url.util';
 
-export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema> & { avatar?: File | Blob | null }, csrfToken: string, options?: FetcherOptions): Promise<IUser> => {
+export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema> & { avatar?: File | Blob | null }, csrfToken: string, options?: FetcherOptions): Promise<IUserPopulated> => {
 	try {
 		const formData = new FormData();
 		formData.append('username', userToCreate.username);
@@ -32,7 +32,7 @@ export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema> 
 	}
 };
 
-export const updateUser = async (userToUpdate: z.infer<typeof UpdateUserSchema> & { avatar?: File | Blob | null }, csrfToken: string, options?: FetcherOptions): Promise<IUser> => {
+export const updateUser = async (userToUpdate: z.infer<typeof UpdateUserSchema> & { avatar?: File | Blob | null }, csrfToken: string, options?: FetcherOptions): Promise<IUserPopulated> => {
 	try {
 		const formData = objectToFormData({ ...userToUpdate });
 		const data = await fetcher('/api/users', {
@@ -70,7 +70,7 @@ export type FetchUsersOptions = {
 	roles?: UserRoleWithOwner[];
 } & FetcherOptions;
 
-export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: IUser[], total: number, count: number }> => {
+export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: IUserPopulated[], total: number, count: number }> => {
 	const { sort = [], skip, limit, search, roles = [], ...restOptions } = options ? options : {
 		sort: [],
 		skip: undefined,

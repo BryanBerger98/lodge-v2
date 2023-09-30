@@ -10,6 +10,8 @@ export interface IFile {
 	extension?: string;
 	size: number;
 	key: string;
+	url: string;
+	url_expiration_date: Date | null;
 	created_at: Date;
 	updated_at: Date | null;
 	created_by: string | null;
