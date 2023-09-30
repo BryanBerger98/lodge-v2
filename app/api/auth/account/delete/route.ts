@@ -12,7 +12,6 @@ import { FORBIDDEN_ERROR, INTERNAL_ERROR, PASSWORD_REQUIRED_ERROR, USER_NOT_FOUN
 import { verifyPassword } from '@/utils/password.util';
 import { USER_ACCOUNT_DELETION_SETTING } from '@/utils/settings';
 
-
 export const POST = async (request: NextRequest) => {
 	try {
 
@@ -55,7 +54,7 @@ export const POST = async (request: NextRequest) => {
 			}));
 		}
 
-		const photoFileObject = userData.photo_key ? await findFileByKey(userData.photo_key) : null;
+		const photoFileObject = userData.photo ? await findFileByKey(userData.photo) : null;
 
 		if (photoFileObject) {
 			await deleteFileFromKey(photoFileObject.key);

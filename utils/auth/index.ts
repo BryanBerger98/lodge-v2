@@ -4,7 +4,7 @@ import { getServerSession } from 'next-auth';
 import { findUserById, findUserWithPasswordById } from '@/database/user/user.repository';
 import authOptions from '@/lib/auth';
 import { connectToDatabase } from '@/lib/database';
-import { IUser, UserRoleWithOwner } from '@/types/user.type';
+import { IUser, IUserPopulated, UserRoleWithOwner } from '@/types/user.type';
 
 import { buildError } from '../error';
 import { FORBIDDEN_ERROR, MISSING_CREDENTIALS_ERROR, UNAUTHORIZED_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '../error/error-codes';
@@ -76,7 +76,7 @@ export const setServerAuthGuard = async (options?: ProtectionOptions) => {
 	};
 };
 
-export const authenticateUserWithPassword = async (userToAuthenticate: IUser, password?: string) => {
+export const authenticateUserWithPassword = async (userToAuthenticate: IUser | IUserPopulated, password?: string) => {
 	try {
 		if (!password) {
 			throw buildError({

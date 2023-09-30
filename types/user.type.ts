@@ -31,14 +31,14 @@ export interface IUserWithPassword extends IUser {
 }
 
 export interface IUserPopulated extends Omit<IUser, 'created_by' | 'updated_by' | 'photo'> {
-	created_by: IUser;
-	updated_by: IUser;
+	created_by: IUser | null;
+	updated_by: IUser | null;
 	photo: IFile | null;
 }
 
 export interface IUserPopulatedWithPassword extends Omit<IUserWithPassword, 'created_by' | 'updated_by' | 'photo'> {
-	created_by: IUser;
-	updated_by: IUser;
+	created_by: IUser | null;
+	updated_by: IUser | null;
 	photo: IFile | null;
 }
 

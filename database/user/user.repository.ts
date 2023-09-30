@@ -2,7 +2,7 @@ import { FilterQuery } from 'mongoose';
 
 import { newId, UpdateQueryOptions, QueryOptions } from '@/lib/database';
 import { IFile } from '@/types/file.type';
-import { IUser, IUserPopulated, IUserWithPassword } from '@/types/user.type';
+import { IUser, IUserPopulated, IUserPopulatedWithPassword, IUserWithPassword } from '@/types/user.type';
 import { Optional } from '@/types/utils';
 
 import { CreateUserDTO, UpdateUserDTO } from './user.dto';
@@ -70,10 +70,27 @@ export const findUserByEmail = async (email: string): Promise<IUser | null> => {
 	}
 };
 
-export const findUserWithPasswordByEmail = async (email: string): Promise<IUserWithPassword | null> => {
+export const findUserWithPasswordByEmail = async (email: string): Promise<IUserPopulatedWithPassword | null> => {
 	try {
 		const serializedEmail = email.toLowerCase().trim();
-		const user = await UserModel.findOne({ email: serializedEmail });
+		const user = await UserModel.findOne({ email: serializedEmail })
+			.populate<{
+			created_by: IUser;
+			updated_by: IUser;
+			photo: IFile | null;
+		}>([
+			{
+				path: 'created_by',
+				select: { password: 0 },
+				model: UserModel,
+			},
+			{
+				path: 'updated_by',
+				select: { password: 0 },
+				model: UserModel,
+			},
+			{ path: 'photo' },
+		]);
 		return user?.toObject() || null;
 	} catch (error) {
 		throw error;
@@ -117,11 +134,10 @@ export const findUserWithPasswordById = async (user_id: string): Promise<IUserWi
 	}
 };
 
-export const createUser = async (userToCreate: CreateUserDTO): Promise<IUserPopulated | null> => {
+export const createUser = async (userToCreate: CreateUserDTO): Promise<IUserPopulated> => {
 	try {
 		const createdUserDoc = await UserModel.create({ ...userToCreate });
-		const document = await UserModel
-			.findById(createdUserDoc.id, { password: 0 })
+		const document = await createdUserDoc
 			.populate<{
 			created_by: IUser;
 			updated_by: IUser;
@@ -139,7 +155,6 @@ export const createUser = async (userToCreate: CreateUserDTO): Promise<IUserPopu
 			},
 			{ path: 'photo' },
 		]);
-		if (!document) return null;
 		return document.toObject();
 	} catch (error) {
 		throw error;

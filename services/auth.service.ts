@@ -95,7 +95,7 @@ export const sendResetPasswordToken = async (email: string, csrfToken: string) =
 	}
 };
 
-export const updateAccount = async (valuesToUpdate: { phone_number?: string, username?: string }, csrfToken: string): Promise<IUser> => {
+export const updateAccount = async (valuesToUpdate: { phone_number?: string, username?: string }, csrfToken: string): Promise<IUserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account', {
 			method: 'PUT',
@@ -109,7 +109,7 @@ export const updateAccount = async (valuesToUpdate: { phone_number?: string, use
 	}
 };
 
-export const updateUserPassword = async (password: string, newPassword: string, csrfToken: string | null): Promise<IUser> => {
+export const updateUserPassword = async (password: string, newPassword: string, csrfToken: string | null): Promise<IUserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account/password', {
 			method: 'PUT',
@@ -126,7 +126,7 @@ export const updateUserPassword = async (password: string, newPassword: string, 
 	}
 };
 
-export const updateUserEmail = async (email: string, password: string, csrfToken: string | null): Promise<IUser> => {
+export const updateUserEmail = async (email: string, password: string, csrfToken: string | null): Promise<IUserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account/email', {
 			method: 'PUT',
