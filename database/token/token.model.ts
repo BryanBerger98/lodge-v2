@@ -2,7 +2,12 @@ import { Schema, model, Types, Model, models } from 'mongoose';
 
 import { IToken } from '@/types/token.type';
 
-const tokenSchema = new Schema<IToken>({
+interface ITokenDocument extends Omit<IToken, 'target_id' | 'created_by'> {
+	target_id: Types.ObjectId;
+	created_by: Types.ObjectId | null;
+}
+
+const tokenSchema = new Schema<ITokenDocument>({
 	token: {
 		type: String,
 		required: true,
@@ -33,8 +38,21 @@ const tokenSchema = new Schema<IToken>({
 	},
 });
 
-tokenSchema.set('toObject', { virtuals: true });
+tokenSchema.virtual('id').get(function getVirtualId () {
+	return this._id.toHexString();
+});
 
-const TokenModel: Model<IToken> = models.Token || model<IToken>('Token', tokenSchema);
+tokenSchema.set('toObject', {
+	virtuals: true,
+	flattenObjectIds: true,
+	versionKey: false, 
+});
+tokenSchema.set('toJSON', {
+	virtuals: true,
+	flattenObjectIds: true,
+	versionKey: false, 
+});
+
+const TokenModel: Model<ITokenDocument> = models.Token || model<ITokenDocument>('Token', tokenSchema);
 
 export default TokenModel;

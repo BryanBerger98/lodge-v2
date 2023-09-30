@@ -1,40 +1,58 @@
 'use client';
 
-import { Dispatch, HTMLAttributes, ReactNode, SetStateAction, createContext, useMemo, useState } from 'react';
+import * as TabsPrimitive from '@radix-ui/react-tabs';
+import * as React from 'react';
 
-type TabsContextValue = {
-	value: string;
-	setValue: Dispatch<SetStateAction<string>>;
-} 
+import { cn } from '@/utils/ui.util';
 
-const TabsContext = createContext<TabsContextValue | null>(null);
-export { TabsContext };
+const Tabs = TabsPrimitive.Root;
 
-type TabsProps = {
-	defaultValue: string;
-	children: ReactNode;
-} & HTMLAttributes<HTMLDivElement>;
+const TabsList = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.List>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
+>(({ className, ...props }, ref) => (
+	<TabsPrimitive.List
+		className={ cn(
+			'inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground',
+			className
+		) }
+		ref={ ref }
+		{ ...props }
+	/>
+));
+TabsList.displayName = TabsPrimitive.List.displayName;
 
-const Tabs = ({ defaultValue, children, ...rest }: TabsProps) => {
+const TabsTrigger = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> & { variant?: 'default' | 'secondary' }
+>(({ className, variant = 'default', ...props }, ref) => (
+	<TabsPrimitive.Trigger
+		className={ cn(
+			'inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm',
+			{ 'hover:bg-secondary/80 hover:text-secondary-foreground data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground': variant === 'secondary' },
+			className
+		) }
+		ref={ ref }
+		{ ...props }
+	/>
+));
+TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
-	const [ value, setValue ] = useState<string>(defaultValue);
+const TabsContent = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
+>(({ className, ...props }, ref) => (
+	<TabsPrimitive.Content
+		className={ cn(
+			'mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+			className
+		) }
+		ref={ ref }
+		{ ...props }
+	/>
+));
+TabsContent.displayName = TabsPrimitive.Content.displayName;
 
-	const contextValue = useMemo(() => ({
-		value,
-		setValue, 
-	}), [
-		value,
-	]);
-
-	return (
-		<TabsContext.Provider value={ contextValue }>
-			<div
-				{ ...rest }
-			>
-				{ children }
-			</div>
-		</TabsContext.Provider>
-	);
+export {
+	Tabs, TabsList, TabsTrigger, TabsContent, 
 };
-
-export default Tabs;

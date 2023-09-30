@@ -20,10 +20,11 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
-import useUsers from '@/context/users/useUsers';
 import { createUser, updateUser } from '@/services/users.service';
 import { IUser, UserRole } from '@/types/user.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
+
+import useUsers from '../../_context/users/useUsers';
 
 type EditUserFormProps = {
 	user?: IUser;
@@ -83,7 +84,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 		}
 		try {
 			setIsLoading(true);
-			if (pathname.includes('/users/edit') && user) {
+			if (user && pathname.includes(`/users/${ user.id }`)) {
 				const updatedUser = await updateUser({
 					...values,
 					role: values.role,
@@ -98,7 +99,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 				role: values.role,
 				avatar: fileToUpload, 
 			}, csrfToken);
-			router.replace(`/users/edit/${ createdUser.id }`);
+			router.replace(`/users/${ createdUser.id }`);
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
 			if (apiError.code === 'invalid-input') {

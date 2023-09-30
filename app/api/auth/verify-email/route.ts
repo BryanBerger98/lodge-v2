@@ -199,7 +199,7 @@ export const PUT = async (request: NextRequest) => {
 
 		await deleteTokenById(savedToken.id);
 
-		if (typeof userData.id === 'string' && userData.id !== currentUser.id || typeof userData.id !== 'string' && userData.id.toHexString() !== currentUser.id) {
+		if (typeof userData.id === 'string' && userData.id !== currentUser.id || typeof userData.id !== 'string' && userData.id !== currentUser.id) {
 			if (!userData) {
 				return sendError(buildError({
 					code: INVALID_TOKEN_ERROR,

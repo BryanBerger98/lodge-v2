@@ -5,19 +5,19 @@ import { redirect } from 'next/navigation';
 
 import PageTitle from '@/components/layout/Header/PageTitle';
 import BackButton from '@/components/ui/Button/BackButton';
-import UsersProvider from '@/context/users/users.provider';
 import { findFileByKey } from '@/database/file/file.repository';
 import { findUserById } from '@/database/user/user.repository';
 import { getFieldSignedURL } from '@/lib/bucket';
 import { getCsrfToken } from '@/lib/csrf';
-import { Id } from '@/lib/database';
 
-const DynamicEditUserForm = dynamic(() => import('../../_components/EditUserForm'));
-const DynamicMenu = dynamic(() => import('../_components/Menu'));
+import UsersProvider from '../_context/users/users.provider';
+
+const DynamicEditUserForm = dynamic(() => import('../_components/EditUserForm'));
+const DynamicMenu = dynamic(() => import('./_components/Menu'));
 
 type EditUserPageProps = {
 	params: {
-		userId: string | Id;
+		user_id: string;
 	}
 };
 
@@ -25,13 +25,13 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
 
 	const csrfToken = await getCsrfToken(headers());
 
-	const { userId } = params;
+	const { user_id } = params;
 
-	if (!userId) {
+	if (!user_id) {
 		redirect('/users');
 	}
 
-	const userData = await findUserById(userId);
+	const userData = await findUserById(user_id);
 
 	if (!userData) {
 		redirect('/users');

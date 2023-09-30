@@ -10,10 +10,11 @@ import ConfirmationFormModal, { ConfirmationModalOpenChangeEvent } from '@/compo
 import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal';
 import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
-import useUsers from '@/context/users/useUsers';
 import { deleteUser, sendResetPasswordTokenToUser, sendVerificationTokenToUser } from '@/services/users.service';
 import { IUser } from '@/types/user.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
+
+import useUsers from '../../_context/users/useUsers';
 
 type MenuProps = {
 	userData: IUser;

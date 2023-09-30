@@ -4,9 +4,9 @@ import { headers } from 'next/headers';
 
 import PageTitle from '@/components/layout/Header/PageTitle';
 import BackButton from '@/components/ui/Button/BackButton';
-import UsersProvider from '@/context/users/users.provider';
 import { getCsrfToken } from '@/lib/csrf';
 
+import UsersProvider from '../_context/users/users.provider';
 
 const DynamicEditUserForm = dynamic(() => import('../_components/EditUserForm'));
 

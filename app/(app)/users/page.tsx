@@ -3,14 +3,15 @@ import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 
+import { FetchUsersSchema } from '@/app/api/users/_schemas/fetch-users.schema';
 import PageTitle from '@/components/layout/Header/PageTitle';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import UsersProvider from '@/context/users/users.provider';
-import { FetchUsersSchema } from '@/database/user/user.dto';
 import { findUsers, findUsersCount } from '@/database/user/user.repository';
 import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
+
+import UsersProvider from './_context/users/users.provider';
 
 const DynamicUsersDataTable = dynamic(() => import('./_components/UsersDataTable'));
 
@@ -60,7 +61,7 @@ const UsersPage = async ({ searchParams }: UsersPageProps) => {
 				headerButton={ {
 					asChild: true,
 					variant: 'ghost',
-					children: <Link href="/users/create"><Plus /></Link>,
+					children: <Link href="/users/new"><Plus /></Link>,
 				} }
 			><Users /> Users
 			</PageTitle>
@@ -102,7 +103,7 @@ const UsersPage = async ({ searchParams }: UsersPageProps) => {
 						className="hidden md:flex gap-2 items-center"
 						asChild
 					>
-						<Link href="/users/create">
+						<Link href="/users/new">
 							<UserPlus size="16" />
 							Create user
 						</Link>
