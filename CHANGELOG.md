@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.9.0...v1.10.0) (2023-09-30)
+
+
+### Features
+
+* **files:** register signed file urls in database ([#193](https://github.com/BryanBerger98/lodge-v2/issues/193)) ([#194](https://github.com/BryanBerger98/lodge-v2/issues/194)) ([348a965](https://github.com/BryanBerger98/lodge-v2/commit/348a965e92e5117db527611add31d045f95a330f))
+
 # [1.9.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.8.0...v1.9.0) (2023-08-07)
 
 
