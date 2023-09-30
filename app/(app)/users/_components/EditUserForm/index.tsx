@@ -21,13 +21,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
 import { createUser, updateUser } from '@/services/users.service';
-import { IUser, UserRole } from '@/types/user.type';
+import { IUserPopulated, UserRole } from '@/types/user.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
 import useUsers from '../../_context/users/useUsers';
 
 type EditUserFormProps = {
-	user?: IUser;
+	user?: IUserPopulated;
 	csrfToken: string;
 };
 
@@ -142,7 +142,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 							<Avatar className="w-32 h-32">
 								<AvatarImage
 									alt="Profile"
-									src={ (fileToUpload && URL.createObjectURL(fileToUpload)) || user?.photo_url || undefined }
+									src={ (fileToUpload && URL.createObjectURL(fileToUpload)) || user?.photo?.url || undefined }
 								/>
 								<AvatarFallback><User /></AvatarFallback>
 							</Avatar>

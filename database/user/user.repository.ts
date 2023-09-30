@@ -1,7 +1,8 @@
 import { FilterQuery } from 'mongoose';
 
 import { newId, UpdateQueryOptions, QueryOptions } from '@/lib/database';
-import { IUser, IUserPopulated, IUserWithPassword, UserRole } from '@/types/user.type';
+import { IFile } from '@/types/file.type';
+import { IUser, IUserPopulated, IUserWithPassword } from '@/types/user.type';
 import { Optional } from '@/types/utils';
 
 import { CreateUserDTO, UpdateUserDTO } from './user.dto';
@@ -15,6 +16,7 @@ export const findUsers = async (searchRequest: FilterQuery<IUser>, options?: Que
 			.populate<{
 				created_by: IUser;
 				updated_by: IUser;
+				photo: IFile | null;
 			}>([
 				{
 					path: 'created_by',
@@ -26,6 +28,7 @@ export const findUsers = async (searchRequest: FilterQuery<IUser>, options?: Que
 					select: { password: 0 },
 					model: UserModel,
 				},
+				{ path: 'photo' },
 			])
 			.skip(options?.skip || 0)
 			.limit(options?.limit || 1000)
@@ -79,9 +82,27 @@ export const findUserWithPasswordByEmail = async (email: string): Promise<IUserW
 	}
 };
 
-export const findUserById = async (user_id: string): Promise<IUser | null> => {
+export const findUserById = async (user_id: string): Promise<IUserPopulated | null> => {
 	try {
-		const document = await UserModel.findById(newId(user_id), { password: 0 });
+		const document = await UserModel
+			.findById(newId(user_id), { password: 0 })
+			.populate<{
+			created_by: IUser;
+			updated_by: IUser;
+			photo: IFile | null;
+		}>([
+			{
+				path: 'created_by',
+				select: { password: 0 },
+				model: UserModel,
+			},
+			{
+				path: 'updated_by',
+				select: { password: 0 },
+				model: UserModel,
+			},
+			{ path: 'photo' },
+		]);
 		if (!document) return null;
 		return document.toObject();
 	} catch (error) {
@@ -98,29 +119,64 @@ export const findUserWithPasswordById = async (user_id: string): Promise<IUserWi
 	}
 };
 
-interface ICreatedUser extends IUser {
-	role: UserRole;
-}
-
-export const createUser = async (userToCreate: CreateUserDTO): Promise<ICreatedUser> => {
+export const createUser = async (userToCreate: CreateUserDTO): Promise<IUserPopulated | null> => {
 	try {
 		const createdUserDoc = await UserModel.create({ ...userToCreate });
-		const createdUser: Optional<IUserWithPassword, 'password'> = createdUserDoc.toObject();
-		delete createdUser.password;
-		return createdUser as ICreatedUser;
+		const document = await UserModel
+			.findById(createdUserDoc.id, { password: 0 })
+			.populate<{
+			created_by: IUser;
+			updated_by: IUser;
+			photo: IFile | null;
+		}>([
+			{
+				path: 'created_by',
+				select: { password: 0 },
+				model: UserModel,
+			},
+			{
+				path: 'updated_by',
+				select: { password: 0 },
+				model: UserModel,
+			},
+			{ path: 'photo' },
+		]);
+		if (!document) return null;
+		return document.toObject();
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const updateUser = async (userToUpdate: UpdateUserDTO, options?: UpdateQueryOptions): Promise<IUser | null> => {
+export const updateUser = async (userToUpdate: UpdateUserDTO, options?: UpdateQueryOptions): Promise<IUserPopulated | null> => {
 	try {
-		const updatedUserDoc = await UserModel.findByIdAndUpdate(newId(userToUpdate.id), { $set: { ...userToUpdate } }, { new: options?.newDocument || false });
-		const updatedUser: Optional<IUserWithPassword, 'password'> | null = updatedUserDoc?.toObject() || null;
-		if (updatedUser) {
-			delete updatedUser.password;
-		}
-		return updatedUser;
+		await UserModel.findByIdAndUpdate(newId(userToUpdate.id), {
+			$set: {
+				...userToUpdate,
+				photo: userToUpdate.photo ? newId(userToUpdate.photo) : undefined, 
+			}, 
+		}, { new: options?.newDocument || false });
+		const document = await UserModel
+			.findById(newId(userToUpdate.id), { password: 0 })
+			.populate<{
+			created_by: IUser;
+			updated_by: IUser;
+			photo: IFile | null;
+		}>([
+			{
+				path: 'created_by',
+				select: { password: 0 },
+				model: UserModel,
+			},
+			{
+				path: 'updated_by',
+				select: { password: 0 },
+				model: UserModel,
+			},
+			{ path: 'photo' },
+		]);
+		if (!document) return null;
+		return document.toObject();
 	} catch (error) {
 		throw error;
 	}

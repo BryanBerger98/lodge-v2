@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { deleteFileById, findFileByKey } from '@/database/file/file.repository';
+import { deleteFileById, findFileById } from '@/database/file/file.repository';
 import { deleteUserById, findUserById } from '@/database/user/user.repository';
 import { deleteFileFromKey } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
@@ -43,7 +43,7 @@ export const DELETE = async (_: any, { params }: { params: { user_id: string } }
 			}));
 		}
 
-		const photoFileObject = userData.photo_key ? await findFileByKey(userData.photo_key) : null;
+		const photoFileObject = userData.photo ? await findFileById(userData.photo.id) : null;
 
 		if (photoFileObject) {
 			await deleteFileFromKey(photoFileObject.key);

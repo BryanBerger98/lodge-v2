@@ -24,17 +24,17 @@ export const generateUniqueNameFromFileName = (filename: string): Promise<string
 	});
 };
 
-export const convertFileRequestObjetToModel = (fileObj: File | Blob, fileKey: string): Omit<IFile, 'id' | 'created_by' | 'created_at' | 'updated_at' | 'updated_by'> => {
-
-	const file = {
+export const convertFileRequestObjetToModel = (fileObj: File | Blob, fileData: { key: string, url: string, expiration_date?: Date }): Omit<IFile, 'id' | 'created_by' | 'created_at' | 'updated_at' | 'updated_by'> => {
+	return {
 		original_name: fileObj.name,
 		custom_name: fileObj.name,
 		mimetype: fileObj.type,
 		extension: getFileExtension(fileObj.name),
 		size: fileObj.size,
-		key: fileKey,
+		key: fileData.key,
+		url: fileData.url,
+		url_expiration_date: fileData.expiration_date || null,
 	};
-	return file;
 };
 
 export const checkIfFileIsAnImage = (fileType: string): fileType is ImageMimetype => {

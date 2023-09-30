@@ -34,6 +34,15 @@ const fileSchema = new Schema<IFileDocument>({
 		required: true,
 		trim: true,
 	},
+	url: {
+		type: String,
+		default: '',
+		trim: true,
+	},
+	url_expiration_date: {
+		type: Date,
+		default: null,
+	},
 	updated_by: {
 		type: Types.ObjectId,
 		default: null,

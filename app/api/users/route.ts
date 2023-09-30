@@ -1,16 +1,15 @@
 import { parse } from 'url';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { ZodError } from 'zod';
 
-import { createFile, deleteFileById, findFileByKey } from '@/database/file/file.repository';
+import { createFile, deleteFileById, findFileById } from '@/database/file/file.repository';
 import { createUser, findUserByEmail, findUserById, findUsers, findUsersCount, updateUser } from '@/database/user/user.repository';
 import { deleteFileFromKey, getFieldSignedURL, uploadImageToS3 } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
-import { IUser } from '@/types/user.type';
+import { IUser, IUserPopulated } from '@/types/user.type';
 import { setServerAuthGuard } from '@/utils/auth';
-import { buildError, sendError } from '@/utils/error';
-import { FILE_TOO_LARGE_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_ALREADY_EXISTS_ERROR, USER_NOT_FOUND_ERROR, USER_UNEDITABLE_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
+import { buildError, sendBuiltErrorWithSchemaValidation } from '@/utils/error';
+import { FILE_TOO_LARGE_ERROR, USER_ALREADY_EXISTS_ERROR, USER_NOT_FOUND_ERROR, USER_UNEDITABLE_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
 import { AUTHORIZED_IMAGE_MIME_TYPES, AUTHORIZED_IMAGE_SIZE, convertFileRequestObjetToModel } from '@/utils/file.util';
 import { generatePassword, hashPassword } from '@/utils/password.util';
 
@@ -18,12 +17,8 @@ import { CreateUserSchema } from './_schemas/create-user.schema';
 import { FetchUsersSchema } from './_schemas/fetch-users.schema';
 import { UpdateUserSchema } from './_schemas/update-user.schema';
 
-const uploadPhotoFile = async (currentUser: IUser, photoFile?: Blob | null, user?: IUser) => {
+const uploadPhotoFile = async (currentUser: IUserPopulated, photoFile?: Blob | null, user?: IUser | IUserPopulated) => {
 	try {
-		const fileData: { photo_url: string | null, photo_key: string | null } = {
-			photo_url: null,
-			photo_key: null,
-		};
 		if (photoFile) {
 			if (!AUTHORIZED_IMAGE_MIME_TYPES.includes(photoFile.type)) {
 				throw buildError({
@@ -41,29 +36,30 @@ const uploadPhotoFile = async (currentUser: IUser, photoFile?: Blob | null, user
 				});
 			}
 	
-			if (user && user.photo_key && user.photo_key !== '') {
-				const oldFile = await findFileByKey(user.photo_key);
+			if (user && user.photo) {
+				const oldFile = await findFileById(typeof user.photo === 'string' ? user.photo : user.photo.id);
 				if (oldFile) {
 					await deleteFileFromKey(oldFile.key);
 					await deleteFileById(oldFile.id);
 				}
 			}
-	
+
 			const photoKey = await uploadImageToS3(photoFile, 'avatars/');
-		
-	
+			const photoUrl = await getFieldSignedURL(photoKey, 24 * 60 * 60);
+
 			const parsedFile = {
-				...convertFileRequestObjetToModel(photoFile, photoKey),
+				...convertFileRequestObjetToModel(photoFile, {
+					url: photoUrl,
+					key: photoKey,
+				}),
 				created_by: currentUser.id,
 			};
 	
 			const savedFile = await createFile(parsedFile);
 	
-			const photoUrl = savedFile ? await getFieldSignedURL(savedFile.key, 24 * 60 * 60) : null;
-			fileData.photo_key = savedFile?.key || null,
-			fileData.photo_url = photoUrl;
+			return savedFile;
 		}
-		return fileData;
+		return null;
 	} catch (error) {
 		throw error;
 	}
@@ -89,11 +85,11 @@ export const POST = async (request: NextRequest) => {
 		const existingUser = await findUserByEmail(email);
 	
 		if (existingUser) {
-			return sendError(buildError({
+			throw buildError({
 				code: USER_ALREADY_EXISTS_ERROR,
 				message: 'User already exists.',
 				status: 422,
-			}));
+			});
 		}
 
 		const hashedPassword = await hashPassword(password);
@@ -108,31 +104,14 @@ export const POST = async (request: NextRequest) => {
 			phone_number,
 			provider_data: 'email',
 			created_by: currentUser.id,
-			photo_key: photoFileData.photo_key,
+			photo: photoFileData?.id || null,
 			is_disabled,
 		});
-
-		if (createdUser) {
-			createdUser.photo_url = photoFileData.photo_url;
-		}
 		
 		return NextResponse.json(createdUser);
 	} catch (error: any) {
 		console.error(error);
-		if (error.name && error.name === 'ZodError') {
-			return sendError(buildError({
-				code: INVALID_INPUT_ERROR,
-				message: 'Invalid input.',
-				status: 422,
-				data: error as ZodError,
-			}));
-		}
-		return sendError(buildError({
-			code: INTERNAL_ERROR,
-			message: error.message || 'An error occured.',
-			status: 500,
-			data: error,
-		}));
+		return sendBuiltErrorWithSchemaValidation(error);
 	}
 };
 
@@ -155,29 +134,29 @@ export const PUT = async (request: NextRequest) => {
 		const existingUser = email ? await findUserByEmail(email) : null;
 	
 		if (existingUser && existingUser.id.toString() !== id) {
-			return sendError(buildError({
+			throw buildError({
 				code: USER_ALREADY_EXISTS_ERROR,
 				message: 'User already exists.',
 				status: 422,
-			}));
+			});
 		}
 
 		const userData = await findUserById(id);
 
 		if (!userData) {
-			return sendError(buildError({
+			throw buildError({
 				code: USER_NOT_FOUND_ERROR,
 				message: 'User not found.',
 				status: 404,
-			}));
+			});
 		}
 
 		if (currentUser.role !== 'owner' && userData.role === 'owner') {
-			return sendError(buildError({
+			throw buildError({
 				code: USER_UNEDITABLE_ERROR,
 				message: 'This user is not editable',
 				status: 403,
-			}));
+			});
 		}
 
 		const photoFileData = await uploadPhotoFile(currentUser, file, userData);
@@ -189,31 +168,14 @@ export const PUT = async (request: NextRequest) => {
 			role: role || userData.role,
 			phone_number: phone_number || userData.phone_number,
 			is_disabled: is_disabled !== undefined && is_disabled !== null ? is_disabled : userData.is_disabled,
-			photo_key: photoFileData.photo_key || userData.photo_key,
+			photo: photoFileData?.id || userData.photo?.id || null,
 			updated_by: currentUser.id,
 		});
-
-		if (updatedUser) {
-			updatedUser.photo_url = photoFileData.photo_url;
-		}
 		
 		return NextResponse.json(updatedUser);
 	} catch (error: any) {
 		console.error(error);
-		if (error.name && error.name === 'ZodError') {
-			return sendError(buildError({
-				code: INVALID_INPUT_ERROR,
-				message: 'Invalid input.',
-				status: 422,
-				data: error as ZodError,
-			}));
-		}
-		return sendError(buildError({
-			code: INTERNAL_ERROR,
-			message: error.message || 'An error occured.',
-			status: 500,
-			data: error,
-		}));
+		return sendBuiltErrorWithSchemaValidation(error);
 	}
 };
 
@@ -242,6 +204,10 @@ export const GET = async (request: NextRequest) => {
 			skip: Math.round(page_index * page_size),
 			limit: page_size,
 		});
+
+		// TODO: Get users photo and verify if url is not expired
+		// Check if AWS allows to get multiple signed urls at once
+
 		const count = users.length;
 		const total = await findUsersCount(searchRequest);
 
@@ -253,20 +219,7 @@ export const GET = async (request: NextRequest) => {
 
 	} catch (error: any) {
 		console.error(error);
-		if (error.name && error.name === 'ZodError') {
-			return sendError(buildError({
-				code: INVALID_INPUT_ERROR,
-				message: 'Invalid input.',
-				status: 422,
-				data: error as ZodError,
-			}));
-		}
-		return sendError(buildError({
-			code: INTERNAL_ERROR,
-			message: error.message || 'An error occured.',
-			status: 500,
-			data: error,
-		}));
+		return sendBuiltErrorWithSchemaValidation(error);
 	}
 };
 

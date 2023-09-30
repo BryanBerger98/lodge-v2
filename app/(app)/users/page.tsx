@@ -36,6 +36,9 @@ const UsersPage = async ({ searchParams }: UsersPageProps) => {
 		skip: Math.round(page_index * page_size),
 		limit: page_size,
 	});
+
+	// TODO: Get users photo and verify if the expiration date is not expired
+	// Check if AWS allows to get multiple signed urls at once
 	
 	const totalUsers = await findUsersCount(searchRequest);
 	const disabledUsersCount = await findUsersCount({
