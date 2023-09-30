@@ -71,8 +71,16 @@ userSchema.virtual('id').get(function getVirtualId () {
 	return this._id.toHexString();
 });
 
-userSchema.set('toObject', { virtuals: true });
-userSchema.set('toJSON', { virtuals: true });
+userSchema.set('toObject', {
+	virtuals: true,
+	flattenObjectIds: true,
+	versionKey: false, 
+});
+userSchema.set('toJSON', {
+	virtuals: true,
+	flattenObjectIds: true,
+	versionKey: false, 
+});
 
 userSchema.plugin(mongooseLeanVirtuals);
 

@@ -53,8 +53,16 @@ fileSchema.virtual('id').get(function getVirtualId () {
 	return this._id.toHexString();
 });
 
-fileSchema.set('toObject', { virtuals: true });
-fileSchema.set('toJSON', { virtuals: true });
+fileSchema.set('toObject', {
+	virtuals: true,
+	flattenObjectIds: true,
+	versionKey: false, 
+});
+fileSchema.set('toJSON', {
+	virtuals: true,
+	flattenObjectIds: true,
+	versionKey: false, 
+});
 
 const FileModel: Model<IFileDocument> = models.File || model<IFileDocument>('File', fileSchema);
 

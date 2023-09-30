@@ -81,8 +81,9 @@ export const findUserWithPasswordByEmail = async (email: string): Promise<IUserW
 
 export const findUserById = async (user_id: string): Promise<IUser | null> => {
 	try {
-		const user = await UserModel.findById(newId(user_id), { password: 0 });
-		return user?.toObject() || null;
+		const document = await UserModel.findById(newId(user_id), { password: 0 });
+		if (!document) return null;
+		return document.toObject();
 	} catch (error) {
 		throw error;
 	}

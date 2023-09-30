@@ -1,12 +1,10 @@
-import { Database, KeyRound, Mail, Settings, Unlock, Unplug, Users } from 'lucide-react';
+import { Database, Globe, KeyRound, Mail, Settings, Star, Unlock, Unplug, Users } from 'lucide-react';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import { ReactNode } from 'react';
 
 import PageTitle from '@/components/layout/Header/PageTitle';
-import Tabs from '@/components/ui/Tabs';
-import TabButton from '@/components/ui/Tabs/TabButton';
-import TabsList from '@/components/ui/Tabs/TabsList';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import SettingsProvider from '@/context/settings/settings.provider';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
@@ -32,53 +30,77 @@ const SettingsLayout = async ({ children }: SettingsLayoutProps) => {
 		redirect: '/', 
 	});
 
+	//  className="px-0 lg:px-2 bg-transparent flex-row lg:flex-col !justify-start w-full overflow-x-scroll lg:overflow-x-auto lg:min-w-[220px] items-start !gap-0 text-slate-900"
+
 	return (
 		<>
 			<PageTitle><Settings /> Settings</PageTitle>
 			<div className="flex flex-col lg:flex-row gap-4">
 				<Tabs
+					className="h-full"
 					defaultValue={ subpath || 'access' }
+					orientation="vertical"
 				>
-					<TabsList className="px-0 lg:px-2 bg-transparent flex-row lg:flex-col !justify-start w-full overflow-x-scroll lg:overflow-x-auto lg:min-w-[220px] items-start !gap-0 text-slate-900">
-						<TabButton
+					<TabsList className="bg-transparent flex-row lg:flex-col !justify-start h-full lg:overflow-x-auto lg:min-w-[220px] items-start !gap-0">
+						<TabsTrigger
 							className="gap-2 items-center w-full justify-start"
 							value="access"
+							variant="secondary"
 							asChild
 						>
 							<Link href="/settings/access"><Unlock size="16" /> Access</Link>
-						</TabButton>
-						<TabButton
+						</TabsTrigger>
+						<TabsTrigger
 							className="gap-2 items-center w-full justify-start"
 							value="users"
+							variant="secondary"
 							asChild
 						>
 							<Link href="/settings/users"><Users size="16" /> Users</Link>
-						</TabButton>
-						<TabButton
+						</TabsTrigger>
+						<TabsTrigger
 							className="gap-2 items-center w-full justify-start"
 							value="auth"
+							variant="secondary"
 							asChild
 						>
 							<Link href="/settings/auth"><KeyRound size="16" /> Authentication</Link>
-						</TabButton>
-						<TabButton
+						</TabsTrigger>
+						<TabsTrigger
 							className="gap-2 items-center w-full justify-start"
 							value="environment"
+							variant="secondary"
 							disabled
 						><Database size="16" /> Environment
-						</TabButton>
-						<TabButton
+						</TabsTrigger>
+						<TabsTrigger
 							className="gap-2 items-center w-full justify-start"
 							value="integrations"
+							variant="secondary"
 							disabled
 						><Unplug size="16" /> Integrations
-						</TabButton>
-						<TabButton
+						</TabsTrigger>
+						<TabsTrigger
 							className="gap-2 items-center w-full justify-start"
 							value="email"
+							variant="secondary"
 							disabled
 						><Mail size="16" /> Email
-						</TabButton>
+						</TabsTrigger>
+						<TabsTrigger
+							className="gap-2 items-center w-full justify-start"
+							value="email"
+							variant="secondary"
+							disabled
+						><Globe size="16" /> Website
+						</TabsTrigger>
+						<TabsTrigger
+							className="gap-2 items-center w-full justify-start"
+							value="email"
+							variant="secondary"
+							disabled
+						><Star size="16" /> Branding
+						</TabsTrigger>
 					</TabsList>
 				</Tabs>
 				<SettingsProvider>

@@ -42,8 +42,16 @@ tokenSchema.virtual('id').get(function getVirtualId () {
 	return this._id.toHexString();
 });
 
-tokenSchema.set('toObject', { virtuals: true });
-tokenSchema.set('toJSON', { virtuals: true });
+tokenSchema.set('toObject', {
+	virtuals: true,
+	flattenObjectIds: true,
+	versionKey: false, 
+});
+tokenSchema.set('toJSON', {
+	virtuals: true,
+	flattenObjectIds: true,
+	versionKey: false, 
+});
 
 const TokenModel: Model<ITokenDocument> = models.Token || model<ITokenDocument>('Token', tokenSchema);
 

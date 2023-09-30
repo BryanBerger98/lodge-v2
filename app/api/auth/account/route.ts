@@ -34,7 +34,6 @@ export const GET = async () => {
 		if (photoFileObject) {
 			const photoUrl = await getFieldSignedURL(photoFileObject.key, 24 * 60 * 60);
 			userData.photo_url = photoUrl ? photoUrl : '';
-			console.log(photoUrl);
 		}
 
 		return NextResponse.json(userData);
