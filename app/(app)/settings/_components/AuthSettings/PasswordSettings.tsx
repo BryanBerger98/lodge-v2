@@ -17,15 +17,15 @@ import useSettings from '@/context/settings/useSettings';
 import { updateSettings } from '@/services/settings.service';
 import { UnregisteredSetting } from '@/types/setting.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
-import { PASSWORD_MIN_LENGTH_SETTING, PASSWORD_LOWERCASE_MIN_SETTING, PASSWORD_NUMBERS_MIN_SETTING, PASSWORD_SYMBOLS_MIN_SETTING, PASSWORD_UNIQUE_CHARS_SETTING, PASSWORD_UPPERCASE_MIN_SETTING } from '@/utils/settings';
+import { SETTING_NAMES } from '@/utils/settings';
 
 const passwordSettingsFormSchema = z.object({
-	uppercase_min: z.coerce.number().default(0).optional(),
-	lowercase_min: z.coerce.number().default(0).optional(),
-	numbers_min: z.coerce.number().default(0).optional(),
-	symbols_min: z.coerce.number().default(0).optional(),
-	min_length: z.coerce.number().default(8).optional(),
-	should_contain_unique_chars: z.boolean().default(false).optional(),
+	uppercase_min: z.coerce.number().default(0),
+	lowercase_min: z.coerce.number().default(0),
+	numbers_min: z.coerce.number().default(0),
+	symbols_min: z.coerce.number().default(0),
+	min_length: z.coerce.number().default(8),
+	should_contain_unique_chars: z.boolean().default(false),
 });
 type PasswordSettingsProps = {
 	csrfToken: string;
@@ -37,12 +37,12 @@ const PasswordSettings = ({ csrfToken }: PasswordSettingsProps) => {
 	
 	const { getSetting, loading, refetchSettings } = useSettings();
 
-	const passwordLowercaseMinSetting = getSetting(PASSWORD_LOWERCASE_MIN_SETTING);
-	const passwordUppercaseMinSetting = getSetting(PASSWORD_UPPERCASE_MIN_SETTING);
-	const passwordNumbersMinSetting = getSetting(PASSWORD_NUMBERS_MIN_SETTING);
-	const passwordSymbolsMinSetting = getSetting(PASSWORD_SYMBOLS_MIN_SETTING);
-	const passwordMinLengthSetting = getSetting(PASSWORD_MIN_LENGTH_SETTING);
-	const passwordUniqueCharsSetting = getSetting(PASSWORD_UNIQUE_CHARS_SETTING);
+	const passwordLowercaseMinSetting = getSetting(SETTING_NAMES.PASSWORD_LOWERCASE_MIN_SETTING);
+	const passwordUppercaseMinSetting = getSetting(SETTING_NAMES.PASSWORD_UPPERCASE_MIN_SETTING);
+	const passwordNumbersMinSetting = getSetting(SETTING_NAMES.PASSWORD_NUMBERS_MIN_SETTING);
+	const passwordSymbolsMinSetting = getSetting(SETTING_NAMES.PASSWORD_SYMBOLS_MIN_SETTING);
+	const passwordMinLengthSetting = getSetting(SETTING_NAMES.PASSWORD_MIN_LENGTH_SETTING);
+	const passwordUniqueCharsSetting = getSetting(SETTING_NAMES.PASSWORD_UNIQUE_CHARS_SETTING);
 
 	const { toast } = useToast();
 
@@ -85,44 +85,44 @@ const PasswordSettings = ({ csrfToken }: PasswordSettingsProps) => {
 			setIsLoading(true);
 			const settingsValues: (UnregisteredSetting & { settingName: string, settingValue: boolean | string | number | undefined })[] = [
 				{
-					settingName: passwordLowercaseMinSetting?.name || PASSWORD_LOWERCASE_MIN_SETTING,
+					settingName: passwordLowercaseMinSetting?.name || SETTING_NAMES.PASSWORD_LOWERCASE_MIN_SETTING,
 					settingValue: passwordLowercaseMinSetting?.value,
-					name: 'lowercase_min',
+					name: SETTING_NAMES.PASSWORD_LOWERCASE_MIN_SETTING,
 					value: values.lowercase_min,
 					data_type: 'number',
 				},
 				{
-					settingName: passwordUppercaseMinSetting?.name || PASSWORD_UPPERCASE_MIN_SETTING,
+					settingName: passwordUppercaseMinSetting?.name || SETTING_NAMES.PASSWORD_UPPERCASE_MIN_SETTING,
 					settingValue: passwordUppercaseMinSetting?.value,
-					name: 'uppercase_min',
+					name: SETTING_NAMES.PASSWORD_UPPERCASE_MIN_SETTING,
 					value: values.uppercase_min,
 					data_type: 'number',
 				},
 				{
-					settingName: passwordNumbersMinSetting?.name || PASSWORD_NUMBERS_MIN_SETTING,
+					settingName: passwordNumbersMinSetting?.name || SETTING_NAMES.PASSWORD_NUMBERS_MIN_SETTING,
 					settingValue: passwordNumbersMinSetting?.value,
-					name: 'numbers_min',
+					name: SETTING_NAMES.PASSWORD_NUMBERS_MIN_SETTING,
 					value: values.numbers_min,
 					data_type: 'number',
 				},
 				{
-					settingName: passwordSymbolsMinSetting?.name || PASSWORD_SYMBOLS_MIN_SETTING,
+					settingName: passwordSymbolsMinSetting?.name || SETTING_NAMES.PASSWORD_SYMBOLS_MIN_SETTING,
 					settingValue: passwordSymbolsMinSetting?.value,
-					name: 'symbols_min',
+					name: SETTING_NAMES.PASSWORD_SYMBOLS_MIN_SETTING,
 					value: values.symbols_min,
 					data_type: 'number',
 				},
 				{
-					settingName: passwordMinLengthSetting?.name || PASSWORD_MIN_LENGTH_SETTING,
+					settingName: passwordMinLengthSetting?.name || SETTING_NAMES.PASSWORD_MIN_LENGTH_SETTING,
 					settingValue: passwordMinLengthSetting?.value,
-					name: 'min_length',
+					name: SETTING_NAMES.PASSWORD_MIN_LENGTH_SETTING,
 					value: values.min_length,
 					data_type: 'number',
 				},
 				{
-					settingName: passwordUniqueCharsSetting?.name || PASSWORD_UNIQUE_CHARS_SETTING,
+					settingName: passwordUniqueCharsSetting?.name || SETTING_NAMES.PASSWORD_UNIQUE_CHARS_SETTING,
 					settingValue: passwordUniqueCharsSetting?.value,
-					name: 'should_contain_unique_chars',
+					name: SETTING_NAMES.PASSWORD_UNIQUE_CHARS_SETTING,
 					value: values.should_contain_unique_chars,
 					data_type: 'boolean',
 				},
@@ -133,7 +133,7 @@ const PasswordSettings = ({ csrfToken }: PasswordSettingsProps) => {
 					name: setting.settingName,
 					value: setting.value,
 					data_type: setting.data_type,
-				}));
+				})) as UnregisteredSetting[];
 			await updateSettings(settingsToUpdate, csrfToken);
 			await refetchSettings();
 		} catch (error) {

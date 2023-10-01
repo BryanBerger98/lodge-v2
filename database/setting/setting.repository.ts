@@ -3,14 +3,16 @@ import { FilterQuery } from 'mongoose';
 import { UpdateQueryOptions, newId } from '@/lib/database';
 import { ISetting, ISettingPopulated, UnregisteredSetting } from '@/types/setting.type';
 import { IUser } from '@/types/user.type';
-import { findDefaultSettingByName } from '@/utils/settings';
+import { SettingName, findDefaultSettingByName } from '@/utils/settings';
+
+import UserModel from '../user/user.model';
 
 import { CreateSettingDTO, UpdateSettingDTO } from './setting.dto';
-import SettingModel from './setting.model';
+import SettingModels from './setting.model';
 
-export const findSettingByName = async (name: string): Promise<ISetting | UnregisteredSetting | null> => {
+export const findSettingByName = async (name: SettingName): Promise<ISetting | UnregisteredSetting | null> => {
 	try {
-		const document = await SettingModel.findOne({ name });
+		const document = await SettingModels.default.findOne({ name });
 		if (!document) return findDefaultSettingByName(name) || null;
 		return document.toObject();
 	} catch (error) {
@@ -20,7 +22,7 @@ export const findSettingByName = async (name: string): Promise<ISetting | Unregi
 
 export const findSettings = async (query: FilterQuery<ISetting>): Promise<ISettingPopulated[]> => {
 	try {
-		const settings = await SettingModel
+		const settings = await SettingModels.default
 			.find(query)
 			.populate<{
 			created_by: IUser;
@@ -29,12 +31,12 @@ export const findSettings = async (query: FilterQuery<ISetting>): Promise<ISetti
 			{
 				path: 'created_by',
 				select: { password: 0 },
-				model: SettingModel,
+				model: UserModel,
 			},
 			{
 				path: 'updated_by',
 				select: { password: 0 },
-				model: SettingModel,
+				model: UserModel,
 			},
 		])
 			.lean({ virtuals: [ 'id' ] });
@@ -46,7 +48,8 @@ export const findSettings = async (query: FilterQuery<ISetting>): Promise<ISetti
 
 export const createSetting = async (settingToCreate: CreateSettingDTO): Promise<ISetting> => {
 	try {
-		const document = await SettingModel.create(settingToCreate);
+		const newSetting = new SettingModels[ settingToCreate.data_type ](settingToCreate);
+		const document = await newSetting.save();
 		return document.toObject();
 	} catch (error) {
 		throw error;
@@ -55,7 +58,7 @@ export const createSetting = async (settingToCreate: CreateSettingDTO): Promise<
 
 export const updateSetting = async (settingToUpdate: UpdateSettingDTO, options?: UpdateQueryOptions): Promise<ISetting | null> => {
 	try {
-		const document = await SettingModel.findOneAndUpdate({ name: settingToUpdate.name }, {
+		const document = await SettingModels.default.findOneAndUpdate({ name: settingToUpdate.name }, {
 			$set: {
 				...settingToUpdate,
 				updated_by: settingToUpdate.updated_by ? newId(settingToUpdate.updated_by) : settingToUpdate.updated_by, 

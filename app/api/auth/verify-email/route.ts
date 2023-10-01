@@ -11,14 +11,14 @@ import { setServerAuthGuard } from '@/utils/auth';
 import { sendAccountVerificationEmail } from '@/utils/email';
 import { buildError, sendError } from '@/utils/error';
 import { EMAIL_ALREADY_VERIFIED_ERROR, FORBIDDEN_ERROR, INTERNAL_ERROR, INVALID_TOKEN_ERROR, TOKEN_ALREADY_SENT_ERROR, TOKEN_EXPIRED_ERROR, TOKEN_NOT_FOUND_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
-import { USER_VERIFY_EMAIL_SETTING } from '@/utils/settings';
+import { SETTING_NAMES } from '@/utils/settings';
 
 export const GET = async () => {
 
 	try {
 		await connectToDatabase();
 
-		const userVerifyEmailSetting = await findSettingByName(USER_VERIFY_EMAIL_SETTING);
+		const userVerifyEmailSetting = await findSettingByName(SETTING_NAMES.USER_VERIFY_EMAIL_SETTING);
 
 		if (userVerifyEmailSetting && userVerifyEmailSetting.data_type === 'boolean' && !userVerifyEmailSetting.value) {
 			return sendError(buildError({
@@ -79,7 +79,7 @@ export const POST = async () => {
 	try {
 		await connectToDatabase();
 
-		const userVerifyEmailSetting = await findSettingByName(USER_VERIFY_EMAIL_SETTING);
+		const userVerifyEmailSetting = await findSettingByName(SETTING_NAMES.USER_VERIFY_EMAIL_SETTING);
 
 		if (userVerifyEmailSetting && userVerifyEmailSetting.data_type === 'boolean' && !userVerifyEmailSetting.value) {
 			return sendError(buildError({

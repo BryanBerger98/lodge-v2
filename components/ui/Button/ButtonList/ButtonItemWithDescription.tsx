@@ -9,13 +9,14 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
 	isLoading?: boolean;
 };
 
-const ButtonItemWithDescription = forwardRef<HTMLButtonElement, ButtonProps>(({ onClick, children, value, description, isLoading = false, ...rest }) => {
+const ButtonItemWithDescription = forwardRef<HTMLButtonElement, ButtonProps>(({ onClick, children, value, description, isLoading = false, disabled = false, ...rest }) => {
 
 	return (
 		<button
 			className={ cn('flex justify-between items-center border border-slate-200 first:rounded-t-md last:rounded-b-md text-sm py-2 px-4 hover:cursor-default [&:not(:first-child)]:-mt-[1px]', { 'hover:bg-secondary hover:cursor-pointer': onClick }) }
 			type="button"
 			{ ...rest }
+			disabled={ disabled || isLoading }
 		>
 			<span className="flex flex-col gap-0 items-start justify-center font-medium">
 				{ children }

@@ -6,8 +6,9 @@ import ButtonList from '@/components/ui/Button/ButtonList';
 import ButtonItem from '@/components/ui/Button/ButtonList/ButtonItem';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import useSettings from '@/context/settings/useSettings';
-import { BRAND_NAME_SETTING } from '@/utils/settings';
+import { SETTING_NAMES } from '@/utils/settings';
 
+import BrandLogoFormDialog from './Dialogs/BrandLogoFormDialog';
 import BrandNameFormDialog from './Dialogs/BrandNameFormDialog';
 
 const BrandSettingsForm = () => {
@@ -17,18 +18,19 @@ const BrandSettingsForm = () => {
 
 	const searchParams = useSearchParams();
 	const isBrandNameDialogOpen = searchParams.get('edit_setting') === 'brand-name';
+	const isBrandLogoDialogOpen = searchParams.get('edit_setting') === 'brand-logo';
 
 	const { getSetting, loading } = useSettings();
 
-	const brandNameSetting = getSetting(BRAND_NAME_SETTING);
+	const brandNameSetting = getSetting(SETTING_NAMES.BRAND_NAME_SETTING);
 
 	const handleClick = () => {
 		console.log('Hello world');
 	};
 
-	const handleClickBrandName = () => { 
+	const handleClickSettingButton = (settingName: string) => () => { 
 		const params = new URLSearchParams(searchParams);
-		params.set('edit_setting', 'brand-name');
+		params.set('edit_setting', settingName);
 		router.push(`${ pathname }?${ params.toString() }`);
 	};
 
@@ -39,25 +41,34 @@ const BrandSettingsForm = () => {
 					<CardTitle>Brand</CardTitle>
 					<CardDescription>Add the name and the logo of your business.</CardDescription>
 				</CardHeader>
-				<CardContent>
+				<CardContent className="flex flex-col gap-4">
+					<ButtonList>
+						<ButtonItem
+							value="Upload a logo"
+							onClick={ handleClickSettingButton('brand-logo') }
+						>
+							Logo
+						</ButtonItem>
+					</ButtonList>
 					<ButtonList>
 						<ButtonItem
 							isLoading={ loading === 'pending' }
-							value={ brandNameSetting?.data_type === 'string' && brandNameSetting?.value !== undefined ? brandNameSetting.value : 'Lodge' }
-							onClick={ handleClickBrandName }
+							value={ brandNameSetting?.data_type === 'string' ? brandNameSetting.value : '' }
+							onClick={ handleClickSettingButton('brand-name') }
 						>
 							Brand name
 						</ButtonItem>
 						<ButtonItem
-							value="Upload a logo"
+							value="Upload a favicon"
 							onClick={ handleClick }
 						>
-							Logo
+							Favicon
 						</ButtonItem>
 					</ButtonList>
 				</CardContent>
 			</Card>
 			<BrandNameFormDialog isOpen={ isBrandNameDialogOpen } />
+			<BrandLogoFormDialog isOpen={ isBrandLogoDialogOpen } />
 		</>
 	);
 };

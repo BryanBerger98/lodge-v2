@@ -16,7 +16,7 @@ import useCsrf from '@/context/csrf/useCsrf';
 import useSettings from '@/context/settings/useSettings';
 import { updateSettings } from '@/services/settings.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
-import { BRAND_NAME_SETTING } from '@/utils/settings';
+import { SETTING_NAMES } from '@/utils/settings';
 
 type BrandNameFormDialogProps = {
 	isOpen: boolean;
@@ -35,7 +35,7 @@ const BrandNameFormDialog = ({ isOpen }: BrandNameFormDialogProps) => {
 	const { csrfToken } = useCsrf();
 	const { getSetting, loading, refetchSettings } = useSettings();
 
-	const brandNameSetting = getSetting(BRAND_NAME_SETTING);
+	const brandNameSetting = getSetting(SETTING_NAMES.BRAND_NAME_SETTING);
 
 	const { toast } = useToast();
 
@@ -68,12 +68,13 @@ const BrandNameFormDialog = ({ isOpen }: BrandNameFormDialogProps) => {
 			setIsLoading(true);
 			await updateSettings([
 				{
-					name: BRAND_NAME_SETTING,
+					name: SETTING_NAMES.BRAND_NAME_SETTING,
 					value: brand_name,
 					data_type: 'string',
 				},
 			], csrfToken);
 			refetchSettings();
+			handleClose();
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
 			toast({

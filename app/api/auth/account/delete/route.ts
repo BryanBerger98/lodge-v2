@@ -10,14 +10,14 @@ import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { FORBIDDEN_ERROR, INTERNAL_ERROR, PASSWORD_REQUIRED_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
 import { verifyPassword } from '@/utils/password.util';
-import { USER_ACCOUNT_DELETION_SETTING } from '@/utils/settings';
+import { SETTING_NAMES } from '@/utils/settings';
 
 export const POST = async (request: NextRequest) => {
 	try {
 
 		await connectToDatabase();
 
-		const userAccountDeletionSetting = await findSettingByName(USER_ACCOUNT_DELETION_SETTING);
+		const userAccountDeletionSetting = await findSettingByName(SETTING_NAMES.USER_ACCOUNT_DELETION_SETTING);
 
 		if (userAccountDeletionSetting && userAccountDeletionSetting.data_type === 'boolean' && !userAccountDeletionSetting.value) {
 			return sendError(buildError({

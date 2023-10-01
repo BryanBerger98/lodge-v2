@@ -16,11 +16,11 @@ import useSettings from '@/context/settings/useSettings';
 import { updateSettings } from '@/services/settings.service';
 import { UnregisteredSetting } from '@/types/setting.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
-import { GOOGLE_AUTH_SETTING, MAGIC_LINK_SIGNIN_SETTING } from '@/utils/settings';
+import { SETTING_NAMES } from '@/utils/settings';
 
 const providersSettingsFormSchema = z.object({
-	magic_link_signin: z.boolean().default(true).optional(),
-	google_auth: z.boolean().default(false).optional(), 
+	magic_link_signin: z.boolean().default(true),
+	google_auth: z.boolean().default(false), 
 });
 
 type ProvidersSettingsProps = {
@@ -34,8 +34,8 @@ const ProvidersSettings = ({ csrfToken, isGoogleAuthEnvProvided }: ProvidersSett
 
 	const { getSetting, loading, refetchSettings } = useSettings();;
 
-	const magicLinkSigninSetting = getSetting(MAGIC_LINK_SIGNIN_SETTING);
-	const googleAuthSetting = getSetting(GOOGLE_AUTH_SETTING);
+	const magicLinkSigninSetting = getSetting(SETTING_NAMES.MAGIC_LINK_SIGNIN_SETTING);
+	const googleAuthSetting = getSetting(SETTING_NAMES.GOOGLE_AUTH_SETTING);
 
 	const { toast } = useToast();
 
@@ -63,14 +63,14 @@ const ProvidersSettings = ({ csrfToken, isGoogleAuthEnvProvided }: ProvidersSett
 			setIsLoading(true);
 			const settingsValues: (UnregisteredSetting & { settingName: string, settingValue: boolean | string | number | undefined })[] = [
 				{
-					settingName: magicLinkSigninSetting?.name || MAGIC_LINK_SIGNIN_SETTING,
+					settingName: magicLinkSigninSetting?.name || SETTING_NAMES.MAGIC_LINK_SIGNIN_SETTING,
 					settingValue: magicLinkSigninSetting?.value,
 					name: 'magic_link_signin',
 					value: magic_link_signin,
 					data_type: 'boolean',
 				},
 				{
-					settingName: googleAuthSetting?.name || GOOGLE_AUTH_SETTING,
+					settingName: googleAuthSetting?.name || SETTING_NAMES.GOOGLE_AUTH_SETTING,
 					settingValue: googleAuthSetting?.value,
 					name: 'google_auth',
 					value: google_auth,
@@ -83,7 +83,7 @@ const ProvidersSettings = ({ csrfToken, isGoogleAuthEnvProvided }: ProvidersSett
 					name: setting.settingName,
 					value: setting.value,
 					data_type: setting.data_type,
-				}));
+				})) as UnregisteredSetting[];
 			await updateSettings(settingsToUpdate, csrfToken);
 			await refetchSettings();
 		} catch (error) {

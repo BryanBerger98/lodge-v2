@@ -3,9 +3,9 @@
 import { ReactNode, useCallback, useEffect, useMemo, useReducer } from 'react';
 
 import useFetchSettings from '@/hooks/settings/useFetchSettings';
-import { IUpdateSetting, ISetting } from '@/types/setting.type';
+import { IUpdateSetting, ISetting, UnregisteredSetting } from '@/types/setting.type';
 import { LoadingStateError, LoadingState } from '@/types/utils/loading.type';
-import { DEFAULT_SETTINGS, findDefaultSettingByName } from '@/utils/settings';
+import { DEFAULT_SETTINGS, findDefaultSettingByName, SettingName, SettingNameType } from '@/utils/settings';
 
 import { SetSettingsStatePayload, SETTINGS_ERROR_ACTION, SETTINGS_IDLE_ACTION, SETTINGS_PENDING_ACTION, SETTINGS_SET_STATE_ACTION, SETTINGS_UPDATE_ACTION } from './settings.actions';
 import settingsReducer, { SettingsState } from './settings.reducer';
@@ -63,11 +63,11 @@ const SettingsProvider = ({ settings: initialSettingsState = [], children }: Set
 		}
 	}, []);
 
-	const getSetting = useCallback((name: string) => {
-		const settingFromState = state.settings.find(setting => setting.name === name);
+	const getSetting = useCallback(<T extends SettingName>(name: T): UnregisteredSetting<SettingNameType<T>> | undefined => {
+		const settingFromState: UnregisteredSetting<SettingNameType<T>> | undefined = state.settings.find(setting => setting.name === name) as UnregisteredSetting<SettingNameType<T>> | undefined;
 		if (settingFromState) return settingFromState;
 		const defaultSetting = findDefaultSettingByName(name);
-		return defaultSetting;
+		return defaultSetting as UnregisteredSetting<SettingNameType<T>> | undefined;
 	}, [ state ]);
 
 	useEffect(() => {

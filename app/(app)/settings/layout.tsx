@@ -11,7 +11,7 @@ import { findSettingByName } from '@/database/setting/setting.repository';
 import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
 import { setServerAuthGuard } from '@/utils/auth';
-import { SHARE_WITH_ADMIN_SETTING } from '@/utils/settings';
+import { SETTING_NAMES } from '@/utils/settings';
 
 type SettingsLayoutProps = {
 	children: ReactNode;
@@ -25,7 +25,7 @@ const SettingsLayout = async ({ children }: SettingsLayoutProps) => {
 
 	await connectToDatabase();
 
-	const shareWithAdminSetting = await findSettingByName(SHARE_WITH_ADMIN_SETTING);
+	const shareWithAdminSetting = await findSettingByName(SETTING_NAMES.SHARE_WITH_ADMIN_SETTING);
 
 	const rolesWhiteList: ('admin' | 'owner')[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ 'owner', 'admin' ] : [ 'owner' ];
 
