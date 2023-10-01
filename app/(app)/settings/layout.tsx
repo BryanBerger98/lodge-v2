@@ -5,8 +5,10 @@ import { ReactNode } from 'react';
 
 import PageTitle from '@/components/layout/Header/PageTitle';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import CsrfProvider from '@/context/csrf/csrf.provider';
 import SettingsProvider from '@/context/settings/settings.provider';
 import { findSettingByName } from '@/database/setting/setting.repository';
+import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
 import { setServerAuthGuard } from '@/utils/auth';
 import { SHARE_WITH_ADMIN_SETTING } from '@/utils/settings';
@@ -19,6 +21,8 @@ const SettingsLayout = async ({ children }: SettingsLayoutProps) => {
 
 	const [ , subpath ] = headers().get('x-pathname')?.split('/').filter(el => el) || [];
 
+	const csrfToken = await getCsrfToken(headers());
+
 	await connectToDatabase();
 
 	const shareWithAdminSetting = await findSettingByName(SHARE_WITH_ADMIN_SETTING);
@@ -29,8 +33,6 @@ const SettingsLayout = async ({ children }: SettingsLayoutProps) => {
 		rolesWhiteList,
 		redirect: '/', 
 	});
-
-	//  className="px-0 lg:px-2 bg-transparent flex-row lg:flex-col !justify-start w-full overflow-x-scroll lg:overflow-x-auto lg:min-w-[220px] items-start !gap-0 text-slate-900"
 
 	return (
 		<>
@@ -98,13 +100,16 @@ const SettingsLayout = async ({ children }: SettingsLayoutProps) => {
 							className="gap-2 items-center w-full justify-start"
 							value="email"
 							variant="secondary"
-							disabled
-						><Star size="16" /> Branding
+							asChild
+						>
+							<Link href="/settings/branding"><Star size="16" /> Branding</Link>
 						</TabsTrigger>
 					</TabsList>
 				</Tabs>
 				<SettingsProvider>
-					{ children }
+					<CsrfProvider csrfToken={ csrfToken }>
+						{ children }
+					</CsrfProvider>
 				</SettingsProvider>
 			</div>
 		</>

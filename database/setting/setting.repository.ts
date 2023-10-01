@@ -1,16 +1,17 @@
 import { FilterQuery } from 'mongoose';
 
 import { UpdateQueryOptions, newId } from '@/lib/database';
-import { ISetting, ISettingPopulated } from '@/types/setting.type';
+import { ISetting, ISettingPopulated, UnregisteredSetting } from '@/types/setting.type';
 import { IUser } from '@/types/user.type';
+import { findDefaultSettingByName } from '@/utils/settings';
 
 import { CreateSettingDTO, UpdateSettingDTO } from './setting.dto';
 import SettingModel from './setting.model';
 
-export const findSettingByName = async (name: string): Promise<ISetting | null> => {
+export const findSettingByName = async (name: string): Promise<ISetting | UnregisteredSetting | null> => {
 	try {
 		const document = await SettingModel.findOne({ name });
-		if (!document) return null;
+		if (!document) return findDefaultSettingByName(name) || null;
 		return document.toObject();
 	} catch (error) {
 		throw error;

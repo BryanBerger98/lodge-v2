@@ -24,6 +24,25 @@ export const MAGIC_LINK_SIGNIN_SETTING = 'magic_link_signin';
 export const GOOGLE_AUTH_SETTING = 'google_auth';
 export const APPLE_AUTH_SETTING = 'apple_auth';
 
+// Branding settings
+export const BRAND_NAME_SETTING = 'brand_name';
+export const BRAND_LOGO_SETTING = 'brand_logo';
+export const BRAND_FAVICON_SETTING = 'brand_favicon';
+export const BRAND_PRIMARY_COLOR_SETTING = 'brand_primary_color';
+export const BRAND_SECONDARY_COLOR_SETTING = 'brand_secondary_color';
+export const BRAND_WARNING_COLOR_SETTING = 'brand_warning_color';
+export const BRAND_DANGER_COLOR_SETTING = 'brand_danger_color';
+export const BRAND_INFO_COLOR_SETTING = 'brand_info_color';
+export const BRAND_SUCCESS_COLOR_SETTING = 'brand_success_color';
+export const BRAND_LIGHT_COLOR_SETTING = 'brand_light_color';
+export const BRAND_DARK_COLOR_SETTING = 'brand_dark_color';
+// export const BRAND_LINK_COLOR_SETTING = 'brand_link_color';
+// export const BRAND_BACKGROUND_COLOR_SETTING = 'brand_background_color';
+// export const BRAND_FONT_SETTING = 'brand_font';
+// export const BRAND_FONT_SIZE_SETTING = 'brand_font_size';
+// export const BRAND_FONT_WEIGHT_SETTING = 'brand_font_weight';
+// export const BRAND_FONT_COLOR_SETTING = 'brand_font_color';
+
 export const DEFAULT_SETTINGS: UnregisteredSetting[] = [
 	{
 		name: SHARE_WITH_ADMIN_SETTING,
@@ -64,6 +83,11 @@ export const DEFAULT_SETTINGS: UnregisteredSetting[] = [
 		name: APPLE_AUTH_SETTING,
 		value: false,
 		data_type: 'boolean',
+	},
+	{
+		name: BRAND_NAME_SETTING,
+		value: 'Lodge',
+		data_type: 'string',
 	},
 ];
 

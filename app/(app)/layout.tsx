@@ -10,7 +10,7 @@ import authOptions from '@/lib/auth';
 import { connectToDatabase } from '@/lib/database';
 import { SHARE_WITH_ADMIN_SETTING, USER_VERIFY_EMAIL_SETTING } from '@/utils/settings';
 
-const DynamicSidebar = dynamic(() => import('@/components/layout/Sidebar'));
+const Sidebar = dynamic(() => import('@/components/layout/Sidebar'));
 
 type AppLayoutProps = {
 	children: ReactNode;
@@ -42,9 +42,15 @@ const AppLayout = async ({ children }: AppLayoutProps) => {
 
 	const hasSettingsAccess = currentUser?.role === 'owner' || (shareWithAdminSetting?.data_type === 'boolean' && shareWithAdminSetting?.value);
 
+	const brandNameSetting = await findSettingByName('brand_name');
+	const bandName: string = brandNameSetting && brandNameSetting.data_type === 'string' ? brandNameSetting.value : 'Lodge';
+
 	return (
 		<HeaderProvider>
-			<DynamicSidebar hasSettingsAccess={ hasSettingsAccess } />
+			<Sidebar
+				brandName={ bandName }
+				hasSettingsAccess={ hasSettingsAccess }
+			/>
 			<div className="ml-0 md:ml-[200px] container !w-auto p-4 lg:p-8">
 				{ children }
 			</div>

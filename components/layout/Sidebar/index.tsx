@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Layers, Menu, Settings, Users, X } from 'lucide-react';
+import { Home, Menu, Settings, Users, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -21,9 +21,10 @@ import useHeader from '../Header/useHeader';
 type SidebarProps = {
 	className?: string;
 	hasSettingsAccess: boolean;
+	brandName: string;
 }
 
-const Sidebar = ({ className, hasSettingsAccess }: SidebarProps) => {
+const Sidebar = ({ className, hasSettingsAccess, brandName }: SidebarProps) => {
 
 	const [ isOpen, setIsOpen ] = useState(false);
 
@@ -55,7 +56,7 @@ const Sidebar = ({ className, hasSettingsAccess }: SidebarProps) => {
 					<Menu size="24" />
 				</Button>
 				<div className="flex flex-col">
-					<p className="text-xl font-medium flex gap-2 items-center">{ headerTitle ? headerTitle : <><Layers size="24" /> Lodge</> }</p>
+					<p className="text-xl font-medium flex gap-2 items-center">{ headerTitle ? headerTitle : brandName }</p>
 					{ !isProductionEnv(process.env.NEXT_PUBLIC_ENVIRONMENT) ? <Badge variant="destructive">{ process.env.NEXT_PUBLIC_ENVIRONMENT }</Badge> : null }
 				</div>
 				{
@@ -74,7 +75,7 @@ const Sidebar = ({ className, hasSettingsAccess }: SidebarProps) => {
 						<div className="h-full border-r-[1px] border-slate-200 px-6 flex flex-col gap-8">
 							<div className="flex gap-4 justify-between items-center">
 								<div className="flex flex-col gap-2">
-									<p className="text-3xl font-medium flex gap-2 items-center"><Layers size="32" /> Lodge</p>
+									<p className="text-3xl font-medium flex gap-2 items-center">{ brandName } </p>
 									{
 										!isProductionEnv(process.env.NEXT_PUBLIC_ENVIRONMENT) ?
 											<Badge
