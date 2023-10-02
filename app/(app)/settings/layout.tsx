@@ -91,14 +91,14 @@ const SettingsLayout = async ({ children }: SettingsLayoutProps) => {
 						</TabsTrigger>
 						<TabsTrigger
 							className="gap-2 items-center w-full justify-start"
-							value="email"
+							value="website"
 							variant="secondary"
 							disabled
 						><Globe size="16" /> Website
 						</TabsTrigger>
 						<TabsTrigger
 							className="gap-2 items-center w-full justify-start"
-							value="email"
+							value="branding"
 							variant="secondary"
 							asChild
 						>

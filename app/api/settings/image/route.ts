@@ -33,13 +33,11 @@ const uploadPhotoFile = async (currentUser: IUserPopulated, photoFile?: Blob | n
 				});
 			}
 	
-			if (setting && setting.value) {
-				if (typeof setting.value === 'string' || (typeof setting.value !== 'string' && setting.value.id)) {
-					const oldFile = await findFileById((typeof setting.value === 'string' ? setting.value : setting.value.id) as string);
-					if (oldFile) {
-						await deleteFileFromKey(oldFile.key);
-						await deleteFileById(oldFile.id);
-					}
+			if (setting && setting.value && typeof setting.value !== 'string' && setting.value.id) {
+				const oldFile = await findFileById(setting.value.id);
+				if (oldFile) {
+					await deleteFileFromKey(oldFile.key);
+					await deleteFileById(oldFile.id);
 				}
 			}
 
@@ -79,7 +77,7 @@ export const PUT = async (request: NextRequest) => {
 
 		const { name, value } = UpdateImageSettingSchema.parse(Object.fromEntries(formData.entries()));
 
-		const settingData = await findSettingByName(name); // Should retreive the populated setting with file image
+		const settingData = await findSettingByName(name);
 
 		const photoFileData = await uploadPhotoFile(currentUser, value, settingData);
 

@@ -2,9 +2,10 @@ import { z } from 'zod';
 
 import { UpdateImageSettingSchema } from '@/app/api/settings/_schemas/update-image.setting.schema';
 import fetcher, { FetcherOptions } from '@/lib/fetcher';
-import { ISetting, IUnregisteredSetting } from '@/types/setting.type';
+import { ISetting, ISettingPopulated, IUnregisteredSetting } from '@/types/setting.type';
 import { IUser } from '@/types/user.type';
 import { objectToFormData } from '@/utils/object.utils';
+import { SettingImageName } from '@/utils/settings';
 import { buildQueryUrl } from '@/utils/url.util';
 
 export type ShareSettings = {
@@ -61,6 +62,18 @@ export const updateImageSetting = async (setting: z.infer<typeof UpdateImageSett
 		const data = await fetcher('/api/settings/image', {
 			method: 'PUT',
 			body: formData,
+			csrfToken,
+		});
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const deleteImageSetting = async (setting_name: SettingImageName, csrfToken: string): Promise<ISettingPopulated | null> => {
+	try {
+		const data = await fetcher(`/api/settings/image/${ setting_name }`, {
+			method: 'DELETE',
 			csrfToken,
 		});
 		return data;

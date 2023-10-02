@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import useSettings from '@/context/settings/useSettings';
 import { SETTING_NAMES } from '@/utils/settings';
 
+import BrandFaviconFormDialog from './Dialogs/BrandFaviconFormDialog';
 import BrandLogoFormDialog from './Dialogs/BrandLogoFormDialog';
 import BrandNameFormDialog from './Dialogs/BrandNameFormDialog';
 
@@ -20,15 +21,13 @@ const BrandSettingsForm = () => {
 	const searchParams = useSearchParams();
 	const isBrandNameDialogOpen = searchParams.get('edit_setting') === 'brand-name';
 	const isBrandLogoDialogOpen = searchParams.get('edit_setting') === 'brand-logo';
+	const isBrandFaviconDialogOpen = searchParams.get('edit_setting') === 'brand-favicon';
 
 	const { getSetting, loading } = useSettings();
 
 	const brandNameSetting = getSetting(SETTING_NAMES.BRAND_NAME_SETTING);
 	const brandLogoSetting = getSetting(SETTING_NAMES.BRAND_LOGO_SETTING);
-
-	const handleClick = () => {
-		//;
-	};
+	const brandFaviconSetting = getSetting(SETTING_NAMES.BRAND_FAVICON_SETTING);
 
 	const handleClickSettingButton = (settingName: string) => () => { 
 		const params = new URLSearchParams(searchParams);
@@ -73,8 +72,22 @@ const BrandSettingsForm = () => {
 							Brand name
 						</ButtonItem>
 						<ButtonItem
-							value="Upload a favicon"
-							onClick={ handleClick }
+							isLoading={ loading === 'pending' }
+							value={
+								loading === 'pending' ? '' : brandFaviconSetting && brandFaviconSetting.value && brandFaviconSetting.value.url ?
+									(
+										<div className="w-4 h-4 relative">
+											<Image
+												alt="Brand logo"
+												className="object-contain"
+												src={ brandFaviconSetting.value.url }
+												fill
+											/>
+										</div>
+									)
+									: 'Upload a favicon'
+							}
+							onClick={ handleClickSettingButton('brand-favicon') }
 						>
 							Favicon
 						</ButtonItem>
@@ -83,6 +96,7 @@ const BrandSettingsForm = () => {
 			</Card>
 			<BrandNameFormDialog isOpen={ isBrandNameDialogOpen } />
 			<BrandLogoFormDialog isOpen={ isBrandLogoDialogOpen } />
+			<BrandFaviconFormDialog isOpen={ isBrandFaviconDialogOpen } />
 		</>
 	);
 };

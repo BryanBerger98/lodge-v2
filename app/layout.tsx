@@ -15,10 +15,19 @@ export const generateMetadata = async (): Promise<Metadata> => {
 	await connectToDatabase();
 
 	const brandNameSetting = await findSettingByName(SETTING_NAMES.BRAND_NAME_SETTING);
+	const brandFaviconSetting = await findSettingByName(SETTING_NAMES.BRAND_FAVICON_SETTING);
 
 	return {
 	  title: brandNameSetting && brandNameSetting.data_type === 'string' ? brandNameSetting.value : 'Lodge',
 	  description: 'Next.js starter app',
+	  icons: [
+			{
+				url: brandFaviconSetting?.value?.url || '/lodge.svg',
+				rel: 'icon',
+				sizes: '16x16',
+				type: brandFaviconSetting?.value?.mimetype || 'image/svg+xml',
+			},
+	  ],
 	};
 };
 

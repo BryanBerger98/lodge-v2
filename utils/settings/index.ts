@@ -46,6 +46,8 @@ export const SettingImageNamesTuple = [
 	SETTING_NAMES.BRAND_FAVICON_SETTING,
 ] as const;
 
+export type SettingImageName = typeof SettingImageNamesTuple[ number ];
+
 export const SettingNamesTuple = [
 	SETTING_NAMES.SHARE_WITH_ADMIN_SETTING,
 	SETTING_NAMES.OWNER_SETTING,
@@ -164,6 +166,11 @@ export const DEFAULT_SETTINGS: IUnregisteredSettingPopulated[] = [
 	},
 	{
 		name: SETTING_NAMES.BRAND_LOGO_SETTING,
+		value: null,
+		data_type: 'image',
+	},
+	{
+		name: SETTING_NAMES.BRAND_FAVICON_SETTING,
 		value: null,
 		data_type: 'image',
 	},
