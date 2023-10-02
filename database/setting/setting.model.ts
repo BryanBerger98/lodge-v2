@@ -3,6 +3,9 @@ import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 
 import { ISettingBase, ISettingString, ISettingBoolean, ISettingDate, ISettingImage, ISettingNumber, ISettingObjectId } from '@/types/setting.type';
 
+import FileModel from '../file/file.model';
+import UserModel from '../user/user.model';
+
 interface ISettingBaseDocument extends Omit<ISettingBase, 'created_by' | 'updated_by'> {
 	created_by: Types.ObjectId | null;
 	updated_by: Types.ObjectId | null;
@@ -64,6 +67,7 @@ const dateSettingSchema = new Schema<ISettingDateDocument>({
 const imageSettingSchema = new Schema<ISettingImageDocument>({
 	value: {
 		type: Schema.Types.ObjectId,
+		ref: FileModel,
 		required: true,
 	},
 }, { discriminatorKey: 'data_type' });
@@ -87,6 +91,7 @@ const settingSchema = new Schema<ISettingBaseDocument>({
 		type: String,
 		required: true,
 		unique: true,
+		index: true,
 	},
 	value: {
 		type: Schema.Types.Mixed,
@@ -95,10 +100,12 @@ const settingSchema = new Schema<ISettingBaseDocument>({
 	created_by: {
 		type: Types.ObjectId,
 		default: null,
+		ref: UserModel,
 	},
 	updated_by: {
 		type: Types.ObjectId,
 		default: null,
+		ref: UserModel,
 	},
 }, {
 	timestamps: {

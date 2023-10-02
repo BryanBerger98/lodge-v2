@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import ButtonList from '@/components/ui/Button/ButtonList';
@@ -23,9 +24,10 @@ const BrandSettingsForm = () => {
 	const { getSetting, loading } = useSettings();
 
 	const brandNameSetting = getSetting(SETTING_NAMES.BRAND_NAME_SETTING);
+	const brandLogoSetting = getSetting(SETTING_NAMES.BRAND_LOGO_SETTING);
 
 	const handleClick = () => {
-		console.log('Hello world');
+		//;
 	};
 
 	const handleClickSettingButton = (settingName: string) => () => { 
@@ -44,10 +46,22 @@ const BrandSettingsForm = () => {
 				<CardContent className="flex flex-col gap-4">
 					<ButtonList>
 						<ButtonItem
-							value="Upload a logo"
+							isLoading={ loading === 'pending' }
+							value={ loading === 'pending' ? '' : brandLogoSetting && brandLogoSetting.value && brandLogoSetting.value.url ? 'Update the logo' : 'Upload a logo' } 
 							onClick={ handleClickSettingButton('brand-logo') }
 						>
-							Logo
+							{
+								brandLogoSetting && brandLogoSetting.value?.url ?
+									<div className="w-32 h-10 relative">
+										<Image
+											alt="Brand logo"
+											className="object-contain"
+											src={ brandLogoSetting.value.url }
+											fill
+										/>
+									</div>
+									: 'Logo'
+							}
 						</ButtonItem>
 					</ButtonList>
 					<ButtonList>

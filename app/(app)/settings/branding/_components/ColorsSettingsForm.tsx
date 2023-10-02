@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 const ColorsSettingsForm = () => {
 
 	const handleClick = () => {
-		console.log('Hello world');
+		//
 	};
 
 	return (

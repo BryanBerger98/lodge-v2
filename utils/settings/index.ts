@@ -1,11 +1,11 @@
-import { UnregisteredSetting } from '@/types/setting.type';
-
 // export const BRAND_LINK_COLOR_SETTING = 'brand_link_color';
 // export const BRAND_BACKGROUND_COLOR_SETTING = 'brand_background_color';
 // export const BRAND_FONT_SETTING = 'brand_font';
 // export const BRAND_FONT_SIZE_SETTING = 'brand_font_size';
 // export const BRAND_FONT_WEIGHT_SETTING = 'brand_font_weight';
 // export const BRAND_FONT_COLOR_SETTING = 'brand_font_color';
+
+import { IUnregisteredSettingPopulated } from '@/types/setting.type';
 
 export const SETTING_NAMES = {
 	// --- SHARE SETTINGS ---
@@ -40,6 +40,38 @@ export const SETTING_NAMES = {
 	BRAND_LIGHT_COLOR_SETTING: 'brand_light_color',
 	BRAND_DARK_COLOR_SETTING: 'brand_dark_color',
 } as const;
+
+export const SettingImageNamesTuple = [
+	SETTING_NAMES.BRAND_LOGO_SETTING,
+	SETTING_NAMES.BRAND_FAVICON_SETTING,
+] as const;
+
+export const SettingNamesTuple = [
+	SETTING_NAMES.SHARE_WITH_ADMIN_SETTING,
+	SETTING_NAMES.OWNER_SETTING,
+	SETTING_NAMES.NEW_USERS_SIGNUP_SETTING,
+	SETTING_NAMES.USER_VERIFY_EMAIL_SETTING,
+	SETTING_NAMES.USER_ACCOUNT_DELETION_SETTING,
+	SETTING_NAMES.PASSWORD_UPPERCASE_MIN_SETTING,
+	SETTING_NAMES.PASSWORD_LOWERCASE_MIN_SETTING,
+	SETTING_NAMES.PASSWORD_NUMBERS_MIN_SETTING,
+	SETTING_NAMES.PASSWORD_SYMBOLS_MIN_SETTING,
+	SETTING_NAMES.PASSWORD_MIN_LENGTH_SETTING,
+	SETTING_NAMES.PASSWORD_UNIQUE_CHARS_SETTING,
+	SETTING_NAMES.MAGIC_LINK_SIGNIN_SETTING,
+	SETTING_NAMES.GOOGLE_AUTH_SETTING,
+	SETTING_NAMES.APPLE_AUTH_SETTING,
+	SETTING_NAMES.BRAND_NAME_SETTING,
+	SETTING_NAMES.BRAND_PRIMARY_COLOR_SETTING,
+	SETTING_NAMES.BRAND_SECONDARY_COLOR_SETTING,
+	SETTING_NAMES.BRAND_WARNING_COLOR_SETTING,
+	SETTING_NAMES.BRAND_DANGER_COLOR_SETTING,
+	SETTING_NAMES.BRAND_INFO_COLOR_SETTING,
+	SETTING_NAMES.BRAND_SUCCESS_COLOR_SETTING,
+	SETTING_NAMES.BRAND_LIGHT_COLOR_SETTING,
+	SETTING_NAMES.BRAND_DARK_COLOR_SETTING,
+	...SettingImageNamesTuple,
+] as const;
 
 export const SETTING_TYPES = {
 	BOOLEAN: 'boolean',
@@ -79,13 +111,12 @@ export const SETTING_NAME_TYPE = {
 } as const;
 
 export type SettingName = typeof SETTING_NAMES[ keyof typeof SETTING_NAMES ];
-export type SettingNames = keyof typeof SETTING_NAMES;
-export type SettingTypes = typeof SETTING_TYPES;
+
 export type SettingNameTypes = typeof SETTING_NAME_TYPE;
 
 export type SettingNameType<T = SettingName> = T extends keyof SettingNameTypes ? SettingNameTypes[ T ] : never;
 
-export const DEFAULT_SETTINGS: UnregisteredSetting[] = [
+export const DEFAULT_SETTINGS: IUnregisteredSettingPopulated[] = [
 	{
 		name: SETTING_NAMES.SHARE_WITH_ADMIN_SETTING,
 		value: false,
@@ -138,7 +169,6 @@ export const DEFAULT_SETTINGS: UnregisteredSetting[] = [
 	},
 ];
 
-export const findDefaultSettingByName = <T extends SettingName>(settingName: T): UnregisteredSetting<SettingNameType<T>> | undefined => {
-	return DEFAULT_SETTINGS.find(({ name }) => name === settingName) as UnregisteredSetting<SettingNameType<T>> | undefined;
-	// return SETTINGS[ settingName ];
+export const findDefaultSettingByName = <T extends SettingName>(settingName: T): IUnregisteredSettingPopulated<SettingNameType<T>> | undefined => {
+	return DEFAULT_SETTINGS.find(({ name }) => name === settingName) as IUnregisteredSettingPopulated<SettingNameType<T>> | undefined;
 };

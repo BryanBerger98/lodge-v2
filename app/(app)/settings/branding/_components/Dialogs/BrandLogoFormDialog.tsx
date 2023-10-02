@@ -1,13 +1,14 @@
-import { Loader2, Save } from 'lucide-react';
+import { ImageIcon, Loader2, Save, Trash, Upload } from 'lucide-react';
+import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { ChangeEventHandler, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
 import useCsrf from '@/context/csrf/useCsrf';
 import useSettings from '@/context/settings/useSettings';
-import { updateSettings } from '@/services/settings.service';
+import { updateImageSetting } from '@/services/settings.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
 import { SETTING_NAMES } from '@/utils/settings';
 
@@ -41,13 +42,11 @@ const BrandLogoFormDialog = ({ isOpen }: BrandLogoFormDialogProps) => {
 		try {
 			if (!csrfToken) return;
 			setIsLoading(true);
-			await updateSettings([
+			await updateImageSetting(
 				{
-					name: SETTING_NAMES.BRAND_NAME_SETTING,
-					value: '',
-					data_type: 'string',
-				},
-			], csrfToken);
+					name: SETTING_NAMES.BRAND_LOGO_SETTING,
+					value: fileToUpload,
+				}, csrfToken);
 			refetchSettings();
 			handleClose();
 		} catch (error) {
@@ -62,6 +61,14 @@ const BrandLogoFormDialog = ({ isOpen }: BrandLogoFormDialogProps) => {
 		}
 	};
 
+	const handleUpdateFile: ChangeEventHandler<HTMLInputElement> = (event) => {
+		const { files } = event.target;
+		if (files) {
+			const file = files.item(0);
+			setFileToUpload(file);
+		}
+	};
+
 	return (
 		<Dialog
 			open={ isOpen }
@@ -73,12 +80,48 @@ const BrandLogoFormDialog = ({ isOpen }: BrandLogoFormDialogProps) => {
 					<DialogDescription>Set up a name for your app.</DialogDescription>
 				</DialogHeader>
 				<div className="grid gap-4 py-4">
+					<label className="rounded-lg border bg-card text-card-foreground shadow-sm mb-4 w-full flex min-h-[178px] relative group justify-center items-center text-slate-100">
+						{
+							fileToUpload || (brandLogoSetting && brandLogoSetting.value && brandLogoSetting.value.url) ? (
+								<Image
+									alt="Brand logo"
+									className="rounded-lg object-contain p-4"
+									src={ fileToUpload ? URL.createObjectURL(fileToUpload) : brandLogoSetting?.value?.url || '' }
+									fill
+								/>
+							) : <ImageIcon size="128" />
+						}
+						<div className="transition-opacity duration-100 ease-linear opacity-0 group-hover:opacity-100 bg-slate-900/30 flex justify-center flex-col gap-4 items-center absolute inset-0 text-white cursor-pointer rounded-lg">
+							<Upload size="32" />
+							<p className="text-lg font-medium">Upload a picture</p>
+						</div>
+						<input
+							accept="image/png, image/gif, image/jpeg, image/webp"
+							disabled={ loading === 'pending' }
+							type="file"
+							hidden
+							onChange={ handleUpdateFile }
+						/>
+					</label>
 				</div>
 				<DialogFooter>
+					{
+						brandLogoSetting && brandLogoSetting.value && brandLogoSetting.value.url ?
+							<Button
+								className="gap-2"
+								type="button"
+								variant="destructive"
+							>
+								<Trash size="16" />
+								Delete logo
+							</Button>
+							: null
+					}
 					<Button
 						className="gap-2"
-						disabled={ isLoading }
-						type="submit"
+						disabled={ isLoading || !fileToUpload }
+						type="button"
+						onClick={ handleSubmit }
 					>
 						{ 
 							isLoading ?

@@ -1,6 +1,7 @@
 'use client';
 
 import { Home, Menu, Settings, Users, X } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -22,9 +23,10 @@ type SidebarProps = {
 	className?: string;
 	hasSettingsAccess: boolean;
 	brandName: string;
+	logoUrl?: string;
 }
 
-const Sidebar = ({ className, hasSettingsAccess, brandName }: SidebarProps) => {
+const Sidebar = ({ className, hasSettingsAccess, brandName, logoUrl }: SidebarProps) => {
 
 	const [ isOpen, setIsOpen ] = useState(false);
 
@@ -57,7 +59,15 @@ const Sidebar = ({ className, hasSettingsAccess, brandName }: SidebarProps) => {
 				</Button>
 				<div className="flex flex-col">
 					<p className="text-xl font-medium flex gap-2 items-center">{ headerTitle ? headerTitle : brandName }</p>
-					{ !isProductionEnv(process.env.NEXT_PUBLIC_ENVIRONMENT) ? <Badge variant="destructive">{ process.env.NEXT_PUBLIC_ENVIRONMENT }</Badge> : null }
+					{
+						!isProductionEnv(process.env.NEXT_PUBLIC_ENVIRONMENT) ?
+							<Badge
+								className="w-fit mx-auto"
+								variant="destructive"
+							>{ process.env.NEXT_PUBLIC_ENVIRONMENT }
+							</Badge>
+							: null
+					}
 				</div>
 				{
 					buttonProps ?
@@ -75,7 +85,20 @@ const Sidebar = ({ className, hasSettingsAccess, brandName }: SidebarProps) => {
 						<div className="h-full border-r-[1px] border-slate-200 px-6 flex flex-col gap-8">
 							<div className="flex gap-4 justify-between items-center">
 								<div className="flex flex-col gap-2">
-									<p className="text-3xl font-medium flex gap-2 items-center">{ brandName } </p>
+									<Link href="/">
+										{
+											logoUrl ?
+												<div className="w-32 h-10 relative">
+													<Image
+														alt="Brand logo"
+														className="object-contain"
+														src={ logoUrl }
+														fill
+													/>
+												</div>
+												: <p className="text-3xl font-medium flex gap-2 items-center">{ brandName } </p>
+										}
+									</Link>
 									{
 										!isProductionEnv(process.env.NEXT_PUBLIC_ENVIRONMENT) ?
 											<Badge
