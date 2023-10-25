@@ -1,15 +1,18 @@
 import { Schema, model, models, Model, Types } from 'mongoose';
 import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 
-import { AuthProviders, IUserWithPassword, UserRolesWithOwner } from '@/types/user.type';
+import { AuthProvider } from '@/schemas/auth-provider';
+import { RoleWithOwner } from '@/schemas/role.schema';
+import { UserWithPassword } from '@/schemas/user';
+import { Gender } from '@/schemas/user/gender.schema';
 
 import FileModel from '../file/file.model';
 
-interface IUserWithPasswordDocument extends Omit<IUserWithPassword, 'created_by' | 'updated_by' | 'photo'> {
+interface IUserWithPasswordDocument extends Omit<UserWithPassword, 'created_by' | 'updated_by' | 'photo'> {
 	created_by: Types.ObjectId | null;
 	updated_by: Types.ObjectId | null;
 	photo: Types.ObjectId | null;
-}
+};
 
 const userSchema = new Schema<IUserWithPasswordDocument>({
 	email: {
@@ -24,13 +27,27 @@ const userSchema = new Schema<IUserWithPasswordDocument>({
 		type: Boolean,
 		default: false,
 	},
-	password: { type: String },
 	role: {
 		type: String,
-		enum: UserRolesWithOwner,
-		default: 'user',
+		enum: RoleWithOwner,
+		default: RoleWithOwner.USER,
+	},
+	first_name: { type: String },
+	last_name: { type: String },
+	birth_date: {
+		type: Date,
+		default: null, 
 	},
 	username: { type: String },
+	display_name: {
+		type: String,
+		default: null, 
+	},
+	gender: {
+		type: String,
+		enum: Gender,
+		default: Gender.UNSPECIFIED,
+	},
 	phone_number: { type: String },
 	photo: {
 		type: Schema.Types.ObjectId,
@@ -43,8 +60,8 @@ const userSchema = new Schema<IUserWithPasswordDocument>({
 	},
 	provider_data: {
 		type: String,
-		enum: AuthProviders,
-		default: 'email',
+		enum: AuthProvider,
+		default: AuthProvider.EMAIL,
 	},
 	updated_by: {
 		type: Schema.Types.ObjectId,
@@ -60,7 +77,10 @@ const userSchema = new Schema<IUserWithPasswordDocument>({
 		type: Date,
 		default: null,
 	},
-	has_password: { type: Boolean },
+	password: {
+		type: String,
+		default: null, 
+	},
 }, {
 	timestamps: {
 		createdAt: 'created_at',
@@ -73,11 +93,7 @@ userSchema.virtual('id').get(function getVirtualId () {
 	return this._id.toHexString();
 });
 
-userSchema.set('toObject', {
-	virtuals: true,
-	flattenObjectIds: true,
-	versionKey: false, 
-});
+userSchema.set('toObject', { virtuals: true });
 userSchema.set('toJSON', {
 	virtuals: true,
 	flattenObjectIds: true,

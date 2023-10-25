@@ -1,44 +1,29 @@
 import { FilterQuery } from 'mongoose';
 
 import { newId, UpdateQueryOptions, QueryOptions } from '@/lib/database';
-import { IFile } from '@/types/file.type';
-import { IUser, IUserPopulated, IUserPopulatedWithPassword, IUserWithPassword } from '@/types/user.type';
+import { User, UserPopulated, UserPopulatedWithPassword, UserWithPassword } from '@/schemas/user';
 import { Optional } from '@/types/utils';
 
 import { CreateUserDTO, UpdateUserDTO } from './user.dto';
 import UserModel from './user.model';
+import { populateUser } from './utils/populate-user';
 
-export interface IUserDocument extends IUser, Document {}
+export interface UserDocument extends User, Document {}
 
-export const findUsers = async (searchRequest: FilterQuery<IUser>, options?: QueryOptions<IUser>): Promise<IUserPopulated[]> => {
+export const findUsers = async (searchRequest: FilterQuery<User>, options?: QueryOptions<User>): Promise<UserPopulated[]> => {
 	try {
 		const users = await UserModel.find(searchRequest, { password: 0 })
-			.populate<{
-				created_by: IUser;
-				updated_by: IUser;
-				photo: IFile | null;
-			}>([
-				{
-					path: 'created_by',
-					select: { password: 0 },
-				},
-				{
-					path: 'updated_by',
-					select: { password: 0 },
-				},
-				{ path: 'photo' },
-			])
+			.populate(populateUser)
 			.skip(options?.skip || 0)
 			.limit(options?.limit || 1000)
-			.sort(options?.sort || {})
-			.lean({ virtuals: [ 'id', 'created_by.id', 'updated_by.id' ] });
-		return users;
+			.sort(options?.sort || {});
+		return users.map(user => user.toJSON());
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const findUsersCount = async (searchRequest: FilterQuery<IUser>): Promise<number> => {
+export const findUsersCount = async (searchRequest: FilterQuery<User>): Promise<number> => {
 	try {
 		const count = await UserModel.find(searchRequest, { password: 0 }).count();
 		return count;
@@ -47,7 +32,7 @@ export const findUsersCount = async (searchRequest: FilterQuery<IUser>): Promise
 	}
 };
 
-export const findOwnerUser = async (): Promise<IUser | null> => {
+export const findOwnerUser = async (): Promise<User | null> => {
 	try {
 		const ownerUser = await UserModel.findOne({ role: 'owner' }, { password: 0 });
 		return ownerUser?.toObject() || null;
@@ -56,76 +41,39 @@ export const findOwnerUser = async (): Promise<IUser | null> => {
 	}
 };
 
-export const findUserByEmail = async (email: string): Promise<IUser | null> => {
+export const findUserByEmail = async (email: string): Promise<User | null> => {
 	try {
 		const serializedEmail = email.toLowerCase().trim();
-		const userDoc = await UserModel.findOne({ email: serializedEmail }, { password: 0 });
-		const user: Optional<IUserWithPassword, 'password'> | null = userDoc?.toObject() || null;
-		if (user) {
-			delete user.password;
-		}
-		return user;
+		const document = await UserModel.findOne({ email: serializedEmail }, { password: 0 });
+		return document?.toJSON() || null;
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const findUserWithPasswordByEmail = async (email: string): Promise<IUserPopulatedWithPassword | null> => {
+export const findUserWithPasswordByEmail = async (email: string): Promise<UserPopulatedWithPassword | null> => {
 	try {
 		const serializedEmail = email.toLowerCase().trim();
-		const user = await UserModel.findOne({ email: serializedEmail })
-			.populate<{
-			created_by: IUser;
-			updated_by: IUser;
-			photo: IFile | null;
-		}>([
-			{
-				path: 'created_by',
-				select: { password: 0 },
-				model: UserModel,
-			},
-			{
-				path: 'updated_by',
-				select: { password: 0 },
-				model: UserModel,
-			},
-			{ path: 'photo' },
-		]);
-		return user?.toObject() || null;
+		const document = await UserModel.findOne({ email: serializedEmail }).populate(populateUser);
+		return document?.toJSON() || null;
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const findUserById = async (user_id: string): Promise<IUserPopulated | null> => {
+export const findUserById = async (user_id: string): Promise<UserPopulated | null> => {
 	try {
 		const document = await UserModel
 			.findById(newId(user_id), { password: 0 })
-			.populate<{
-			created_by: IUser;
-			updated_by: IUser;
-			photo: IFile | null;
-		}>([
-			{
-				path: 'created_by',
-				select: { password: 0 },
-				model: UserModel,
-			},
-			{
-				path: 'updated_by',
-				select: { password: 0 },
-				model: UserModel,
-			},
-			{ path: 'photo' },
-		]);
+			.populate(populateUser);
 		if (!document) return null;
-		return document.toObject();
+		return document.toJSON();
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const findUserWithPasswordById = async (user_id: string): Promise<IUserWithPassword | null> => {
+export const findUserWithPasswordById = async (user_id: string): Promise<UserWithPassword | null> => {
 	try {
 		const user = await UserModel.findById(newId(user_id));
 		return user?.toObject() || null;
@@ -134,34 +82,17 @@ export const findUserWithPasswordById = async (user_id: string): Promise<IUserWi
 	}
 };
 
-export const createUser = async (userToCreate: CreateUserDTO): Promise<IUserPopulated> => {
+export const createUser = async (userData: CreateUserDTO): Promise<UserPopulated> => {
 	try {
-		const createdUserDoc = await UserModel.create({ ...userToCreate });
-		const document = await createdUserDoc
-			.populate<{
-			created_by: IUser;
-			updated_by: IUser;
-			photo: IFile | null;
-		}>([
-			{
-				path: 'created_by',
-				select: { password: 0 },
-				model: UserModel,
-			},
-			{
-				path: 'updated_by',
-				select: { password: 0 },
-				model: UserModel,
-			},
-			{ path: 'photo' },
-		]);
-		return document.toObject();
+		const createdDocument = await UserModel.create({ ...userData });
+		const document = await createdDocument.populate(populateUser);
+		return document.toJSON();
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const updateUser = async (userToUpdate: UpdateUserDTO, options?: UpdateQueryOptions): Promise<IUserPopulated | null> => {
+export const updateUser = async (userToUpdate: UpdateUserDTO, options?: UpdateQueryOptions): Promise<UserPopulated | null> => {
 	try {
 		await UserModel.findByIdAndUpdate(newId(userToUpdate.id), {
 			$set: {
@@ -169,25 +100,7 @@ export const updateUser = async (userToUpdate: UpdateUserDTO, options?: UpdateQu
 				photo: userToUpdate.photo ? newId(userToUpdate.photo) : undefined, 
 			}, 
 		}, { new: options?.newDocument || false });
-		const document = await UserModel
-			.findById(newId(userToUpdate.id), { password: 0 })
-			.populate<{
-			created_by: IUser;
-			updated_by: IUser;
-			photo: IFile | null;
-		}>([
-			{
-				path: 'created_by',
-				select: { password: 0 },
-				model: UserModel,
-			},
-			{
-				path: 'updated_by',
-				select: { password: 0 },
-				model: UserModel,
-			},
-			{ path: 'photo' },
-		]);
+		const document = await UserModel.findById(newId(userToUpdate.id), { password: 0 }).populate(populateUser);
 		if (!document) return null;
 		return document.toObject();
 	} catch (error) {
@@ -210,10 +123,10 @@ export const updateUserPassword = async (user_id: string, newHashedPassword: str
 	}
 };
 
-export const deleteUserById = async (user_id: string): Promise<IUser | null> => {
+export const deleteUserById = async (user_id: string): Promise<User | null> => {
 	try {
 		const deletedUserDoc = await UserModel.findByIdAndDelete(newId(user_id));
-		const deletedUser: Optional<IUserWithPassword, 'password'> | null = deletedUserDoc?.toObject() || null;
+		const deletedUser: Optional<UserWithPassword, 'password'> | null = deletedUserDoc?.toObject() || null;
 		if (deletedUser) {
 			delete deletedUser.password;
 		}

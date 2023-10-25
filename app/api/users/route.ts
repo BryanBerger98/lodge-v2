@@ -6,6 +6,7 @@ import { createFile, deleteFileById, findFileById, updateFileURL } from '@/datab
 import { createUser, findUserByEmail, findUserById, findUsers, findUsersCount, updateUser } from '@/database/user/user.repository';
 import { deleteFileFromKey, getFieldSignedURL, uploadImageToS3 } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
+import { AuthProvider } from '@/schemas/auth-provider';
 import { IUser, IUserPopulated } from '@/types/user.type';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendBuiltErrorWithSchemaValidation } from '@/utils/error';
@@ -102,7 +103,7 @@ export const POST = async (request: NextRequest) => {
 			username,
 			role,
 			phone_number,
-			provider_data: 'email',
+			provider_data: AuthProvider.EMAIL,
 			created_by: currentUser.id,
 			photo: photoFileData?.id || null,
 			is_disabled,

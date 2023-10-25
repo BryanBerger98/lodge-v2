@@ -1,0 +1,11 @@
+import { z } from 'zod';
+
+export enum Gender {
+	MALE = 'male',
+	FEMALE = 'female',
+	UNSPECIFIED = 'unspecified',
+};
+
+export const GenderSchema = z.nativeEnum(Gender);
+
+// const Genders = [ Gender.MALE, Gender.FEMALE, Gender.UNSPECIFIED ] as const;
