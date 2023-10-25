@@ -1,6 +1,11 @@
+import { z } from 'zod';
+
+import { UpdateImageSettingSchema } from '@/app/api/settings/_schemas/update-image.setting.schema';
 import fetcher, { FetcherOptions } from '@/lib/fetcher';
-import { ISetting, UnregisteredSetting } from '@/types/setting.type';
+import { ISetting, ISettingPopulated, IUnregisteredSetting } from '@/types/setting.type';
 import { IUser } from '@/types/user.type';
+import { objectToFormData } from '@/utils/object.utils';
+import { SettingImageName } from '@/utils/settings';
 import { buildQueryUrl } from '@/utils/url.util';
 
 export type ShareSettings = {
@@ -37,7 +42,7 @@ export const fetchSettings = async (options?: FetchSettingsOptions): Promise<ISe
 	}
 };
 
-export const updateSettings = async (settings: UnregisteredSetting[], csrfToken: string): Promise<{ message: string }> => {
+export const updateSettings = async (settings: IUnregisteredSetting[], csrfToken: string): Promise<{ message: string }> => {
 	try {
 		const data = await fetcher('/api/settings', {
 			method: 'PUT',
@@ -51,7 +56,33 @@ export const updateSettings = async (settings: UnregisteredSetting[], csrfToken:
 	}
 };
 
-export const updateShareSettings = async (settings: UnregisteredSetting[], csrfToken: string, password: string): Promise<{ message: string }> => {
+export const updateImageSetting = async (setting: z.infer<typeof UpdateImageSettingSchema>, csrfToken: string): Promise<{ message: string }> => {
+	try {
+		const formData = objectToFormData({ ...setting });
+		const data = await fetcher('/api/settings/image', {
+			method: 'PUT',
+			body: formData,
+			csrfToken,
+		});
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const deleteImageSetting = async (setting_name: SettingImageName, csrfToken: string): Promise<ISettingPopulated | null> => {
+	try {
+		const data = await fetcher(`/api/settings/image/${ setting_name }`, {
+			method: 'DELETE',
+			csrfToken,
+		});
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const updateShareSettings = async (settings: IUnregisteredSetting[], csrfToken: string, password: string): Promise<{ message: string }> => {
 	try {
 		const data = await fetcher('/api/settings/share', {
 			method: 'PUT',

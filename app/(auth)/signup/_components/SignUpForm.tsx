@@ -28,7 +28,7 @@ import GoogleAuthButton from '../../_components/ProvidersButtons/GoogleAuthButto
 
 type SignUpFormProperties = {
 	csrfToken: string;
-	userVerifyEmailSetting: ISetting | null;
+	userVerifyEmailSetting: ISetting | UnregisteredSetting | null;
 	passwordRules: {
 		uppercase_min: number;
 		lowercase_min: number;

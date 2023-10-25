@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
-import { APPLE_AUTH_SETTING, GOOGLE_AUTH_SETTING, NEW_USERS_SIGNUP_SETTING, PASSWORD_LOWERCASE_MIN_SETTING, PASSWORD_MIN_LENGTH_SETTING, PASSWORD_NUMBERS_MIN_SETTING, PASSWORD_SYMBOLS_MIN_SETTING, PASSWORD_UNIQUE_CHARS_SETTING, PASSWORD_UPPERCASE_MIN_SETTING, USER_VERIFY_EMAIL_SETTING, findDefaultSettingByName } from '@/utils/settings';
+import { SETTING_NAMES, findDefaultSettingByName } from '@/utils/settings';
 
 
 const DynamicSignUpForm = dynamic(() => import('./_components/SignUpForm'));
@@ -15,25 +15,25 @@ const SignUpPage = async () => {
 
 	await connectToDatabase();
 
-	const newUserSignUpSetting = await findSettingByName(NEW_USERS_SIGNUP_SETTING);
+	const newUserSignUpSetting = await findSettingByName(SETTING_NAMES.NEW_USERS_SIGNUP_SETTING);
 	
 	if (newUserSignUpSetting && newUserSignUpSetting.data_type === 'boolean' && !newUserSignUpSetting.value) {
 		redirect('/signin');
 	}
 
-	const userVerifyEmailSetting = await findSettingByName(USER_VERIFY_EMAIL_SETTING);
+	const userVerifyEmailSetting = await findSettingByName(SETTING_NAMES.USER_VERIFY_EMAIL_SETTING);
 
-	const passwordLowercaseMinSetting = await findSettingByName(PASSWORD_LOWERCASE_MIN_SETTING);
-	const passwordUppercaseMinSetting = await findSettingByName(PASSWORD_UPPERCASE_MIN_SETTING);
-	const passwordNumbersMinSetting = await findSettingByName(PASSWORD_NUMBERS_MIN_SETTING);
-	const passwordSymbolsMinSetting = await findSettingByName(PASSWORD_SYMBOLS_MIN_SETTING);
-	const passwordMinLengthSetting = await findSettingByName(PASSWORD_MIN_LENGTH_SETTING);
-	const passwordUniqueCharsSetting = await findSettingByName(PASSWORD_UNIQUE_CHARS_SETTING);
+	const passwordLowercaseMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_LOWERCASE_MIN_SETTING);
+	const passwordUppercaseMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_UPPERCASE_MIN_SETTING);
+	const passwordNumbersMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_NUMBERS_MIN_SETTING);
+	const passwordSymbolsMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_SYMBOLS_MIN_SETTING);
+	const passwordMinLengthSetting = await findSettingByName(SETTING_NAMES.PASSWORD_MIN_LENGTH_SETTING);
+	const passwordUniqueCharsSetting = await findSettingByName(SETTING_NAMES.PASSWORD_UNIQUE_CHARS_SETTING);
 
-	const googleAuthSetting = await findSettingByName(GOOGLE_AUTH_SETTING);
-	const defaultGoogleAuthSetting = await findDefaultSettingByName(GOOGLE_AUTH_SETTING);
-	const appleAuthSetting = await findSettingByName(APPLE_AUTH_SETTING);
-	const defaultAppleAuthSetting = await findDefaultSettingByName(APPLE_AUTH_SETTING);
+	const googleAuthSetting = await findSettingByName(SETTING_NAMES.GOOGLE_AUTH_SETTING);
+	const defaultGoogleAuthSetting = await findDefaultSettingByName(SETTING_NAMES.GOOGLE_AUTH_SETTING);
+	const appleAuthSetting = await findSettingByName(SETTING_NAMES.APPLE_AUTH_SETTING);
+	const defaultAppleAuthSetting = await findDefaultSettingByName(SETTING_NAMES.APPLE_AUTH_SETTING);
 
 	return (
 		<div className="min-h-screen flex justify-center items-center">

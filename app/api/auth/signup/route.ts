@@ -10,7 +10,7 @@ import { sendAccountVerificationEmail } from '@/utils/email';
 import { buildError, sendError } from '@/utils/error';
 import { FORBIDDEN_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_ALREADY_EXISTS_ERROR } from '@/utils/error/error-codes';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules, hashPassword } from '@/utils/password.util';
-import { NEW_USERS_SIGNUP_SETTING, PASSWORD_LOWERCASE_MIN_SETTING, PASSWORD_MIN_LENGTH_SETTING, PASSWORD_NUMBERS_MIN_SETTING, PASSWORD_SYMBOLS_MIN_SETTING, PASSWORD_UNIQUE_CHARS_SETTING, PASSWORD_UPPERCASE_MIN_SETTING } from '@/utils/settings';
+import { SETTING_NAMES } from '@/utils/settings';
 
 import { SignUpUserSchema } from './_schemas/signup-user.schema';
 
@@ -19,7 +19,7 @@ export const POST = async (request: NextRequest) => {
 	try {
 		await connectToDatabase();
 
-		const newUserSignUpSetting = await findSettingByName(NEW_USERS_SIGNUP_SETTING);
+		const newUserSignUpSetting = await findSettingByName(SETTING_NAMES.NEW_USERS_SIGNUP_SETTING);
 
 		if (newUserSignUpSetting && newUserSignUpSetting.data_type === 'boolean' && !newUserSignUpSetting.value) {
 			return sendError(buildError({
@@ -29,12 +29,12 @@ export const POST = async (request: NextRequest) => {
 			}));
 		}
 
-		const passwordLowercaseMinSetting = await findSettingByName(PASSWORD_LOWERCASE_MIN_SETTING);
-		const passwordUppercaseMinSetting = await findSettingByName(PASSWORD_UPPERCASE_MIN_SETTING);
-		const passwordNumbersMinSetting = await findSettingByName(PASSWORD_NUMBERS_MIN_SETTING);
-		const passwordSymbolsMinSetting = await findSettingByName(PASSWORD_SYMBOLS_MIN_SETTING);
-		const passwordMinLengthSetting = await findSettingByName(PASSWORD_MIN_LENGTH_SETTING);
-		const passwordUniqueCharsSetting = await findSettingByName(PASSWORD_UNIQUE_CHARS_SETTING);
+		const passwordLowercaseMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_LOWERCASE_MIN_SETTING);
+		const passwordUppercaseMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_UPPERCASE_MIN_SETTING);
+		const passwordNumbersMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_NUMBERS_MIN_SETTING);
+		const passwordSymbolsMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_SYMBOLS_MIN_SETTING);
+		const passwordMinLengthSetting = await findSettingByName(SETTING_NAMES.PASSWORD_MIN_LENGTH_SETTING);
+		const passwordUniqueCharsSetting = await findSettingByName(SETTING_NAMES.PASSWORD_UNIQUE_CHARS_SETTING);
 
 		const passwordRules = {
 			uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,

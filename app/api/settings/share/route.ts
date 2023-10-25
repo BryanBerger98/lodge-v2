@@ -7,7 +7,7 @@ import { connectToDatabase } from '@/lib/database';
 import { authenticateUserWithPassword, setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
-import { OWNER_SETTING, SHARE_WITH_ADMIN_SETTING } from '@/utils/settings';
+import { SETTING_NAMES } from '@/utils/settings';
 
 import { UpdateShareSettingsSchema } from './_schemas/update-share-settings.schema';
 
@@ -17,8 +17,8 @@ export const GET = async () => {
 
 		await setServerAuthGuard({ rolesWhiteList: [ 'owner' ] });
 
-		const shareWithAdminSetting = await findSettingByName(SHARE_WITH_ADMIN_SETTING);
-		const ownerSetting = await findSettingByName(OWNER_SETTING);
+		const shareWithAdminSetting = await findSettingByName(SETTING_NAMES.SHARE_WITH_ADMIN_SETTING);
+		const ownerSetting = await findSettingByName(SETTING_NAMES.OWNER_SETTING);
 
 		const ownerUser = await findOwnerUser();
 
@@ -33,12 +33,12 @@ export const GET = async () => {
 		return NextResponse.json({
 			settings: {
 				shareWithAdmin: shareWithAdminSetting ?? {
-					name: SHARE_WITH_ADMIN_SETTING,
+					name: SETTING_NAMES.SHARE_WITH_ADMIN_SETTING,
 					value: false,
 					data_type: 'boolean',
 				},
 				owner: ownerSetting ?? {
-					name: OWNER_SETTING,
+					name: SETTING_NAMES.OWNER_SETTING,
 					value: ownerUser.id,
 					data_type: 'objectId',
 				},
@@ -73,7 +73,7 @@ export const PUT = async (request: NextRequest) => {
 
 		await authenticateUserWithPassword(currentUser, password);
 
-		const ownerSetting = settingsToUpdate.find(setting => setting.name === OWNER_SETTING);
+		const ownerSetting = settingsToUpdate.find(setting => setting.name === SETTING_NAMES.OWNER_SETTING);
 
 		if (ownerSetting?.value) {
 			const prevOwnerUser = await findOwnerUser();

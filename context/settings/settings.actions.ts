@@ -1,4 +1,4 @@
-import { IUpdateSetting } from '@/types/setting.type';
+import { IUpdateUnregisteredSettingPopulated } from '@/types/setting.type';
 
 import { SettingsState } from './settings.reducer';
 
@@ -14,7 +14,7 @@ type SetSettingsStateAction = {
 	payload: SetSettingsStatePayload;
 }
 
-export type UpdateSettingsPayload = IUpdateSetting[];
+export type UpdateSettingsPayload = IUpdateUnregisteredSettingPopulated[];
 type UpdateSettingsAction = {
 	type: typeof SETTINGS_UPDATE_ACTION;
 	payload: UpdateSettingsPayload;

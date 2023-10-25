@@ -4,7 +4,7 @@ import { findSettingByName } from '@/database/setting/setting.repository';
 import { findUserById, findUserByEmail } from '@/database/user/user.repository';
 import { buildError } from '@/utils/error';
 import { FORBIDDEN_ERROR } from '@/utils/error/error-codes';
-import { MAGIC_LINK_SIGNIN_SETTING, findDefaultSettingByName } from '@/utils/settings';
+import { SETTING_NAMES, findDefaultSettingByName } from '@/utils/settings';
 
 import { connectToDatabase } from '../database';
 
@@ -64,8 +64,8 @@ const authOptions: NextAuthOptions = {
 				}
 
 				if (account?.provider === 'email') {
-					const registeredMagicLinkSignInSetting = await findSettingByName(MAGIC_LINK_SIGNIN_SETTING);
-					const defaultMagicLinkSignInSetting = findDefaultSettingByName(MAGIC_LINK_SIGNIN_SETTING);
+					const registeredMagicLinkSignInSetting = await findSettingByName(SETTING_NAMES.MAGIC_LINK_SIGNIN_SETTING);
+					const defaultMagicLinkSignInSetting = findDefaultSettingByName(SETTING_NAMES.MAGIC_LINK_SIGNIN_SETTING);
 
 					const magicLinkSignInSetting = registeredMagicLinkSignInSetting || defaultMagicLinkSignInSetting || null;
 

@@ -21,7 +21,7 @@ import { fetchUsers } from '@/services/users.service';
 import { UnregisteredSetting } from '@/types/setting.type';
 import { IUser } from '@/types/user.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
-import { OWNER_SETTING, SHARE_WITH_ADMIN_SETTING } from '@/utils/settings';
+import { SETTING_NAMES } from '@/utils/settings';
 
 const shareSettingsFormSchema = z.object({
 	share_with_admin: z.boolean().default(false).optional(),
@@ -43,8 +43,8 @@ const ShareSettings = ({ csrfToken, ownerUser }: ShareSettingsProps) => {
 	const { getSetting, loading, refetchSettings } = useSettings();
 	const { currentUser, fetchCurrentUser } = useAuth();
 
-	const shareWithAdminSetting = getSetting(SHARE_WITH_ADMIN_SETTING);
-	const ownerSetting = getSetting(OWNER_SETTING);
+	const shareWithAdminSetting = getSetting(SETTING_NAMES.SHARE_WITH_ADMIN_SETTING);
+	const ownerSetting = getSetting(SETTING_NAMES.OWNER_SETTING);
 
 	const { toast } = useToast();
 
@@ -120,15 +120,15 @@ const ShareSettings = ({ csrfToken, ownerUser }: ShareSettingsProps) => {
 			if ((owner && owner !== ownerUser?.id.toString()) || (owner && owner !== ownerSetting?.value)) {
 				settingsToUpdate.push({
 					id: ownerSetting?.id,
-					name: ownerSetting?.name || OWNER_SETTING,
+					name: ownerSetting?.name || SETTING_NAMES.OWNER_SETTING,
 					value: owner,
-					data_type: 'objectId',
+					data_type: 'object_id',
 				});
 			}
 			if (share_with_admin !== undefined && share_with_admin !== shareWithAdminSetting?.value) {
 				settingsToUpdate.push({
 					id: shareWithAdminSetting?.id,
-					name: shareWithAdminSetting?.name || SHARE_WITH_ADMIN_SETTING,
+					name: shareWithAdminSetting?.name || SETTING_NAMES.SHARE_WITH_ADMIN_SETTING,
 					value: share_with_admin || false,
 					data_type: 'boolean',
 				});
@@ -138,7 +138,7 @@ const ShareSettings = ({ csrfToken, ownerUser }: ShareSettingsProps) => {
 			}
 			await updateShareSettings(settingsToUpdate, csrfToken, password);
 			await refetchSettings();
-			if (settingsToUpdate.find(({ name }) => name === OWNER_SETTING)) {
+			if (settingsToUpdate.find(({ name }) => name === SETTING_NAMES.OWNER_SETTING)) {
 				await fetchCurrentUser();
 			}
 		} catch (error) {

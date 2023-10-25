@@ -8,7 +8,7 @@ import { connectToDatabase } from '@/lib/database';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { INTERNAL_ERROR, INVALID_INPUT_ERROR } from '@/utils/error/error-codes';
-import { OWNER_SETTING, SHARE_WITH_ADMIN_SETTING } from '@/utils/settings';
+import { SETTING_NAMES } from '@/utils/settings';
 
 import { FetchSettingsSchema } from './_schemas/fetch-settings.schema';
 import { UpdateSettingsSchema } from './_schemas/update-settings.schema';
@@ -18,7 +18,7 @@ export const PUT = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		const shareWithAdminSetting = await findSettingByName(SHARE_WITH_ADMIN_SETTING);
+		const shareWithAdminSetting = await findSettingByName(SETTING_NAMES.SHARE_WITH_ADMIN_SETTING);
 
 		const rolesWhiteList: ('admin' | 'owner')[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ 'owner', 'admin' ] : [ 'owner' ];
 
@@ -32,7 +32,7 @@ export const PUT = async (request: NextRequest) => {
 			return NextResponse.json({ message: 'Nothing to update.' });
 		}
 
-		const settingsToUpdate = settings.filter(setting => setting.name !== OWNER_SETTING && setting.name !== SHARE_WITH_ADMIN_SETTING);
+		const settingsToUpdate = settings.filter(setting => setting.name !== SETTING_NAMES.OWNER_SETTING && setting.name !== SETTING_NAMES.SHARE_WITH_ADMIN_SETTING);
 		
 		for (const setting of settingsToUpdate) {
 			await updateSetting({

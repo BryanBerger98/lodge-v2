@@ -16,12 +16,12 @@ import useSettings from '@/context/settings/useSettings';
 import { updateSettings } from '@/services/settings.service';
 import { UnregisteredSetting } from '@/types/setting.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
-import { NEW_USERS_SIGNUP_SETTING, USER_ACCOUNT_DELETION_SETTING, USER_VERIFY_EMAIL_SETTING } from '@/utils/settings';
+import { SETTING_NAMES } from '@/utils/settings';
 
 const usersSettingsFormSchema = z.object({
-	can_new_user_signup: z.boolean().default(true).optional(),
-	should_verify_email: z.boolean().default(true).optional(),
-	can_user_delete_account: z.boolean().default(true).optional(),
+	can_new_user_signup: z.boolean().default(true),
+	should_verify_email: z.boolean().default(true),
+	can_user_delete_account: z.boolean().default(true),
 });
 
 type UsersManagementSettingsProps = {
@@ -34,9 +34,9 @@ const UsersManagementSettings = ({ csrfToken }: UsersManagementSettingsProps) =>
 
 	const { getSetting, loading, refetchSettings } = useSettings();
 
-	const newUserSignupSetting = getSetting(NEW_USERS_SIGNUP_SETTING);
-	const userVerifyEmailSetting = getSetting(USER_VERIFY_EMAIL_SETTING);
-	const userAccountDeletionSetting = getSetting(USER_ACCOUNT_DELETION_SETTING);
+	const newUserSignupSetting = getSetting(SETTING_NAMES.NEW_USERS_SIGNUP_SETTING);
+	const userVerifyEmailSetting = getSetting(SETTING_NAMES.USER_VERIFY_EMAIL_SETTING);
+	const userAccountDeletionSetting = getSetting(SETTING_NAMES.USER_ACCOUNT_DELETION_SETTING);
 
 	const { toast } = useToast();
 
@@ -70,23 +70,23 @@ const UsersManagementSettings = ({ csrfToken }: UsersManagementSettingsProps) =>
 			setIsLoading(true);
 			const settingsValues: (UnregisteredSetting & { settingName: string, settingValue: boolean | string | number | undefined })[] = [
 				{
-					settingName: newUserSignupSetting?.name || NEW_USERS_SIGNUP_SETTING,
+					settingName: newUserSignupSetting?.name || SETTING_NAMES.NEW_USERS_SIGNUP_SETTING,
 					settingValue: newUserSignupSetting?.value,
-					name: 'can_new_user_signup',
+					name: SETTING_NAMES.NEW_USERS_SIGNUP_SETTING,
 					value: can_new_user_signup,
 					data_type: 'boolean',
 				},
 				{
-					settingName: userVerifyEmailSetting?.name || USER_VERIFY_EMAIL_SETTING,
+					settingName: userVerifyEmailSetting?.name || SETTING_NAMES.USER_VERIFY_EMAIL_SETTING,
 					settingValue: userVerifyEmailSetting?.value,
-					name: 'should_verify_email',
+					name: SETTING_NAMES.USER_VERIFY_EMAIL_SETTING,
 					value: should_verify_email,
 					data_type: 'boolean',
 				},
 				{
-					settingName: userAccountDeletionSetting?.name || USER_ACCOUNT_DELETION_SETTING,
+					settingName: userAccountDeletionSetting?.name || SETTING_NAMES.USER_ACCOUNT_DELETION_SETTING,
 					settingValue: userAccountDeletionSetting?.value,
-					name: 'can_user_delete_account',
+					name: SETTING_NAMES.USER_ACCOUNT_DELETION_SETTING,
 					value: can_user_delete_account,
 					data_type: 'boolean',
 				},
@@ -97,7 +97,7 @@ const UsersManagementSettings = ({ csrfToken }: UsersManagementSettingsProps) =>
 					name: setting.settingName,
 					value: setting.value,
 					data_type: setting.data_type,
-				}));
+				})) as UnregisteredSetting[];
 			await updateSettings(settingsToUpdate, csrfToken);
 			await refetchSettings();
 		} catch (error) {
