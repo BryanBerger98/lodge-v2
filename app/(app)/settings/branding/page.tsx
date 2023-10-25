@@ -2,7 +2,7 @@ import { Star } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 const BrandSettingsForm = dynamic(() => import('./_components/BrandSettingsForm'));
-const ColorsSettingsForm = dynamic(() => import('./_components/ColorsSettingsForm'));
+// const ColorsSettingsForm = dynamic(() => import('./_components/ColorsSettingsForm'));
 
 const BrandingSettingsPage = () => {
 
@@ -12,7 +12,7 @@ const BrandingSettingsPage = () => {
 			<div className="grid grid-cols-12">
 				<div className="col-start-1 col-span-12 lg:col-span-6 flex flex-col gap-8">
 					<BrandSettingsForm />
-					<ColorsSettingsForm />
+					{ /* <ColorsSettingsForm /> */ }
 				</div>
 			</div>
 		</div>

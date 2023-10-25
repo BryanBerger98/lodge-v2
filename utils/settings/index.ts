@@ -174,6 +174,76 @@ export const DEFAULT_SETTINGS: IUnregisteredSettingPopulated[] = [
 		value: null,
 		data_type: 'image',
 	},
+	{
+		name: SETTING_NAMES.BRAND_PRIMARY_COLOR_SETTING,
+		value: '#0F172A',
+		data_type: 'string',
+	},
+	{
+		name: SETTING_NAMES.BRAND_SECONDARY_COLOR_SETTING,
+		value: '#000000',
+		data_type: 'string',
+	},
+	{
+		name: SETTING_NAMES.BRAND_WARNING_COLOR_SETTING,
+		value: '#000000',
+		data_type: 'string',
+	},
+	{
+		name: SETTING_NAMES.BRAND_DANGER_COLOR_SETTING,
+		value: '#000000',
+		data_type: 'string',
+	},
+	{
+		name: SETTING_NAMES.BRAND_INFO_COLOR_SETTING,
+		value: '#000000',
+		data_type: 'string',
+	},
+	{
+		name: SETTING_NAMES.BRAND_SUCCESS_COLOR_SETTING,
+		value: '#000000',
+		data_type: 'string',
+	},
+	{
+		name: SETTING_NAMES.BRAND_LIGHT_COLOR_SETTING,
+		value: '#000000',
+		data_type: 'string',
+	},
+	{
+		name: SETTING_NAMES.BRAND_DARK_COLOR_SETTING,
+		value: '#000000',
+		data_type: 'string',
+	},
+	{
+		name: SETTING_NAMES.PASSWORD_UPPERCASE_MIN_SETTING,
+		value: 0,
+		data_type: 'number',
+	},
+	{
+		name: SETTING_NAMES.PASSWORD_LOWERCASE_MIN_SETTING,
+		value: 0,
+		data_type: 'number',
+	},
+	{
+		name: SETTING_NAMES.PASSWORD_NUMBERS_MIN_SETTING,
+		value: 0,
+		data_type: 'number',
+	},
+	{
+		name: SETTING_NAMES.PASSWORD_SYMBOLS_MIN_SETTING,
+		value: 0,
+		data_type: 'number',
+	},
+	{
+		name: SETTING_NAMES.PASSWORD_MIN_LENGTH_SETTING,
+		value: 8,
+		data_type: 'number',
+	},
+	{
+		name: SETTING_NAMES.PASSWORD_UNIQUE_CHARS_SETTING,
+		value: false,
+		data_type: 'boolean',
+	},
 ];
 
 export const findDefaultSettingByName = <T extends SettingName>(settingName: T): IUnregisteredSettingPopulated<SettingNameType<T>> | undefined => {
