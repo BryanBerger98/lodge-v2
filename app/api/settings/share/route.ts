@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ZodError } from 'zod';
 
 import { findSettingByName, updateSetting } from '@/database/setting/setting.repository';
 import { findOwnerUser, findUserById, updateUser } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
+import { Role } from '@/schemas/role.schema';
+import { SettingDataType, SettingName } from '@/schemas/setting';
 import { authenticateUserWithPassword, setServerAuthGuard } from '@/utils/auth';
-import { buildError, sendError } from '@/utils/error';
-import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
-import { SETTING_NAMES } from '@/utils/settings';
+import { buildError, sendBuiltError, sendBuiltErrorWithSchemaValidation, sendError } from '@/utils/error';
+import { USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
 
 import { UpdateShareSettingsSchema } from './_schemas/update-share-settings.schema';
 
@@ -15,10 +15,10 @@ export const GET = async () => {
 	try {
 		await connectToDatabase();
 
-		await setServerAuthGuard({ rolesWhiteList: [ 'owner' ] });
+		await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER ] });
 
-		const shareWithAdminSetting = await findSettingByName(SETTING_NAMES.SHARE_WITH_ADMIN_SETTING);
-		const ownerSetting = await findSettingByName(SETTING_NAMES.OWNER_SETTING);
+		const shareWithAdminSetting = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
+		const ownerSetting = await findSettingByName(SettingName.OWNER);
 
 		const ownerUser = await findOwnerUser();
 
@@ -33,26 +33,21 @@ export const GET = async () => {
 		return NextResponse.json({
 			settings: {
 				shareWithAdmin: shareWithAdminSetting ?? {
-					name: SETTING_NAMES.SHARE_WITH_ADMIN_SETTING,
+					name: SettingName.SHARE_WITH_ADMIN,
 					value: false,
-					data_type: 'boolean',
+					data_type: SettingDataType.BOOLEAN,
 				},
 				owner: ownerSetting ?? {
-					name: SETTING_NAMES.OWNER_SETTING,
+					name: SettingName.OWNER,
 					value: ownerUser.id,
-					data_type: 'objectId',
+					data_type: SettingDataType.OBJECT_ID,
 				},
 			},
 			ownerUser,
 		});
 	} catch (error: any) {
 		console.error(error);
-		return sendError(buildError({
-			code: INTERNAL_ERROR,
-			message: error.message || 'An error occured.',
-			status: 500,
-			data: error,
-		}));
+		return sendBuiltError(error);
 	}
 };
 
@@ -61,7 +56,7 @@ export const PUT = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'owner' ] });
+		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER ] });
 
 		const body = await request.json();
 
@@ -73,7 +68,7 @@ export const PUT = async (request: NextRequest) => {
 
 		await authenticateUserWithPassword(currentUser, password);
 
-		const ownerSetting = settingsToUpdate.find(setting => setting.name === SETTING_NAMES.OWNER_SETTING);
+		const ownerSetting = settingsToUpdate.find(setting => setting.name === SettingName.OWNER);
 
 		if (ownerSetting?.value) {
 			const prevOwnerUser = await findOwnerUser();
@@ -88,39 +83,30 @@ export const PUT = async (request: NextRequest) => {
 			await updateUser({
 				id: prevOwnerUser?.id,
 				updated_by: currentUser.id,
-				role: 'admin',
+				role: Role.ADMIN,
 			});
 			await updateUser({
 				id: newOwnerUser.id,
 				updated_by: currentUser.id,
-				role: 'owner',
+				role: Role.OWNER,
 			});
 		}
 
+		console.log('SETTINGS TO UPDATE >>> ', settingsToUpdate);
 		for (const setting of settingsToUpdate) {
 			await updateSetting({
 				...setting,
 				updated_by: currentUser.id,
-			}, { upsert: true });
+			}, {
+				upsert: true,
+				newDocument: true, 
+			});
 		}
 
 		return NextResponse.json({ message: 'Updated.' });
 		
 	} catch (error: any) {
 		console.error(error);
-		if (error.name && error.name === 'ZodError') {
-			return sendError(buildError({
-				code: INVALID_INPUT_ERROR,
-				message: 'Invalid input.',
-				status: 422,
-				data: error as ZodError,
-			}));
-		}
-		return sendError(buildError({
-			code: error.code || INTERNAL_ERROR,
-			message: error.message || 'An error occured.',
-			status: 500,
-			data: error,
-		}));
+		return sendBuiltErrorWithSchemaValidation(error);
 	}
 };

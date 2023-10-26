@@ -3,11 +3,10 @@ import path from 'path';
 
 import imageCompression from 'browser-image-compression';
 
-import { IFile, ImageMimetype } from '../types/file.type';
+import { IFile } from '@/schemas/file';
+import { ImageMimeType, MimeTypeSchema } from '@/schemas/file/mime-type.schema';
 
-const imageMimetypes: string[] = [ 'image/gif', 'image/jpeg', 'image/png', 'image/webp' ] as ImageMimetype[];
-
-export const AUTHORIZED_IMAGE_MIME_TYPES = [ 'image/jpeg', 'image/png', 'image/gif', 'image/webp' ];
+export const AUTHORIZED_IMAGE_MIME_TYPES = [ ImageMimeType.JPEG, ImageMimeType.PNG, ImageMimeType.GIF, ImageMimeType.WEBP ];
 export const AUTHORIZED_IMAGE_SIZE = 1024 * 1024 * 1; // 1 MB
 
 export const getFileExtension = (fileName: string) => fileName.split('.').pop();
@@ -25,20 +24,17 @@ export const generateUniqueNameFromFileName = (filename: string): Promise<string
 };
 
 export const convertFileRequestObjetToModel = (fileObj: File | Blob, fileData: { key: string, url: string, expiration_date?: Date }): Omit<IFile, 'id' | 'created_by' | 'created_at' | 'updated_at' | 'updated_by'> => {
+	const fileMimeType = MimeTypeSchema.parse(fileObj.type);
 	return {
 		original_name: fileObj.name,
 		custom_name: fileObj.name,
-		mimetype: fileObj.type,
+		mime_type: fileMimeType,
 		extension: getFileExtension(fileObj.name),
 		size: fileObj.size,
 		key: fileData.key,
 		url: fileData.url,
 		url_expiration_date: fileData.expiration_date || null,
 	};
-};
-
-export const checkIfFileIsAnImage = (fileType: string): fileType is ImageMimetype => {
-	return typeof fileType === 'string' && imageMimetypes.includes(fileType);
 };
 
 type ImageOptimizationOptions = {

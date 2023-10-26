@@ -47,7 +47,7 @@ const UpdateUsernameForm = ({ csrfToken }: UpdateUsernameFormProps) => {
 		
 		try {
 			setIsLoading(true);
-			const updatedUser = await updateAccount({ username }, csrfToken);
+			const updatedUser = await updateAccount({ username }, { csrfToken });
 			await updateCurrentUser(updatedUser);
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;

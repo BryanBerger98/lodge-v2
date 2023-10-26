@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { SafeToken } from '@/schemas/token.schema';
 import { getSentEmailVerificationToken, sendEmailVerificationToken } from '@/services/auth.service';
-import { SafeTokenData } from '@/types/token.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
 import { TOKEN_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
 
@@ -18,7 +18,7 @@ type SendEmailConfirmationCardProps = {
 
 const SendEmailConfirmationCard = ({ csrfToken }: SendEmailConfirmationCardProps) => {
 
-	const [ emailVerificationTokenData, setEmailVerificationTokenData ] = useState<SafeTokenData | null>(null);
+	const [ emailVerificationTokenData, setEmailVerificationTokenData ] = useState<SafeToken | null>(null);
 	const [ resendEmailCountDown, setResendEmailCountDown ] = useState(0);
 	const [ isLoading, setIsLoading ] = useState(false);
 	const [ error, setError ] = useState('');
@@ -32,7 +32,7 @@ const SendEmailConfirmationCard = ({ csrfToken }: SendEmailConfirmationCardProps
 			} catch (error) {
 				const apiError = error as ApiError<unknown>;
 				if (apiError.code === TOKEN_NOT_FOUND_ERROR) {
-					const tokenData = await sendEmailVerificationToken(csrfToken);
+					const tokenData = await sendEmailVerificationToken({ csrfToken });
 					setEmailVerificationTokenData(tokenData);
 				} else {
 					console.error(apiError);
@@ -78,7 +78,7 @@ const SendEmailConfirmationCard = ({ csrfToken }: SendEmailConfirmationCardProps
 		try {
 			setIsLoading(true);
 			setError('');
-			const token = await sendEmailVerificationToken(csrfToken);
+			const token = await sendEmailVerificationToken({ csrfToken });
 			setEmailVerificationTokenData(token);
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;

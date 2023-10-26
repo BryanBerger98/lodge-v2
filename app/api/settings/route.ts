@@ -5,10 +5,11 @@ import { ZodError } from 'zod';
 
 import { findSettingByName, findSettings, updateSetting } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
+import { Role } from '@/schemas/role.schema';
+import { SettingName } from '@/schemas/setting';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { INTERNAL_ERROR, INVALID_INPUT_ERROR } from '@/utils/error/error-codes';
-import { SETTING_NAMES } from '@/utils/settings';
 
 import { FetchSettingsSchema } from './_schemas/fetch-settings.schema';
 import { UpdateSettingsSchema } from './_schemas/update-settings.schema';
@@ -18,9 +19,9 @@ export const PUT = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		const shareWithAdminSetting = await findSettingByName(SETTING_NAMES.SHARE_WITH_ADMIN_SETTING);
+		const shareWithAdminSetting = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
 
-		const rolesWhiteList: ('admin' | 'owner')[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ 'owner', 'admin' ] : [ 'owner' ];
+		const rolesWhiteList: Role[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ Role.OWNER, Role.ADMIN ] : [ Role.OWNER ];
 
 		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList });
 
@@ -32,7 +33,7 @@ export const PUT = async (request: NextRequest) => {
 			return NextResponse.json({ message: 'Nothing to update.' });
 		}
 
-		const settingsToUpdate = settings.filter(setting => setting.name !== SETTING_NAMES.OWNER_SETTING && setting.name !== SETTING_NAMES.SHARE_WITH_ADMIN_SETTING);
+		const settingsToUpdate = settings.filter(setting => setting.name !== SettingName.OWNER && setting.name !== SettingName.SHARE_WITH_ADMIN);
 		
 		for (const setting of settingsToUpdate) {
 			await updateSetting({

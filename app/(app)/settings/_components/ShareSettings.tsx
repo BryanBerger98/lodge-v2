@@ -16,12 +16,13 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
 import useSettings from '@/context/settings/useSettings';
+import { Role } from '@/schemas/role.schema';
+import { SettingDataType, UnregisteredSetting } from '@/schemas/setting';
+import { SettingName } from '@/schemas/setting/name.shema';
+import { User } from '@/schemas/user';
 import { updateShareSettings } from '@/services/settings.service';
 import { fetchUsers } from '@/services/users.service';
-import { UnregisteredSetting } from '@/types/setting.type';
-import { IUser } from '@/types/user.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
-import { SETTING_NAMES } from '@/utils/settings';
 
 const shareSettingsFormSchema = z.object({
 	share_with_admin: z.boolean().default(false).optional(),
@@ -30,7 +31,7 @@ const shareSettingsFormSchema = z.object({
 
 type ShareSettingsProps = {
 	csrfToken: string;
-	ownerUser: IUser | null;
+	ownerUser: User | null;
 };
 
 const ShareSettings = ({ csrfToken, ownerUser }: ShareSettingsProps) => {
@@ -43,8 +44,8 @@ const ShareSettings = ({ csrfToken, ownerUser }: ShareSettingsProps) => {
 	const { getSetting, loading, refetchSettings } = useSettings();
 	const { currentUser, fetchCurrentUser } = useAuth();
 
-	const shareWithAdminSetting = getSetting(SETTING_NAMES.SHARE_WITH_ADMIN_SETTING);
-	const ownerSetting = getSetting(SETTING_NAMES.OWNER_SETTING);
+	const shareWithAdminSetting = getSetting(SettingName.SHARE_WITH_ADMIN);
+	const ownerSetting = getSetting(SettingName.OWNER);
 
 	const { toast } = useToast();
 
@@ -72,7 +73,7 @@ const ShareSettings = ({ csrfToken, ownerUser }: ShareSettingsProps) => {
 			setIsSearchLoading(true);
 			const data = await fetchUsers({
 				search: value,
-				roles: [ 'admin', 'user' ],
+				roles: [ Role.ADMIN, Role.USER ],
 			});
 			const options = value ? data.users.map(user => ({
 				value: user.id.toString(),
@@ -120,25 +121,28 @@ const ShareSettings = ({ csrfToken, ownerUser }: ShareSettingsProps) => {
 			if ((owner && owner !== ownerUser?.id.toString()) || (owner && owner !== ownerSetting?.value)) {
 				settingsToUpdate.push({
 					id: ownerSetting?.id,
-					name: ownerSetting?.name || SETTING_NAMES.OWNER_SETTING,
+					name: ownerSetting?.name || SettingName.OWNER,
 					value: owner,
-					data_type: 'object_id',
+					data_type: SettingDataType.OBJECT_ID,
 				});
 			}
 			if (share_with_admin !== undefined && share_with_admin !== shareWithAdminSetting?.value) {
 				settingsToUpdate.push({
 					id: shareWithAdminSetting?.id,
-					name: shareWithAdminSetting?.name || SETTING_NAMES.SHARE_WITH_ADMIN_SETTING,
+					name: shareWithAdminSetting?.name || SettingName.SHARE_WITH_ADMIN,
 					value: share_with_admin || false,
-					data_type: 'boolean',
+					data_type: SettingDataType.BOOLEAN,
 				});
 			}
 			if (settingsToUpdate.length === 0) {
 				return;
 			}
-			await updateShareSettings(settingsToUpdate, csrfToken, password);
+			await updateShareSettings({
+				settings: settingsToUpdate,
+				password, 
+			}, { csrfToken });
 			await refetchSettings();
-			if (settingsToUpdate.find(({ name }) => name === SETTING_NAMES.OWNER_SETTING)) {
+			if (settingsToUpdate.find(({ name }) => name === SettingName.OWNER)) {
 				await fetchCurrentUser();
 			}
 		} catch (error) {

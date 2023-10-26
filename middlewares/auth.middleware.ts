@@ -5,7 +5,6 @@ import { getRedirectURLWithSearchParams } from '@/utils/url.util';
 
 import { MiddlewareFactory } from './middleware.type';
 
-
 const BLACKLIST_PATHNAMES = [
 	'/',
 	'/users',

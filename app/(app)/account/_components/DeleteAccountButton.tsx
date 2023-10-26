@@ -34,7 +34,7 @@ const DeleteAccountButton = ({ className, csrfToken }: DeleteAccountButtonProps)
 		try {
 			setIsPasswordModalOpen(openState);
 			setIsLoading(true);
-			await deleteUserAccount(csrfToken, password);
+			await deleteUserAccount(password, { csrfToken });
 			await signOut({ redirect: false });
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;

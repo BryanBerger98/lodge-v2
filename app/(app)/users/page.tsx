@@ -2,6 +2,7 @@ import { Plus, UserPlus, Users } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 import Link from 'next/link';
+import { z } from 'zod';
 
 import { FetchUsersSchema } from '@/app/api/users/_schemas/fetch-users.schema';
 import PageTitle from '@/components/layout/Header/PageTitle';
@@ -12,6 +13,7 @@ import { findUsers, findUsersCount } from '@/database/user/user.repository';
 import { getFieldSignedURL } from '@/lib/bucket';
 import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
+import { UserPopulatedSchema } from '@/schemas/user/populated.schema';
 import { isFileURLExpired } from '@/utils/file.util';
 
 import UsersProvider from './_context/users/users.provider';
@@ -70,7 +72,7 @@ const UsersPage = async ({ searchParams }: UsersPageProps) => {
 		...searchRequest,
 		has_email_verified: false, 
 	});
-	const parsedUsers = JSON.parse(JSON.stringify(users));
+	const parsedUsers = z.array(UserPopulatedSchema).parse(users);
 
 	return (
 		<UsersProvider

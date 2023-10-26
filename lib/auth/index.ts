@@ -1,10 +1,12 @@
 import { NextAuthOptions } from 'next-auth';
+import { type JWT } from 'next-auth/jwt';
 
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { findUserById, findUserByEmail } from '@/database/user/user.repository';
+import { SettingDataType, SettingName } from '@/schemas/setting';
+import { Env, Environment } from '@/utils/env.util';
 import { buildError } from '@/utils/error';
-import { FORBIDDEN_ERROR } from '@/utils/error/error-codes';
-import { SETTING_NAMES, findDefaultSettingByName } from '@/utils/settings';
+import { FORBIDDEN_ERROR, MISSING_CREDENTIALS_ERROR } from '@/utils/error/error-codes';
 
 import { connectToDatabase } from '../database';
 
@@ -27,7 +29,7 @@ const authOptions: NextAuthOptions = {
 		error: '/error', 
 	},
 	callbacks: {
-		async jwt ({ user, token, trigger }) {
+		async jwt ({ user, token, trigger }): Promise<JWT> {
 			if (trigger === 'update') {
 				await connectToDatabase();
 				const updatedUser = await findUserById(token.id);
@@ -56,6 +58,14 @@ const authOptions: NextAuthOptions = {
 		signIn: async ({ user, profile, email, account }) => {
 			try {
 				await connectToDatabase();
+				
+				if (!user.email) {
+					throw buildError({
+						code: MISSING_CREDENTIALS_ERROR,
+						message: 'Credentials are missing.',
+						status: 422,
+					});
+				}
 
 				const userExists = await findUserByEmail(user.email);
 
@@ -64,14 +74,11 @@ const authOptions: NextAuthOptions = {
 				}
 
 				if (account?.provider === 'email') {
-					const registeredMagicLinkSignInSetting = await findSettingByName(SETTING_NAMES.MAGIC_LINK_SIGNIN_SETTING);
-					const defaultMagicLinkSignInSetting = findDefaultSettingByName(SETTING_NAMES.MAGIC_LINK_SIGNIN_SETTING);
-
-					const magicLinkSignInSetting = registeredMagicLinkSignInSetting || defaultMagicLinkSignInSetting || null;
+					const registeredMagicLinkSignInSetting = await findSettingByName(SettingName.MAGIC_LINK_SIGNIN);
 
 					if (
 						email?.verificationRequest
-					&& (magicLinkSignInSetting && magicLinkSignInSetting.data_type === 'boolean' && magicLinkSignInSetting.value)
+					&& (registeredMagicLinkSignInSetting && registeredMagicLinkSignInSetting.data_type === SettingDataType.BOOLEAN && registeredMagicLinkSignInSetting.value)
 					&& userExists
 					) {
 						return true;
@@ -109,8 +116,8 @@ const authOptions: NextAuthOptions = {
 		maxAge: JWT_MAX_AGE, 
 	},
 	jwt: { maxAge: JWT_MAX_AGE },
-	secret: process.env.JWT_SECRET,
-	debug: process.env.ENVIRONMENT === 'Development',
+	secret: Env.JWT_SECRET,
+	debug: Env.ENVIRONMENT === Environment.DEVELOPMENT,
 };
 
 export default authOptions;

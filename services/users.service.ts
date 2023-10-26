@@ -3,13 +3,15 @@ import { z } from 'zod';
 
 import { CreateUserSchema } from '@/app/api/users/_schemas/create-user.schema';
 import { UpdateUserSchema } from '@/app/api/users/_schemas/update-user.schema';
-import fetcher, { FetcherOptions } from '@/lib/fetcher';
-import { SafeTokenData } from '@/types/token.type';
-import { IUser, IUserPopulated, UserRoleWithOwner } from '@/types/user.type';
+import fetcher, { FetcherOptions, FetcherOptionsWithCsrf } from '@/lib/fetcher';
+import { Role } from '@/schemas/role.schema';
+import { SafeToken, SafeTokenSchema } from '@/schemas/token.schema';
+import { User, UserSchema } from '@/schemas/user';
+import { UserPopulated, UserPopulatedSchema } from '@/schemas/user/populated.schema';
 import { objectToFormData } from '@/utils/object.utils';
 import { buildQueryUrl } from '@/utils/url.util';
 
-export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema> & { avatar?: File | Blob | null }, csrfToken: string, options?: FetcherOptions): Promise<IUserPopulated> => {
+export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema> & { avatar?: File | Blob | null }, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
 	try {
 		const formData = new FormData();
 		formData.append('username', userToCreate.username);
@@ -24,39 +26,36 @@ export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema> 
 			method: 'POST',
 			body: formData,
 			...options,
-			csrfToken,
 		});
-		return data;
+		return UserPopulatedSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const updateUser = async (userToUpdate: z.infer<typeof UpdateUserSchema> & { avatar?: File | Blob | null }, csrfToken: string, options?: FetcherOptions): Promise<IUserPopulated> => {
+export const updateUser = async (userToUpdate: z.infer<typeof UpdateUserSchema> & { avatar?: File | Blob | null }, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
 	try {
 		const formData = objectToFormData({ ...userToUpdate });
 		const data = await fetcher('/api/users', {
 			method: 'PUT',
 			body: formData,
 			...options,
-			csrfToken,
 		});
-		return data;
+		return UserPopulatedSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const updateMultipleUsers = async (usersToUpdate: z.infer<typeof UpdateUserSchema>[], csrfToken: string, options?: FetcherOptions): Promise<IUser> => {
+export const updateMultipleUsers = async (usersToUpdate: z.infer<typeof UpdateUserSchema>[], options: FetcherOptionsWithCsrf): Promise<User> => {
 	try {
 		const data = await fetcher('/api/users/bulk', {
 			method: 'PUT',
 			body: JSON.stringify(usersToUpdate),
 			headers: { 'Content-Type': 'application/json' },
 			...options,
-			csrfToken,
 		});
-		return data;
+		return UserSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -67,10 +66,10 @@ export type FetchUsersOptions = {
 	skip?: number;
 	limit?: number;
 	search?: string;
-	roles?: UserRoleWithOwner[];
+	roles?: Role[];
 } & FetcherOptions;
 
-export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: IUserPopulated[], total: number, count: number }> => {
+export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: UserPopulated[], total: number, count: number }> => {
 	const { sort = [], skip, limit, search, roles = [], ...restOptions } = options ? options : {
 		sort: [],
 		skip: undefined,
@@ -90,18 +89,21 @@ export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: 
 
 	try {
 		const data = await fetcher(`/api/users/${ query }`, restOptions);
-		return data;
+		return z.object({
+			users: z.array(UserPopulatedSchema),
+			total: z.number(),
+			count: z.number(),
+		}).parse(data);
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const deleteUser = async (user_id: string, csrfToken: string, options?: FetcherOptions): Promise<void> => {
+export const deleteUser = async (user_id: string, options: FetcherOptionsWithCsrf): Promise<void> => {
 	try {
 		await fetcher(`/api/users/${ user_id }`, {
 			method: 'DELETE',
 			...options,
-			csrfToken,
 		});
 		return;
 	} catch (error) {
@@ -109,12 +111,11 @@ export const deleteUser = async (user_id: string, csrfToken: string, options?: F
 	}
 };
 
-export const deleteMultipleUsers = async (user_ids: (string)[], csrfToken: string, options?: FetcherOptions): Promise<void> => {
+export const deleteMultipleUsers = async (user_ids: (string)[], options: FetcherOptionsWithCsrf): Promise<void> => {
 	try {
 		await fetcher(`/api/users/bulk/${ user_ids.join(',') }`, {
 			method: 'DELETE',
 			...options,
-			csrfToken,
 		});
 		return;
 	} catch (error) {
@@ -122,25 +123,25 @@ export const deleteMultipleUsers = async (user_ids: (string)[], csrfToken: strin
 	}
 };
 
-export const sendResetPasswordTokenToUser = async (user_id: string, csrfToken: string): Promise<SafeTokenData> => {
+export const sendResetPasswordTokenToUser = async (user_id: string, options: FetcherOptionsWithCsrf): Promise<SafeToken> => {
 	try {
 		const data = await fetcher(`/api/users/${ user_id }/reset-password`, {
 			method: 'POST',
-			csrfToken, 
+			...options, 
 		});
-		return data;
+		return SafeTokenSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const sendVerificationTokenToUser = async (user_id: string, csrfToken: string): Promise<SafeTokenData> => {
+export const sendVerificationTokenToUser = async (user_id: string, options: FetcherOptionsWithCsrf): Promise<SafeToken> => {
 	try {
 		const data = await fetcher(`/api/users/${ user_id }/verify-email`, {
 			method: 'POST',
-			csrfToken, 
+			...options, 
 		});
-		return data;
+		return SafeTokenSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}

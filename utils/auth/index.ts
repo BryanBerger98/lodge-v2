@@ -4,14 +4,16 @@ import { getServerSession } from 'next-auth';
 import { findUserById, findUserWithPasswordById } from '@/database/user/user.repository';
 import authOptions from '@/lib/auth';
 import { connectToDatabase } from '@/lib/database';
-import { IUser, IUserPopulated, UserRoleWithOwner } from '@/types/user.type';
+import { Role } from '@/schemas/role.schema';
+import { User } from '@/schemas/user';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 
 import { buildError } from '../error';
 import { FORBIDDEN_ERROR, MISSING_CREDENTIALS_ERROR, UNAUTHORIZED_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '../error/error-codes';
 import { verifyPassword } from '../password.util';
 
 export interface ProtectionOptions {
-	rolesWhiteList?: UserRoleWithOwner[];
+	rolesWhiteList?: Role[];
 	redirect?: boolean | string;
 }
 
@@ -76,7 +78,7 @@ export const setServerAuthGuard = async (options?: ProtectionOptions) => {
 	};
 };
 
-export const authenticateUserWithPassword = async (userToAuthenticate: IUser | IUserPopulated, password?: string) => {
+export const authenticateUserWithPassword = async (userToAuthenticate: User | UserPopulated, password?: string) => {
 	try {
 		if (!password) {
 			throw buildError({
@@ -93,6 +95,14 @@ export const authenticateUserWithPassword = async (userToAuthenticate: IUser | I
 				code: USER_NOT_FOUND_ERROR,
 				message: 'User not found.',
 				status: 404,
+			});
+		}
+
+		if (!user.password) {
+			throw buildError({
+				code: MISSING_CREDENTIALS_ERROR, // TODO: Create a new error code for this.
+				message: 'Missing credentials.',
+				status: 401,
 			});
 		}
 

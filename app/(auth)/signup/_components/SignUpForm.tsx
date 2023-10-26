@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { ZodError, boolean, object, string, z } from 'zod';
+import { boolean, object, string, z } from 'zod';
 
 import PasswordValidationCheckList from '@/components/features/auth/PasswordValidationCheckList';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -18,9 +18,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { SettingPopulatedBoolean, UnregisteredSettingBooleanPopulated } from '@/schemas/setting';
 import { signUpUser } from '@/services/auth.service';
-import { ISetting, UnregisteredSetting } from '@/types/setting.type';
-import { ApiError, getErrorMessage } from '@/utils/error';
+import { ApiError, buildFormError, getErrorMessage } from '@/utils/error';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules } from '@/utils/password.util';
 
 import AppleAuthButton from '../../_components/ProvidersButtons/AppleAuthButton';
@@ -28,7 +28,7 @@ import GoogleAuthButton from '../../_components/ProvidersButtons/GoogleAuthButto
 
 type SignUpFormProperties = {
 	csrfToken: string;
-	userVerifyEmailSetting: ISetting | UnregisteredSetting | null;
+	userVerifyEmailSetting: SettingPopulatedBoolean | UnregisteredSettingBooleanPopulated | null;
 	passwordRules: {
 		uppercase_min: number;
 		lowercase_min: number;
@@ -37,8 +37,8 @@ type SignUpFormProperties = {
 		min_length: number;
 		should_contain_unique_chars: boolean;
 	};
-	googleAuthSetting: ISetting | UnregisteredSetting | null;
-	appleAuthSetting: ISetting | UnregisteredSetting | null;
+	googleAuthSetting: SettingPopulatedBoolean | UnregisteredSettingBooleanPopulated | null;
+	appleAuthSetting: SettingPopulatedBoolean | UnregisteredSettingBooleanPopulated | null;
 };
 
 const SignUpForm = ({ csrfToken, userVerifyEmailSetting, passwordRules, googleAuthSetting, appleAuthSetting }: SignUpFormProperties) => {
@@ -73,7 +73,10 @@ const SignUpForm = ({ csrfToken, userVerifyEmailSetting, passwordRules, googleAu
 		const { email, password } = values;
 		setIsLoading(true);
 		try {
-			await signUpUser(email, password, csrfToken);
+			await signUpUser({
+				email,
+				password, 
+			}, { csrfToken });
 			const signInData = await signIn('credentials', {
 				redirect: false,
 				email,
@@ -82,7 +85,7 @@ const SignUpForm = ({ csrfToken, userVerifyEmailSetting, passwordRules, googleAu
 			if (signInData?.error) {
 				setError('Incorrect credentials.');
 			} else {
-				if (!userVerifyEmailSetting || (userVerifyEmailSetting && userVerifyEmailSetting.data_type === 'boolean' && userVerifyEmailSetting.value)) {
+				if (!userVerifyEmailSetting || (userVerifyEmailSetting && userVerifyEmailSetting.value)) {
 					router.replace('/verify-email');
 					return;
 				}
@@ -90,16 +93,7 @@ const SignUpForm = ({ csrfToken, userVerifyEmailSetting, passwordRules, googleAu
 			}
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
-			if (apiError.code === 'invalid-input') {
-				const { data } = apiError as ApiError<ZodError>;
-				if (data) {
-					data.issues.forEach(issue => {
-						type IssueName = keyof z.infer<typeof signUpFormSchema>;
-						const [ inputName ] = issue.path;
-						form.setError(inputName.toString() as IssueName, { message: issue.message });
-					});
-				}
-			}
+			buildFormError(apiError, { form });
 			setError(getErrorMessage(apiError));
 		} finally {
 			setIsLoading(false);

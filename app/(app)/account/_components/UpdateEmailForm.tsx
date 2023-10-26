@@ -65,7 +65,10 @@ const UpdateEmailForm = ({ csrfToken }: UpdateEmailFormProps) => {
 		try {
 			setIsPasswordModalOpen(openState);
 			setIsLoading(true);
-			const updatedUser = await updateUserEmail(email, password, csrfToken);
+			const updatedUser = await updateUserEmail({
+				email,
+				password, 
+			}, { csrfToken });
 			await updateCurrentUser(updatedUser);
 			router.replace('/verify-email');
 		} catch (error) {

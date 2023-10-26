@@ -1,7 +1,7 @@
 import { S3Client, GetObjectCommand, DeleteObjectCommand, PutObjectCommand, DeleteObjectsCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-import { IFile } from '@/types/file.type';
+import { IFile } from '@/schemas/file';
 import { generateUniqueNameFromFileName } from '@/utils/file.util';
 
 const config = {
@@ -22,7 +22,7 @@ export const getFileFromKey = async (file: IFile) => {
 	});
 	const res = await bucket.send(command);
 	const fileBuffer = await res.Body?.transformToByteArray();
-	return fileBuffer ? `data:${ file.mimetype };base64,${ Buffer.from(fileBuffer).toString('base64') }` : null;
+	return fileBuffer ? `data:${ file.mime_type };base64,${ Buffer.from(fileBuffer).toString('base64') }` : null;
 };
 
 export const getMultipleFiles = (files: IFile[]) => {
@@ -34,7 +34,7 @@ export const getMultipleFiles = (files: IFile[]) => {
 		const fileData = await bucket.send(command);
 		const fileBuffer = await fileData.Body?.transformToByteArray();
 		return {
-			fileString: fileBuffer ? `data:${ file.mimetype };base64,${ Buffer.from(fileBuffer).toString('base64') }` : null,
+			fileString: fileBuffer ? `data:${ file.mime_type };base64,${ Buffer.from(fileBuffer).toString('base64') }` : null,
 			key: file.key,
 		};
 	});

@@ -4,7 +4,7 @@ import { updateFileURL } from '@/database/file/file.repository';
 import { findUserById, updateUser } from '@/database/user/user.repository';
 import { getFieldSignedURL } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
-import { IUser } from '@/types/user.type';
+import { User } from '@/schemas/user';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendBuiltError, sendBuiltErrorWithSchemaValidation } from '@/utils/error';
 import { USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
@@ -54,7 +54,7 @@ export const PUT = async (request: NextRequest) => {
 
 		const { username, phone_number } = UpdateUserAccountSchema.parse(body);
 
-		const updateObject: Partial<IUser> = {};
+		const updateObject: Partial<User> = {};
 
 		if (username) {
 			updateObject.username = username;

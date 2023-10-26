@@ -11,7 +11,7 @@ import HeaderButton from '@/components/layout/Header/HeaderButton';
 import { Badge } from '@/components/ui/badge';
 import useAuth from '@/context/auth/useAuth';
 import useBreakPoint from '@/hooks/utils/useBreakPoint';
-import { isProductionEnv } from '@/utils/env.util';
+import { Env, isProductionEnv } from '@/utils/env.util';
 import { SETTINGS_ACTIONS } from '@/utils/roles/settings.permissions';
 import { USERS_ACTIONS } from '@/utils/roles/users.permissions';
 
@@ -60,11 +60,11 @@ const Sidebar = ({ className, hasSettingsAccess, brandName, logoUrl }: SidebarPr
 				<div className="flex flex-col">
 					<p className="text-xl font-medium flex gap-2 items-center">{ headerTitle ? headerTitle : brandName }</p>
 					{
-						!isProductionEnv(process.env.NEXT_PUBLIC_ENVIRONMENT) ?
+						!isProductionEnv(Env.NEXT_PUBLIC_ENVIRONMENT) ?
 							<Badge
 								className="w-fit mx-auto"
 								variant="destructive"
-							>{ process.env.NEXT_PUBLIC_ENVIRONMENT }
+							>{ Env.NEXT_PUBLIC_ENVIRONMENT }
 							</Badge>
 							: null
 					}
@@ -100,11 +100,11 @@ const Sidebar = ({ className, hasSettingsAccess, brandName, logoUrl }: SidebarPr
 										}
 									</Link>
 									{
-										!isProductionEnv(process.env.NEXT_PUBLIC_ENVIRONMENT) ?
+										!isProductionEnv(Env.NEXT_PUBLIC_ENVIRONMENT) ?
 											<Badge
 												className="w-fit"
 												variant="destructive"
-											>{ process.env.NEXT_PUBLIC_ENVIRONMENT }
+											>{ Env.NEXT_PUBLIC_ENVIRONMENT }
 											</Badge>
 											: null
 									}

@@ -1,8 +1,8 @@
 import { Schema, model, Types, Model, models } from 'mongoose';
 
-import { IToken } from '@/types/token.type';
+import { Token } from '@/schemas/token.schema';
 
-interface ITokenDocument extends Omit<IToken, 'target_id' | 'created_by'> {
+interface ITokenDocument extends Omit<Token, 'target_id' | 'created_by'> {
 	target_id: Types.ObjectId;
 	created_by: Types.ObjectId | null;
 }
@@ -42,11 +42,7 @@ tokenSchema.virtual('id').get(function getVirtualId () {
 	return this._id.toHexString();
 });
 
-tokenSchema.set('toObject', {
-	virtuals: true,
-	flattenObjectIds: true,
-	versionKey: false, 
-});
+tokenSchema.set('toObject', { virtuals: true });
 tokenSchema.set('toJSON', {
 	virtuals: true,
 	flattenObjectIds: true,

@@ -13,10 +13,9 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } fr
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
 import useSettings from '@/context/settings/useSettings';
+import { SettingDataType, SettingName, UnregisteredSetting } from '@/schemas/setting';
 import { updateSettings } from '@/services/settings.service';
-import { UnregisteredSetting } from '@/types/setting.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
-import { SETTING_NAMES } from '@/utils/settings';
 
 const providersSettingsFormSchema = z.object({
 	magic_link_signin: z.boolean().default(true),
@@ -34,8 +33,8 @@ const ProvidersSettings = ({ csrfToken, isGoogleAuthEnvProvided }: ProvidersSett
 
 	const { getSetting, loading, refetchSettings } = useSettings();;
 
-	const magicLinkSigninSetting = getSetting(SETTING_NAMES.MAGIC_LINK_SIGNIN_SETTING);
-	const googleAuthSetting = getSetting(SETTING_NAMES.GOOGLE_AUTH_SETTING);
+	const magicLinkSigninSetting = getSetting(SettingName.MAGIC_LINK_SIGNIN);
+	const googleAuthSetting = getSetting(SettingName.GOOGLE_AUTH);
 
 	const { toast } = useToast();
 
@@ -63,18 +62,18 @@ const ProvidersSettings = ({ csrfToken, isGoogleAuthEnvProvided }: ProvidersSett
 			setIsLoading(true);
 			const settingsValues: (UnregisteredSetting & { settingName: string, settingValue: boolean | string | number | undefined })[] = [
 				{
-					settingName: magicLinkSigninSetting?.name || SETTING_NAMES.MAGIC_LINK_SIGNIN_SETTING,
+					settingName: magicLinkSigninSetting?.name || SettingName.MAGIC_LINK_SIGNIN,
 					settingValue: magicLinkSigninSetting?.value,
-					name: 'magic_link_signin',
+					name: SettingName.MAGIC_LINK_SIGNIN,
 					value: magic_link_signin,
-					data_type: 'boolean',
+					data_type: SettingDataType.BOOLEAN,
 				},
 				{
-					settingName: googleAuthSetting?.name || SETTING_NAMES.GOOGLE_AUTH_SETTING,
+					settingName: googleAuthSetting?.name || SettingName.GOOGLE_AUTH,
 					settingValue: googleAuthSetting?.value,
-					name: 'google_auth',
+					name: SettingName.GOOGLE_AUTH,
 					value: google_auth,
-					data_type: 'boolean',
+					data_type: SettingDataType.BOOLEAN,
 				},
 			];
 			const settingsToUpdate: UnregisteredSetting[] = settingsValues
@@ -84,7 +83,7 @@ const ProvidersSettings = ({ csrfToken, isGoogleAuthEnvProvided }: ProvidersSett
 					value: setting.value,
 					data_type: setting.data_type,
 				})) as UnregisteredSetting[];
-			await updateSettings(settingsToUpdate, csrfToken);
+			await updateSettings(settingsToUpdate, { csrfToken });
 			await refetchSettings();
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;

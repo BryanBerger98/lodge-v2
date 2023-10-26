@@ -8,17 +8,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
+import { UnregisteredSettingBooleanPopulatedSchema, UnregisteredSettingNumberPopulatedSchema } from '@/schemas/setting';
+import { SettingName } from '@/schemas/setting/name.shema';
 import { setServerAuthGuard } from '@/utils/auth';
-import { PASSWORD_LOWERCASE_MIN_SETTING, PASSWORD_MIN_LENGTH_SETTING, PASSWORD_NUMBERS_MIN_SETTING, PASSWORD_SYMBOLS_MIN_SETTING, PASSWORD_UNIQUE_CHARS_SETTING, PASSWORD_UPPERCASE_MIN_SETTING, USER_ACCOUNT_DELETION_SETTING } from '@/utils/settings';
 
 const PageTitle = dynamic(() => import('@/components/layout/Header/PageTitle'));
-const DynamicSignOutButton = dynamic(() => import('./_components/SignOutButton'), { ssr: false });
-const DynamicDeleteAccountButton = dynamic(() => import('./_components/DeleteAccountButton'), { ssr: false });
-const DynamicUpdateUsernameForm = dynamic(() => import('./_components/UpdateUsernameForm'), { ssr: false });
-const DynamicUpdatePhoneNumberForm = dynamic(() => import('./_components/UpdatePhoneNumberForm'), { ssr: false });
-const DynamicUpdateAvatarForm = dynamic(() => import('./_components/UpdateAvatarForm'), { ssr: false });
-const DynamicUpdateEmailForm = dynamic(() => import('./_components/UpdateEmailForm'), { ssr: false });
-const DynamicUpdatePasswordForm = dynamic(() => import('./_components/UpdatePasswordForm'), { ssr: false });
+const SignOutButton = dynamic(() => import('./_components/SignOutButton'), { ssr: false });
+const DeleteAccountButton = dynamic(() => import('./_components/DeleteAccountButton'), { ssr: false });
+const UpdateUsernameForm = dynamic(() => import('./_components/UpdateUsernameForm'), { ssr: false });
+const UpdatePhoneNumberForm = dynamic(() => import('./_components/UpdatePhoneNumberForm'), { ssr: false });
+const UpdateAvatarForm = dynamic(() => import('./_components/UpdateAvatarForm'), { ssr: false });
+const UpdateEmailForm = dynamic(() => import('./_components/UpdateEmailForm'), { ssr: false });
+const UpdatePasswordForm = dynamic(() => import('./_components/UpdatePasswordForm'), { ssr: false });
 
 const AccountPage = async () => {
 
@@ -28,28 +29,35 @@ const AccountPage = async () => {
 
 	const { user: currentUser } = await setServerAuthGuard();
 
-	const userAccountDeletionSetting = await findSettingByName(USER_ACCOUNT_DELETION_SETTING);
+	const userAccountDeletionSettingData = await findSettingByName(SettingName.USER_ACCOUNT_DELETION);
+	const userAccountDeletionSetting = UnregisteredSettingBooleanPopulatedSchema.parse(userAccountDeletionSettingData);
 
-	const canDeleteAccount = userAccountDeletionSetting && userAccountDeletionSetting.data_type === 'boolean' && userAccountDeletionSetting.value;
+	const canDeleteAccount = userAccountDeletionSetting && userAccountDeletionSetting.value;
 
-	const passwordLowercaseMinSetting = await findSettingByName(PASSWORD_LOWERCASE_MIN_SETTING);
-	const passwordUppercaseMinSetting = await findSettingByName(PASSWORD_UPPERCASE_MIN_SETTING);
-	const passwordNumbersMinSetting = await findSettingByName(PASSWORD_NUMBERS_MIN_SETTING);
-	const passwordSymbolsMinSetting = await findSettingByName(PASSWORD_SYMBOLS_MIN_SETTING);
-	const passwordMinLengthSetting = await findSettingByName(PASSWORD_MIN_LENGTH_SETTING);
-	const passwordUniqueCharsSetting = await findSettingByName(PASSWORD_UNIQUE_CHARS_SETTING);
+	const passwordLowercaseMinSettingData = await findSettingByName(SettingName.PASSWORD_LOWERCASE_MIN);
+	const passwordLowercaseMinSetting = UnregisteredSettingNumberPopulatedSchema.parse(passwordLowercaseMinSettingData);
+	const passwordUppercaseMinSettingData = await findSettingByName(SettingName.PASSWORD_UPPERCASE_MIN);
+	const passwordUppercaseMinSetting = UnregisteredSettingNumberPopulatedSchema.parse(passwordUppercaseMinSettingData);
+	const passwordNumbersMinSettingData = await findSettingByName(SettingName.PASSWORD_NUMBERS_MIN);
+	const passwordNumbersMinSetting = UnregisteredSettingNumberPopulatedSchema.parse(passwordNumbersMinSettingData);
+	const passwordSymbolsMinSettingData = await findSettingByName(SettingName.PASSWORD_SYMBOLS_MIN);
+	const passwordSymbolsMinSetting = UnregisteredSettingNumberPopulatedSchema.parse(passwordSymbolsMinSettingData);
+	const passwordMinLengthSettingData = await findSettingByName(SettingName.PASSWORD_MIN_LENGTH);
+	const passwordMinLengthSetting = UnregisteredSettingNumberPopulatedSchema.parse(passwordMinLengthSettingData);
+	const passwordUniqueCharsSettingData = await findSettingByName(SettingName.PASSWORD_UNIQUE_CHARS);
+	const passwordUniqueCharsSetting = UnregisteredSettingBooleanPopulatedSchema.parse(passwordUniqueCharsSettingData);
 
 	return (
 		<>
 			<PageTitle><User /> Account</PageTitle>
 			<div className="grid grid-cols-1 xl:grid-cols-3">
 				<div className="xl:col-span-2 flex flex-col gap-y-8 mb-8">
-					<DynamicUpdateAvatarForm csrfToken={ csrfToken } />
-					<DynamicUpdateUsernameForm csrfToken={ csrfToken } />
-					<DynamicUpdatePhoneNumberForm csrfToken={ csrfToken } />
+					<UpdateAvatarForm csrfToken={ csrfToken } />
+					<UpdateUsernameForm csrfToken={ csrfToken } />
+					<UpdatePhoneNumberForm csrfToken={ csrfToken } />
 					{
 						currentUser.provider_data === 'email' ?
-							<DynamicUpdateEmailForm csrfToken={ csrfToken } />
+							<UpdateEmailForm csrfToken={ csrfToken } />
 							: null
 					}
 					{
@@ -73,7 +81,7 @@ const AccountPage = async () => {
 									<span> process.</span>
 								</CardContent>
 							</Card>
-							: <DynamicUpdatePasswordForm
+							: <UpdatePasswordForm
 								csrfToken={ csrfToken }
 								passwordRules={ {
 									uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,
@@ -103,10 +111,10 @@ const AccountPage = async () => {
 				</div>
 			</div>
 			<div className="flex gap-4">
-				<DynamicSignOutButton />
+				<SignOutButton />
 				{
 					canDeleteAccount && currentUser.role !== 'owner' ?
-						<DynamicDeleteAccountButton csrfToken={ csrfToken } />
+						<DeleteAccountButton csrfToken={ csrfToken } />
 						: null
 				}
 			</div>

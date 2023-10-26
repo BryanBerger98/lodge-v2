@@ -12,7 +12,7 @@ import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { ISetting, UnregisteredSetting } from '@/types/setting.type';
+import { SettingPopulatedBoolean, UnregisteredSettingBooleanPopulated } from '@/schemas/setting';
 
 import AppleAuthButton from '../../_components/ProvidersButtons/AppleAuthButton';
 import GoogleAuthButton from '../../_components/ProvidersButtons/GoogleAuthButton';
@@ -20,9 +20,9 @@ import GoogleAuthButton from '../../_components/ProvidersButtons/GoogleAuthButto
 import { useSignInContext } from './SignInCard';
 
 type EmailSignInFormProps = {
-	newUserSignUpSetting: ISetting | UnregisteredSetting | null;
-	googleAuthSetting: ISetting | UnregisteredSetting | null;
-	appleAuthSetting: ISetting | UnregisteredSetting | null;
+	newUserSignUpSetting: SettingPopulatedBoolean | UnregisteredSettingBooleanPopulated | null;
+	googleAuthSetting: SettingPopulatedBoolean | UnregisteredSettingBooleanPopulated | null;
+	appleAuthSetting: SettingPopulatedBoolean | UnregisteredSettingBooleanPopulated | null;
 };
 
 const EmailSignInForm = ({ newUserSignUpSetting, googleAuthSetting, appleAuthSetting } :EmailSignInFormProps) => {
@@ -47,8 +47,8 @@ const EmailSignInForm = ({ newUserSignUpSetting, googleAuthSetting, appleAuthSet
 	}
 
 	const areProvidersEnabled =
-		(googleAuthSetting && googleAuthSetting.data_type === 'boolean' && googleAuthSetting.value)
-		|| (appleAuthSetting && appleAuthSetting.data_type === 'boolean' && appleAuthSetting.value);
+		(googleAuthSetting && googleAuthSetting.value)
+		|| (appleAuthSetting && appleAuthSetting.value);
 
 	return (
 		<Form { ...form }>
@@ -64,8 +64,8 @@ const EmailSignInForm = ({ newUserSignUpSetting, googleAuthSetting, appleAuthSet
 						areProvidersEnabled ?
 							<>
 								<div className="flex flex-col gap-4 mb-4">
-									{ googleAuthSetting && googleAuthSetting.data_type === 'boolean' && googleAuthSetting.value ? <GoogleAuthButton /> : null }
-									{ appleAuthSetting && appleAuthSetting.data_type === 'boolean' && appleAuthSetting.value ? <AppleAuthButton /> : null }
+									{ googleAuthSetting && googleAuthSetting.value ? <GoogleAuthButton /> : null }
+									{ appleAuthSetting && appleAuthSetting.value ? <AppleAuthButton /> : null }
 								</div>
 								<div className="flex gap-4 items-center justify-center w-full mb-2">
 									<Separator

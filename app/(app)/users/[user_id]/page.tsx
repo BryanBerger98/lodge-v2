@@ -9,10 +9,11 @@ import { updateFileURL } from '@/database/file/file.repository';
 import { findUserById } from '@/database/user/user.repository';
 import { getFieldSignedURL } from '@/lib/bucket';
 import { getCsrfToken } from '@/lib/csrf';
+import { UserPopulatedSchema } from '@/schemas/user/populated.schema';
 
 import UsersProvider from '../_context/users/users.provider';
 
-const DynamicEditUserForm = dynamic(() => import('../_components/EditUserForm'));
+const EditUserForm = dynamic(() => import('../_components/EditUserForm'));
 const DynamicMenu = dynamic(() => import('./_components/Menu'));
 
 type EditUserPageProps = {
@@ -45,6 +46,9 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
 		});
 		userData.photo = updatedFile;
 	}
+
+	const parsedUserData = UserPopulatedSchema.parse(userData);
+
 	return (
 		<>
 			<PageTitle><User /> Edit user</PageTitle>
@@ -60,9 +64,9 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
 								userData={ userData }
 							/>
 						</div>
-						<DynamicEditUserForm
+						<EditUserForm
 							csrfToken={ csrfToken }
-							user={ userData }
+							user={ parsedUserData }
 						/>
 					</div>
 				</div>

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { ZodError, object, string, z } from 'zod';
+import { object, string, z } from 'zod';
 
 import PasswordValidationCheckList from '@/components/features/auth/PasswordValidationCheckList';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -17,7 +17,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { resetUserPassword } from '@/services/auth.service';
-import { ApiError, getErrorMessage } from '@/utils/error';
+import { ApiError, buildFormError, getErrorMessage } from '@/utils/error';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules } from '@/utils/password.util';
 
 type ResetPasswordFormProps = {
@@ -62,20 +62,14 @@ const ResetPasswordForm = ({ csrfToken, verificationToken, passwordRules }: Rese
 		try {
 			setIsLoading(true);
 			setError(null);
-			await resetUserPassword(verificationToken, password, csrfToken);
+			await resetUserPassword({
+				token: verificationToken,
+				password, 
+			}, { csrfToken });
 			router.replace('/signin');
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
-			if (apiError.code === 'invalid-input') {
-				const { data } = apiError as ApiError<ZodError>;
-				if (data) {
-					data.issues.forEach(issue => {
-						type IssueName = keyof z.infer<typeof resetPasswordFormSchema>;
-						const [ inputName ] = issue.path;
-						form.setError(inputName.toString() as IssueName, { message: issue.message });
-					});
-				}
-			}
+			buildFormError(apiError, { form });
 			setError(getErrorMessage(apiError));
 		} finally {
 			setIsLoading(false);

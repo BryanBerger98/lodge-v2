@@ -1,4 +1,4 @@
-import { SettingDataType } from '@/types/setting.type';
+import { SettingDataType } from '@/schemas/setting';
 
 export type CreateSettingDTO = {
 	name: string;

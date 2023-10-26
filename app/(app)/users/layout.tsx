@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 
+import { Role } from '@/schemas/role.schema';
 import { setServerAuthGuard } from '@/utils/auth';
 
 type UsersLayoutProps = {
@@ -9,7 +10,7 @@ type UsersLayoutProps = {
 const UsersLayout = async ({ children }: UsersLayoutProps) => {
 
 	await setServerAuthGuard({
-		rolesWhiteList: [ 'owner', 'admin' ],
+		rolesWhiteList: [ Role.OWNER, Role.ADMIN ],
 		redirect: '/', 
 	});
 

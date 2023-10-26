@@ -4,9 +4,10 @@ import { deleteFileById, findFileById } from '@/database/file/file.repository';
 import { findSettingByName, updateSetting } from '@/database/setting/setting.repository';
 import { deleteFileFromKey } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
+import { Role } from '@/schemas/role.schema';
+import { SettingDataType, SettingName } from '@/schemas/setting';
 import { setServerAuthGuard } from '@/utils/auth';
 import { sendBuiltErrorWithSchemaValidation } from '@/utils/error';
-import { SETTING_NAMES } from '@/utils/settings';
 
 import { DeleteImageSettingSchema } from './_schemas/delete-image-setting.schema';
 
@@ -17,15 +18,15 @@ export const DELETE = async (_: any, { params }: { params: { setting_name: strin
 
 		await connectToDatabase();
 
-		const shareWithAdminSetting = await findSettingByName(SETTING_NAMES.SHARE_WITH_ADMIN_SETTING);
+		const shareWithAdminSetting = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
 
-		const rolesWhiteList: ('admin' | 'owner')[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ 'owner', 'admin' ] : [ 'owner' ];
+		const rolesWhiteList: Role[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ Role.OWNER, Role.ADMIN ] : [ Role.OWNER ];
 
 		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList });
 
 		const settingData = await findSettingByName(name);
 
-		if (settingData && settingData.value && settingData.value.id) {
+		if (settingData && settingData.data_type === SettingDataType.IMAGE && settingData.value && 'id' in settingData.value && settingData.value.id) {
 			const oldFile = await findFileById(settingData.value.id);
 			if (oldFile) {
 				await deleteFileFromKey(oldFile.key);
@@ -36,7 +37,7 @@ export const DELETE = async (_: any, { params }: { params: { setting_name: strin
 		const updatedSetting = await updateSetting({
 			...settingData,
 			name,
-			data_type: 'image',
+			data_type: SettingDataType.IMAGE,
 			value: null,
 			updated_by: currentUser.id,
 		}, { upsert: true });

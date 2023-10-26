@@ -3,6 +3,7 @@ import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
 import { createUser } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
 import clientPromise from '@/lib/mongodb';
+import { Role } from '@/schemas/role.schema';
 
 const DatabaseAdapter = MongoDBAdapter(clientPromise);
 
@@ -15,7 +16,7 @@ DatabaseAdapter.createUser = async (user) => {
 	});
 	return {
 		...createdUser,
-		role: createdUser.role === 'owner' ? 'user' : createdUser.role,
+		role: createdUser.role === Role.OWNER ? Role.USER : createdUser.role,
 	};
 };
 

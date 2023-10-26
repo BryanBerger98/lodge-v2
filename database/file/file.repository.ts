@@ -1,16 +1,16 @@
 import { newId } from '@/lib/database';
-import { CreateLodgeFileDTO, IFile, IFilePopulated } from '@/types/file.type';
-import { IUser } from '@/types/user.type';
+import { IFile } from '@/schemas/file';
+import { IFilePopulated } from '@/schemas/file/populated.schema';
 
-import UserModel from '../user/user.model';
-
+import { CreateFileDTO } from './file.dto';
 import FileModel from './file.model';
+import { populateFile } from './utils/populate-file';
 
 export const findFileById = async (file_id: string): Promise<IFile | null> => {
 	try {
 		const document = await FileModel.findById(newId(file_id));
 		if (!document) return null;
-		return document.toObject();
+		return document.toJSON();
 	} catch (error) {
 		throw error;
 	}
@@ -20,32 +20,16 @@ export const findFileByKey = async (key: string): Promise<IFile | null> => {
 	try {
 		const document = await FileModel.findOne({ key });
 		if (!document) return null;
-		return document.toObject();
+		return document.toJSON();
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const findMultipleFilesByKey = async (keysArray: string[]): Promise<IFilePopulated[] | null> => {
+export const findMultipleFilesByKey = async (keysArray: string[]): Promise<IFilePopulated[]> => {
 	try {
-		const files = await FileModel.find({ key: { $in: keysArray } })
-			.populate<{
-			created_by: IUser | null,
-			updated_by: IUser | null,
-		}>([
-			{
-				path: 'created_by',
-				select: { password: 0 },
-				model: UserModel,
-			},
-			{
-				path: 'updated_by',
-				select: { password: 0 },
-				model: UserModel,
-			},
-		])
-			.lean({ virtuals: [ 'id' ] });
-		return files;
+		const documents = await FileModel.find({ key: { $in: keysArray } }).populate(populateFile);
+		return documents.map(document => document.toJSON());
 	} catch (error) {
 		throw error;
 	}
@@ -60,7 +44,7 @@ export const updateFileURL = async (fileToUpdate: { id: string, url: string, url
 			},
 		});
 		if (!document) return null;
-		return document.toObject();
+		return document.toJSON();
 	} catch (error) {
 		throw error;
 	}
@@ -70,7 +54,7 @@ export const deleteFileById = async (file_id: string): Promise<IFile | null> => 
 	try {
 		const document = await FileModel.findByIdAndDelete(newId(file_id));
 		if (!document) return null;
-		return document.toObject();
+		return document.toJSON();
 	} catch (error) {
 		throw error;
 	}
@@ -85,10 +69,10 @@ export const deleteMultipleFilesById = async (file_ids: string[]): Promise<numbe
 	}
 };
 
-export const createFile = async (fileToCreate: CreateLodgeFileDTO): Promise<IFile | null> => {
+export const createFile = async (fileToCreate: CreateFileDTO): Promise<IFile | null> => {
 	try {
 		const document = await FileModel.create(fileToCreate);
-		return document.toObject();
+		return document.toJSON();
 	} catch (error) {
 		throw error;
 	}

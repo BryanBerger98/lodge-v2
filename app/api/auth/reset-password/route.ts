@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ZodError, object, string } from 'zod';
+import { object, string } from 'zod';
 
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { createToken, deleteTokenById, getTokenFromTargetId, getTokenFromTokenString } from '@/database/token/token.repository';
 import { findUserByEmail, findUserById, updateUserPassword } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
 import { generateToken, verifyToken } from '@/lib/jwt';
-import { IToken } from '@/types/token.type';
+import { SettingName } from '@/schemas/setting';
+import { Token, TokenAction } from '@/schemas/token.schema';
 import { Optional } from '@/types/utils';
 import { sendResetPasswordEmail } from '@/utils/email';
-import { buildError, sendError } from '@/utils/error';
-import { INTERNAL_ERROR, INVALID_INPUT_ERROR, INVALID_TOKEN_ERROR, TOKEN_ALREADY_SENT_ERROR, TOKEN_NOT_FOUND_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
+import { buildError, sendBuiltErrorWithSchemaValidation } from '@/utils/error';
+import { INVALID_TOKEN_ERROR, TOKEN_ALREADY_SENT_ERROR, TOKEN_NOT_FOUND_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules, hashPassword } from '@/utils/password.util';
-import { SETTING_NAMES } from '@/utils/settings';
 
 export const POST = async (request: NextRequest) => {
 
@@ -28,61 +28,48 @@ export const POST = async (request: NextRequest) => {
 		const userData = await findUserByEmail(email);
 
 		if (!userData) {
-			return sendError(buildError({
+			throw buildError({
 				code: USER_NOT_FOUND_ERROR,
 				message: 'User not found.',
 				status: 404,
-			}));
+			});
 		}
 
-		const oldToken = await getTokenFromTargetId(userData.id, { action: 'reset_password' });
+		const oldToken = await getTokenFromTargetId(userData.id, { action: TokenAction.RESET_PASSWORD });
 
 		if (oldToken) {
 			const tokenCreationTimestamp = oldToken.created_at.getTime();
 			const now = Date.now();
 			const timeDiff = Math.round((now - tokenCreationTimestamp) / 1000);
 			if (timeDiff < 60) {
-				return sendError(buildError({
+				throw buildError({
 					code: TOKEN_ALREADY_SENT_ERROR,
 					message: 'Wait a minute before sending a new verification email',
 					status: 403,
-				}));
+				});
 			}
 			await deleteTokenById(oldToken.id);
 		}
 
 		const expirationDate = Math.floor(Date.now() / 1000) + (60 * 60 * 2);
-		const token = generateToken(userData, expirationDate, 'reset_password');
+		const token = generateToken(userData, expirationDate, TokenAction.RESET_PASSWORD);
 		const savedToken = await createToken({
 			token,
 			expiration_date: new Date(expirationDate),
-			action: 'reset_password',
+			action: TokenAction.RESET_PASSWORD,
 			created_by: userData.id,
 			target_id: userData.id,
 		});
 
 		await sendResetPasswordEmail(userData, savedToken);
 
-		const safeTokenData: Optional<IToken, 'token'> = savedToken;
+		const safeTokenData: Optional<Token, 'token'> = savedToken;
 		delete safeTokenData.token;
 
 		return NextResponse.json(safeTokenData);
 	} catch (error: any) {
 		console.error(error);
-		if (error.name && error.name === 'ZodError') {
-			return sendError(buildError({
-				code: INVALID_INPUT_ERROR,
-				message: 'Invalid input.',
-				status: 422,
-				data: error as ZodError,
-			}));
-		}
-		return sendError(buildError({
-			code: INTERNAL_ERROR,
-			message: error.message || 'An error occured.',
-			status: 500,
-			data: error,
-		}));
+		return sendBuiltErrorWithSchemaValidation(error);
 	}
 
 };
@@ -92,12 +79,12 @@ export const PUT = async (request: NextRequest) => {
 	try {
 		await connectToDatabase();
 
-		const passwordLowercaseMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_LOWERCASE_MIN_SETTING);
-		const passwordUppercaseMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_UPPERCASE_MIN_SETTING);
-		const passwordNumbersMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_NUMBERS_MIN_SETTING);
-		const passwordSymbolsMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_SYMBOLS_MIN_SETTING);
-		const passwordMinLengthSetting = await findSettingByName(SETTING_NAMES.PASSWORD_MIN_LENGTH_SETTING);
-		const passwordUniqueCharsSetting = await findSettingByName(SETTING_NAMES.PASSWORD_UNIQUE_CHARS_SETTING);
+		const passwordLowercaseMinSetting = await findSettingByName(SettingName.PASSWORD_LOWERCASE_MIN);
+		const passwordUppercaseMinSetting = await findSettingByName(SettingName.PASSWORD_UPPERCASE_MIN);
+		const passwordNumbersMinSetting = await findSettingByName(SettingName.PASSWORD_NUMBERS_MIN);
+		const passwordSymbolsMinSetting = await findSettingByName(SettingName.PASSWORD_SYMBOLS_MIN);
+		const passwordMinLengthSetting = await findSettingByName(SettingName.PASSWORD_MIN_LENGTH);
+		const passwordUniqueCharsSetting = await findSettingByName(SettingName.PASSWORD_UNIQUE_CHARS);
 
 		const passwordRules = {
 			uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,
@@ -119,30 +106,30 @@ export const PUT = async (request: NextRequest) => {
 		const savedToken = await getTokenFromTokenString(token);
 
 		if (!savedToken?.created_by) {
-			return sendError(buildError({
+			throw buildError({
 				code: TOKEN_NOT_FOUND_ERROR,
 				message: 'Token not found.',
 				status: 404,
-			}));
+			});
 		}
 
 		const tokenPayload = verifyToken(savedToken.token);
 		if (typeof tokenPayload === 'string') {
-			return sendError(buildError({
+			throw buildError({
 				code: INVALID_TOKEN_ERROR,
 				message: 'Invalid token.',
 				status: 401,
-			})); 
+			}); 
 		}
 
 		const userData = await findUserById(savedToken.target_id);
 
 		if (!userData) {
-			return sendError(buildError({
+			throw buildError({
 				code: USER_NOT_FOUND_ERROR,
 				message: 'User not found.',
 				status: 404,
-			}));
+			});
 		}
 
 		await deleteTokenById(savedToken.id);
@@ -153,20 +140,7 @@ export const PUT = async (request: NextRequest) => {
 		return NextResponse.json({ message: 'Updated.' });
 	} catch (error: any) {
 		console.error(error);
-		if (error.name && error.name === 'ZodError') {
-			return sendError(buildError({
-				code: INVALID_INPUT_ERROR,
-				message: 'Invalid input.',
-				status: 422,
-				data: error as ZodError,
-			}));
-		}
-		return sendError(buildError({
-			code: INTERNAL_ERROR,
-			message: error.message || 'An error occured.',
-			status: 500,
-			data: error,
-		}));
+		return sendBuiltErrorWithSchemaValidation(error);
 	}
 
 };

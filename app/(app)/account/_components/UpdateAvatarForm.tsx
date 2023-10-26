@@ -43,7 +43,7 @@ const UpdateAvatarForm = ({ csrfToken }: UpdateAvatarFormProps) => {
 			setIsLoading(true);
 			try {
 				const optimizedFile = await optimizeImage(fileToUpload);
-				const updatedUser = await updateUserAvatar(optimizedFile, csrfToken);
+				const updatedUser = await updateUserAvatar(optimizedFile, { csrfToken });
 				if (updatedUser) {
 					await updateCurrentUser(updatedUser);
 				}

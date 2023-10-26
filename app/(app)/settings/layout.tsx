@@ -10,8 +10,9 @@ import SettingsProvider from '@/context/settings/settings.provider';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
+import { Role } from '@/schemas/role.schema';
+import { SettingName } from '@/schemas/setting/name.shema';
 import { setServerAuthGuard } from '@/utils/auth';
-import { SETTING_NAMES } from '@/utils/settings';
 
 type SettingsLayoutProps = {
 	children: ReactNode;
@@ -25,9 +26,9 @@ const SettingsLayout = async ({ children }: SettingsLayoutProps) => {
 
 	await connectToDatabase();
 
-	const shareWithAdminSetting = await findSettingByName(SETTING_NAMES.SHARE_WITH_ADMIN_SETTING);
+	const shareWithAdminSetting = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
 
-	const rolesWhiteList: ('admin' | 'owner')[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ 'owner', 'admin' ] : [ 'owner' ];
+	const rolesWhiteList: Role[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ Role.OWNER, Role.ADMIN ] : [ Role.OWNER ];
 
 	await setServerAuthGuard({
 		rolesWhiteList,

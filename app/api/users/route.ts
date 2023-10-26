@@ -6,7 +6,11 @@ import { createFile, deleteFileById, findFileById, updateFileURL } from '@/datab
 import { createUser, findUserByEmail, findUserById, findUsers, findUsersCount, updateUser } from '@/database/user/user.repository';
 import { deleteFileFromKey, getFieldSignedURL, uploadImageToS3 } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
-import { IUser, IUserPopulated } from '@/types/user.type';
+import { AuthenticationProvider } from '@/schemas/authentication-provider';
+import { ImageMimeTypeSchema } from '@/schemas/file/mime-type.schema';
+import { Role } from '@/schemas/role.schema';
+import { User } from '@/schemas/user';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendBuiltErrorWithSchemaValidation } from '@/utils/error';
 import { FILE_TOO_LARGE_ERROR, USER_ALREADY_EXISTS_ERROR, USER_NOT_FOUND_ERROR, USER_UNEDITABLE_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
@@ -17,10 +21,11 @@ import { CreateUserSchema } from './_schemas/create-user.schema';
 import { FetchUsersSchema } from './_schemas/fetch-users.schema';
 import { UpdateUserSchema } from './_schemas/update-user.schema';
 
-const uploadPhotoFile = async (currentUser: IUserPopulated, photoFile?: Blob | null, user?: IUser | IUserPopulated) => {
+const uploadPhotoFile = async (currentUser: UserPopulated, photoFile?: Blob | null, user?: User | UserPopulated) => {
 	try {
 		if (photoFile) {
-			if (!AUTHORIZED_IMAGE_MIME_TYPES.includes(photoFile.type)) {
+			const fileMimeType = ImageMimeTypeSchema.parse(photoFile.type);
+			if (!AUTHORIZED_IMAGE_MIME_TYPES.includes(fileMimeType)) {
 				throw buildError({
 					code: WRONG_FILE_FORMAT_ERROR,
 					message: 'Wrong file format.',
@@ -71,7 +76,7 @@ export const POST = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
+		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
 
 		const formData = await request.formData();
 
@@ -102,7 +107,7 @@ export const POST = async (request: NextRequest) => {
 			username,
 			role,
 			phone_number,
-			provider_data: 'email',
+			provider_data: AuthenticationProvider.EMAIL,
 			created_by: currentUser.id,
 			photo: photoFileData?.id || null,
 			is_disabled,
@@ -121,7 +126,7 @@ export const PUT = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
+		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
 
 		const formData = await request.formData();
 
@@ -164,7 +169,7 @@ export const PUT = async (request: NextRequest) => {
 		const updatedUser = await updateUser({
 			id,
 			email: email || userData.email,
-			username: username || userData.username,
+			username: username || userData.username || undefined,
 			role: role || userData.role,
 			phone_number: phone_number || userData.phone_number,
 			is_disabled: is_disabled !== undefined && is_disabled !== null ? is_disabled : userData.is_disabled,
@@ -184,7 +189,7 @@ export const GET = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
+		await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
 
 		const queryParams = parse(request.url, true).query;
 

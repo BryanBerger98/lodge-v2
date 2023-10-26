@@ -8,9 +8,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from '@/components/ui/use-toast';
 import useCsrf from '@/context/csrf/useCsrf';
 import useSettings from '@/context/settings/useSettings';
+import { SettingName } from '@/schemas/setting';
 import { deleteImageSetting, updateImageSetting } from '@/services/settings.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
-import { SETTING_NAMES } from '@/utils/settings';
 
 type BrandFaviconFormDialogProps = {
 	isOpen: boolean;
@@ -31,7 +31,7 @@ const BrandFaviconFormDialog = ({ isOpen }: BrandFaviconFormDialogProps) => {
 	const { csrfToken } = useCsrf();
 	const { getSetting, loading, refetchSettings } = useSettings();
 
-	const brandFaviconSetting = getSetting(SETTING_NAMES.BRAND_FAVICON_SETTING);
+	const brandFaviconSetting = getSetting(SettingName.BRAND_FAVICON);
 
 	const { toast } = useToast();
 
@@ -47,9 +47,9 @@ const BrandFaviconFormDialog = ({ isOpen }: BrandFaviconFormDialogProps) => {
 			setIsLoading(true);
 			await updateImageSetting(
 				{
-					name: SETTING_NAMES.BRAND_FAVICON_SETTING,
+					name: SettingName.BRAND_FAVICON,
 					value: fileToUpload,
-				}, csrfToken);
+				}, { csrfToken });
 			refetchSettings();
 			handleClose();
 		} catch (error) {
@@ -76,7 +76,7 @@ const BrandFaviconFormDialog = ({ isOpen }: BrandFaviconFormDialogProps) => {
 		try {
 			if (!csrfToken) return;
 			setIsDeletionLoading(true);
-			await deleteImageSetting(SETTING_NAMES.BRAND_FAVICON_SETTING, csrfToken);
+			await deleteImageSetting(SettingName.BRAND_FAVICON, { csrfToken });
 			refetchSettings();
 			handleClose();
 		} catch (error) {

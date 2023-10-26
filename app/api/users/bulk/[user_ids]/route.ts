@@ -4,6 +4,7 @@ import { deleteMultipleFilesById, findMultipleFilesByKey } from '@/database/file
 import { deleteMultipleUsersById, findUsers } from '@/database/user/user.repository';
 import { deleteMultipleFilesFromKey } from '@/lib/bucket';
 import { connectToDatabase, newId } from '@/lib/database';
+import { Role } from '@/schemas/role.schema';
 import { filterEmptyValues } from '@/utils/array.util';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendBuiltError } from '@/utils/error';
@@ -34,7 +35,7 @@ export const DELETE = async (_: any, { params }: { params: { user_ids: string } 
 
 		await connectToDatabase();
 
-		await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
+		await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
 
 		const usersData = await findUsers({
 			_id: { $in: userIdsArr.map(id => newId(id)) },

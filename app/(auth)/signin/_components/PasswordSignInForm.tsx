@@ -14,14 +14,14 @@ import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { ISetting, UnregisteredSetting } from '@/types/setting.type';
+import { SettingPopulatedBoolean, UnregisteredSettingBooleanPopulated } from '@/schemas/setting';
 
 import { useSignInContext } from './SignInCard';
 
 
 type PasswordSignInFormProps = {
-	userVerifyEmailSetting: ISetting | UnregisteredSetting | null;
-	magicLinkSignInSetting: ISetting | UnregisteredSetting | null;
+	userVerifyEmailSetting: SettingPopulatedBoolean | UnregisteredSettingBooleanPopulated | null;
+	magicLinkSignInSetting: SettingPopulatedBoolean | UnregisteredSettingBooleanPopulated | null;
 };
 
 const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: PasswordSignInFormProps) => {
@@ -54,7 +54,7 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 				if (data?.error) {
 					setError('Incorrect credentials.');
 				} else {
-					if (!userVerifyEmailSetting || (userVerifyEmailSetting && userVerifyEmailSetting.data_type === 'boolean' && userVerifyEmailSetting.value)) {
+					if (!userVerifyEmailSetting || (userVerifyEmailSetting && userVerifyEmailSetting.value)) {
 						if (verificationToken) {
 							router.replace(`/verify-email/${ verificationToken }`);
 						} else {
@@ -75,7 +75,7 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 	};
 
 	const handleSendSignInMagicLink = () => {
-		if (!magicLinkSignInSetting || magicLinkSignInSetting.data_type !== 'boolean' || !magicLinkSignInSetting.value) {
+		if (!magicLinkSignInSetting || !magicLinkSignInSetting.value) {
 			return;
 		}
 		setIsLoading(true);
@@ -117,7 +117,7 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 				</CardHeader>
 				<CardContent>
 					{
-						magicLinkSignInSetting && magicLinkSignInSetting.data_type === 'boolean' && magicLinkSignInSetting.value ?
+						magicLinkSignInSetting && magicLinkSignInSetting.value ?
 							<div className="flex flex-col gap-4">
 								<Button
 									className="gap-2 w-full"

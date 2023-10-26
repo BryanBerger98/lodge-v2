@@ -2,7 +2,7 @@ import Credentials from 'next-auth/providers/credentials';
 
 import { findUserWithPasswordByEmail, updateUser } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
-import { IUserPopulatedWithPassword } from '@/types/user.type';
+import { UserPopulatedWithPassword } from '@/schemas/user/populated.schema';
 import { Optional } from '@/types/utils';
 import { buildError } from '@/utils/error';
 import { ACCOUNT_DISABLED_ERROR, INTERNAL_ERROR, MISSING_CREDENTIALS_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
@@ -50,11 +50,19 @@ const CredentialsProvider = Credentials({
 				});
 			}
 
+			if (!user.password) {
+				throw buildError({
+					code: WRONG_PASSWORD_ERROR,
+					message: 'Wrong Password',
+					status: 401,
+				});
+			}
+
 			const isPasswordValid = await verifyPassword(credentials.password, user.password);
 
 			if (!isPasswordValid) {
 				throw buildError({
-					code: WRONG_PASSWORD_ERROR,
+					code: WRONG_PASSWORD_ERROR, // TODO: Change to warn the user is not registered with email and password.
 					message: 'Wrong Password',
 					status: 401,
 				});
@@ -66,7 +74,7 @@ const CredentialsProvider = Credentials({
 				last_login_date: new Date(), 
 			}, { newDocument: true });
 
-			const sanitizedUser: Optional<IUserPopulatedWithPassword, 'password'> = updatedUser ? updatedUser : user;
+			const sanitizedUser: Optional<UserPopulatedWithPassword, 'password'> = updatedUser ? updatedUser : user;
 
 			delete sanitizedUser.password;
 
