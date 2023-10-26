@@ -16,10 +16,10 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
 import useSettings from '@/context/settings/useSettings';
+import { User } from '@/schemas/user';
 import { updateShareSettings } from '@/services/settings.service';
 import { fetchUsers } from '@/services/users.service';
-import { UnregisteredSetting } from '@/types/setting.type';
-import { IUser } from '@/types/user.type';
+import { IUnregisteredSetting } from '@/types/setting.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
 import { SETTING_NAMES } from '@/utils/settings';
 
@@ -30,7 +30,7 @@ const shareSettingsFormSchema = z.object({
 
 type ShareSettingsProps = {
 	csrfToken: string;
-	ownerUser: IUser | null;
+	ownerUser: User | null;
 };
 
 const ShareSettings = ({ csrfToken, ownerUser }: ShareSettingsProps) => {
@@ -116,7 +116,7 @@ const ShareSettings = ({ csrfToken, ownerUser }: ShareSettingsProps) => {
 		try {
 			setIsPasswordModalOpen(openState);
 			setIsLoading(true);
-			const settingsToUpdate: UnregisteredSetting[] = [];
+			const settingsToUpdate: IUnregisteredSetting[] = [];
 			if ((owner && owner !== ownerUser?.id.toString()) || (owner && owner !== ownerSetting?.value)) {
 				settingsToUpdate.push({
 					id: ownerSetting?.id,

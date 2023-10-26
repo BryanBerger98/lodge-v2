@@ -10,14 +10,14 @@ import ConfirmationFormModal, { ConfirmationModalOpenChangeEvent } from '@/compo
 import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal';
 import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
+import { UserPopulated } from '@/schemas/user';
 import { deleteUser, sendResetPasswordTokenToUser, sendVerificationTokenToUser } from '@/services/users.service';
-import { IUserPopulated } from '@/types/user.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
 import useUsers from '../../_context/users/useUsers';
 
 type MenuProps = {
-	userData: IUserPopulated;
+	userData: UserPopulated;
 	csrfToken: string;
 }
 
@@ -34,7 +34,7 @@ type ModalState<T extends ('form' | 'simple')> = T extends 'form' ? {
 	action: 'reset-password' | 'verify-email';
 };
 
-const getModalContent = (userData: IUserPopulated) => ({
+const getModalContent = (userData: UserPopulated) => ({
 	delete: {
 		title: 'Delete user',
 		description: <span>Please enter the email of the user <span className="font-bold text-slate-700 select-none">{ userData.email }</span> to confirm the deletion. This action is irreversible.</span>,

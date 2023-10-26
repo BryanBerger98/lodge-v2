@@ -4,6 +4,8 @@ import { createToken, deleteTokenById, getTokenFromTargetId } from '@/database/t
 import { findUserById } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
 import { generateToken } from '@/lib/jwt';
+import { Role } from '@/schemas/role.schema';
+import { TokenAction } from '@/schemas/token.schema';
 import { IToken } from '@/types/token.type';
 import { Optional } from '@/types/utils';
 import { setServerAuthGuard } from '@/utils/auth';
@@ -14,7 +16,7 @@ import { EMAIL_ALREADY_VERIFIED_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, TOKE
 export const POST = async (_: any, { params }: { params: { user_id: string } }) => {
 	try {
 		
-		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
+		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
 
 		await connectToDatabase();
 
@@ -46,7 +48,7 @@ export const POST = async (_: any, { params }: { params: { user_id: string } }) 
 			}));
 		}
 
-		const oldToken = await getTokenFromTargetId(userData.id, { action: 'email_verification' });
+		const oldToken = await getTokenFromTargetId(userData.id, { action: TokenAction.EMAIL_VERIFICATION });
 
 		if (oldToken) {
 			const tokenCreationTimestamp = oldToken.created_at.getTime();
@@ -63,11 +65,11 @@ export const POST = async (_: any, { params }: { params: { user_id: string } }) 
 		}
 
 		const expirationDate = Math.floor(Date.now() / 1000) + (60 * 60 * 24);
-		const token = generateToken(userData, expirationDate, 'email_verification');
+		const token = generateToken(userData, expirationDate, TokenAction.EMAIL_VERIFICATION);
 		const savedToken = await createToken({
 			token,
 			expiration_date: new Date(expirationDate),
-			action: 'email_verification',
+			action: TokenAction.EMAIL_VERIFICATION,
 			created_by: currentUser.id,
 			target_id: userData.id,
 		});

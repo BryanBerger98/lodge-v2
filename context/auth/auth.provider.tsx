@@ -4,8 +4,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
+import { UserPopulated } from '@/schemas/user';
 import { getCurrentLoggedInUser } from '@/services/auth.service';
-import { IUserPopulated } from '@/types/user.type';
 import { LoadingState } from '@/types/utils/loading.type';
 import { ApiError } from '@/utils/error';
 import { USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
@@ -25,7 +25,7 @@ type AuthProviderProps = {
 
 const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
-	const [ currentUser, setCurrentUser ] = useState<IUserPopulated | null>(null);
+	const [ currentUser, setCurrentUser ] = useState<UserPopulated | null>(null);
 	const [ loading, setLoading ] = useState<LoadingState>('idle');
 	const [ error, setError ] = useState<string | null>(null);
 
@@ -88,7 +88,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 		}
 	}, [ setCurrentUser ]);
 
-	const updateCurrentUser = useCallback(async (user: IUserPopulated) => {
+	const updateCurrentUser = useCallback(async (user: UserPopulated) => {
 		setCurrentUser({
 			...currentUser,
 			...user,

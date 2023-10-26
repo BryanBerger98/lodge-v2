@@ -1,3 +1,5 @@
+import { IFile as ILodgeFile } from '@/schemas/file';
+
 import { IUser } from './user.type';
 
 export type ImageMimetype = 'image/png' | 'image/jpeg' | 'image/gif' | 'image/webp';
@@ -23,4 +25,4 @@ export interface IFilePopulated extends Omit<IFile, 'created_by' | 'updated_by'>
 	updated_by: IUser | null;
 }
 
-export type CreateLodgeFileDTO = Omit<IFile, 'id' | 'created_at' | 'updated_at' | 'updated_by'>
+export type CreateLodgeFileDTO = Omit<ILodgeFile, 'id' | 'created_at' | 'updated_at' | 'updated_by'>

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export enum AuthProvider {
+export enum AuthenticationProvider {
 	EMAIL = 'email',
 	GOOGLE = 'google',
 	FACEBOOK = 'facebook',
@@ -11,4 +11,4 @@ export enum AuthProvider {
 	DISCORD = 'discord',
 };
 
-export const AuthProviderSchema = z.nativeEnum(AuthProvider);
+export const AuthenticationProviderSchema = z.nativeEnum(AuthenticationProvider);

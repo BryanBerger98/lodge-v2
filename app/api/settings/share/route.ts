@@ -4,6 +4,7 @@ import { ZodError } from 'zod';
 import { findSettingByName, updateSetting } from '@/database/setting/setting.repository';
 import { findOwnerUser, findUserById, updateUser } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
+import { Role } from '@/schemas/role.schema';
 import { authenticateUserWithPassword, setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
@@ -15,7 +16,7 @@ export const GET = async () => {
 	try {
 		await connectToDatabase();
 
-		await setServerAuthGuard({ rolesWhiteList: [ 'owner' ] });
+		await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER ] });
 
 		const shareWithAdminSetting = await findSettingByName(SETTING_NAMES.SHARE_WITH_ADMIN_SETTING);
 		const ownerSetting = await findSettingByName(SETTING_NAMES.OWNER_SETTING);
@@ -61,7 +62,7 @@ export const PUT = async (request: NextRequest) => {
 
 		await connectToDatabase();
 
-		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'owner' ] });
+		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER ] });
 
 		const body = await request.json();
 
@@ -88,12 +89,12 @@ export const PUT = async (request: NextRequest) => {
 			await updateUser({
 				id: prevOwnerUser?.id,
 				updated_by: currentUser.id,
-				role: 'admin',
+				role: Role.ADMIN,
 			});
 			await updateUser({
 				id: newOwnerUser.id,
 				updated_by: currentUser.id,
-				role: 'owner',
+				role: Role.OWNER,
 			});
 		}
 

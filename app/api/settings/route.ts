@@ -5,6 +5,7 @@ import { ZodError } from 'zod';
 
 import { findSettingByName, findSettings, updateSetting } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
+import { Role } from '@/schemas/role.schema';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { INTERNAL_ERROR, INVALID_INPUT_ERROR } from '@/utils/error/error-codes';
@@ -20,7 +21,7 @@ export const PUT = async (request: NextRequest) => {
 
 		const shareWithAdminSetting = await findSettingByName(SETTING_NAMES.SHARE_WITH_ADMIN_SETTING);
 
-		const rolesWhiteList: ('admin' | 'owner')[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ 'owner', 'admin' ] : [ 'owner' ];
+		const rolesWhiteList: Role[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ Role.OWNER, Role.ADMIN ] : [ Role.OWNER ];
 
 		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList });
 

@@ -1,6 +1,6 @@
 import { Schema, model, models, Model, Types } from 'mongoose';
 
-import { IFile } from '@/types/file.type';
+import { IFile } from '@/schemas/file';
 
 interface IFileDocument extends Omit<IFile, 'created_by' | 'updated_by'> {
 	created_by: Types.ObjectId | null;
@@ -16,7 +16,7 @@ const fileSchema = new Schema<IFileDocument>({
 		type: String,
 		default: '',
 	},
-	mimetype: {
+	mime_type: {
 		type: String,
 		default: '',
 	},
@@ -62,11 +62,7 @@ fileSchema.virtual('id').get(function getVirtualId () {
 	return this._id.toHexString();
 });
 
-fileSchema.set('toObject', {
-	virtuals: true,
-	flattenObjectIds: true,
-	versionKey: false, 
-});
+fileSchema.set('toObject', { virtuals: true });
 fileSchema.set('toJSON', {
 	virtuals: true,
 	flattenObjectIds: true,

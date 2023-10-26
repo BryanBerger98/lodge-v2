@@ -3,14 +3,14 @@
 import { type Session } from 'next-auth';
 import { createContext } from 'react';
 
-import { IUserPopulated } from '@/types/user.type';
+import { UserPopulated } from '@/schemas/user';
 import { LoadingState } from '@/types/utils/loading.type';
 import { Permission } from '@/utils/roles';
 
 export type AuthContextValue = {
-	currentUser: IUserPopulated | null;
-	fetchCurrentUser: () => Promise<IUserPopulated>,
-	updateCurrentUser: (user: IUserPopulated) => Promise<void>,
+	currentUser: UserPopulated | null;
+	fetchCurrentUser: () => Promise<UserPopulated>,
+	updateCurrentUser: (user: UserPopulated) => Promise<void>,
 	updateSession: () => Promise<Session | null>;
 	can: (action: Permission) => boolean;
 	loading: LoadingState,

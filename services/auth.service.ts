@@ -1,9 +1,9 @@
 import fetcher from '@/lib/fetcher';
+import { User, UserPopulated } from '@/schemas/user';
 import { SafeTokenData } from '@/types/token.type';
 
-import { IUser, IUserPopulated } from '../types/user.type';
 
-export const getCurrentLoggedInUser = async (): Promise<IUserPopulated> => {
+export const getCurrentLoggedInUser = async (): Promise<UserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account');
 		return data;
@@ -12,7 +12,7 @@ export const getCurrentLoggedInUser = async (): Promise<IUserPopulated> => {
 	}
 };
 
-export const signUpUser = async (email: string, password: string, csrfToken?: string | null): Promise<IUser> => {
+export const signUpUser = async (email: string, password: string, csrfToken?: string | null): Promise<User> => {
 	try {
 		const data = await fetcher('/api/auth/signup', {
 			method: 'POST',
@@ -95,7 +95,7 @@ export const sendResetPasswordToken = async (email: string, csrfToken: string) =
 	}
 };
 
-export const updateAccount = async (valuesToUpdate: { phone_number?: string, username?: string }, csrfToken: string): Promise<IUserPopulated> => {
+export const updateAccount = async (valuesToUpdate: { phone_number?: string, username?: string }, csrfToken: string): Promise<UserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account', {
 			method: 'PUT',
@@ -109,7 +109,7 @@ export const updateAccount = async (valuesToUpdate: { phone_number?: string, use
 	}
 };
 
-export const updateUserPassword = async (password: string, newPassword: string, csrfToken: string | null): Promise<IUserPopulated> => {
+export const updateUserPassword = async (password: string, newPassword: string, csrfToken: string | null): Promise<UserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account/password', {
 			method: 'PUT',
@@ -126,7 +126,7 @@ export const updateUserPassword = async (password: string, newPassword: string, 
 	}
 };
 
-export const updateUserEmail = async (email: string, password: string, csrfToken: string | null): Promise<IUserPopulated> => {
+export const updateUserEmail = async (email: string, password: string, csrfToken: string | null): Promise<UserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account/email', {
 			method: 'PUT',
@@ -143,7 +143,7 @@ export const updateUserEmail = async (email: string, password: string, csrfToken
 	}
 };
 
-export const updateUserAvatar = async (file: File, csrfToken: string): Promise<IUserPopulated | null> => {
+export const updateUserAvatar = async (file: File, csrfToken: string): Promise<UserPopulated | null> => {
 	try {
 		const formData = new FormData();
 		formData.append('avatar', file);

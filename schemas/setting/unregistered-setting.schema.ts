@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { FileSchema } from '../file.schema';
+import { FileSchema } from '../file';
 import { UserSchema } from '../user';
 
 import { SettingDataType } from './data-type.schema';

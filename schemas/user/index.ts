@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import { AuthProviderSchema } from '../auth-provider';
-import { FileSchema } from '../file.schema';
-import { RoleWithOwnerSchema } from '../role.schema';
+import { AuthenticationProviderSchema } from '../authentication-provider';
+import { FileSchema } from '../file';
+import { RoleSchema } from '../role.schema';
 
 import { GenderSchema } from './gender.schema';
 
@@ -12,7 +12,7 @@ export const UserSchema = z.object({
 	has_email_verified: z.coerce.boolean(),
 	first_name: z.coerce.string().nullable().optional(),
 	last_name: z.coerce.string().nullable().optional(),
-	role: RoleWithOwnerSchema,
+	role: RoleSchema,
 	birth_date: z.coerce.date().nullable().optional(),
 	gender: GenderSchema.optional(),
 	username: z.coerce.string().nullable().optional(),
@@ -20,7 +20,7 @@ export const UserSchema = z.object({
 	phone_number: z.coerce.string().optional(),
 	photo: z.coerce.string().nullable(),
 	is_disabled: z.coerce.boolean(),
-	provider_data: AuthProviderSchema,
+	provider_data: AuthenticationProviderSchema,
 	created_at: z.coerce.date().nullable(),
 	updated_at: z.coerce.date().nullable(),
 	created_by: z.coerce.string().min(1, 'Cannot be empty.').nullable(),

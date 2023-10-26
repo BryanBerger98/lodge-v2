@@ -1,8 +1,8 @@
 import { Schema, model, models, Model, Types } from 'mongoose';
 import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 
-import { AuthProvider } from '@/schemas/auth-provider';
-import { RoleWithOwner } from '@/schemas/role.schema';
+import { AuthenticationProvider } from '@/schemas/authentication-provider';
+import { Role } from '@/schemas/role.schema';
 import { UserWithPassword } from '@/schemas/user';
 import { Gender } from '@/schemas/user/gender.schema';
 
@@ -29,8 +29,8 @@ const userSchema = new Schema<IUserWithPasswordDocument>({
 	},
 	role: {
 		type: String,
-		enum: RoleWithOwner,
-		default: RoleWithOwner.USER,
+		enum: Role,
+		default: Role.USER,
 	},
 	first_name: { type: String },
 	last_name: { type: String },
@@ -60,8 +60,8 @@ const userSchema = new Schema<IUserWithPasswordDocument>({
 	},
 	provider_data: {
 		type: String,
-		enum: AuthProvider,
-		default: AuthProvider.EMAIL,
+		enum: AuthenticationProvider,
+		default: AuthenticationProvider.EMAIL,
 	},
 	updated_by: {
 		type: Schema.Types.ObjectId,

@@ -1,10 +1,9 @@
 import { newId } from '@/lib/database';
-import { CreateLodgeFileDTO, IFile, IFilePopulated } from '@/types/file.type';
-import { IUser } from '@/types/user.type';
-
-import UserModel from '../user/user.model';
+import { IFile, IFilePopulated } from '@/schemas/file';
+import { CreateLodgeFileDTO } from '@/types/file.type';
 
 import FileModel from './file.model';
+import { populateFile } from './utils/populate-file';
 
 export const findFileById = async (file_id: string): Promise<IFile | null> => {
 	try {
@@ -26,26 +25,10 @@ export const findFileByKey = async (key: string): Promise<IFile | null> => {
 	}
 };
 
-export const findMultipleFilesByKey = async (keysArray: string[]): Promise<IFilePopulated[] | null> => {
+export const findMultipleFilesByKey = async (keysArray: string[]): Promise<IFilePopulated[]> => {
 	try {
-		const files = await FileModel.find({ key: { $in: keysArray } })
-			.populate<{
-			created_by: IUser | null,
-			updated_by: IUser | null,
-		}>([
-			{
-				path: 'created_by',
-				select: { password: 0 },
-				model: UserModel,
-			},
-			{
-				path: 'updated_by',
-				select: { password: 0 },
-				model: UserModel,
-			},
-		])
-			.lean({ virtuals: [ 'id' ] });
-		return files;
+		const documents = await FileModel.find({ key: { $in: keysArray } }).populate(populateFile);
+		return documents.map(document => document.toJSON());
 	} catch (error) {
 		throw error;
 	}

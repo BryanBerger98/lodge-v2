@@ -4,8 +4,10 @@ import { createFile, deleteFileById, findFileById } from '@/database/file/file.r
 import { findSettingByName, updateSetting } from '@/database/setting/setting.repository';
 import { deleteFileFromKey, getFieldSignedURL, uploadImageToS3 } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
+import { ImageMimeTypeSchema } from '@/schemas/file/mime-type.schema';
+import { Role } from '@/schemas/role.schema';
+import { UserPopulated } from '@/schemas/user';
 import { ISettingImage, ISettingImagePopulated, IUnregisteredSettingImage, IUnregisteredSettingImagePopulated } from '@/types/setting.type';
-import { IUserPopulated } from '@/types/user.type';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendBuiltErrorWithSchemaValidation } from '@/utils/error';
 import { FILE_TOO_LARGE_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
@@ -14,10 +16,11 @@ import { SETTING_NAMES } from '@/utils/settings';
 
 import { UpdateImageSettingSchema } from '../_schemas/update-image.setting.schema';
 
-const uploadPhotoFile = async (currentUser: IUserPopulated, photoFile?: Blob | null, setting?: ISettingImagePopulated | ISettingImage | IUnregisteredSettingImage | IUnregisteredSettingImagePopulated | null) => {
+const uploadPhotoFile = async (currentUser: UserPopulated, photoFile?: Blob | null, setting?: ISettingImagePopulated | ISettingImage | IUnregisteredSettingImage | IUnregisteredSettingImagePopulated | null) => {
 	try {
 		if (photoFile) {
-			if (!AUTHORIZED_IMAGE_MIME_TYPES.includes(photoFile.type)) {
+			const fileMimeType = ImageMimeTypeSchema.parse(photoFile.type);
+			if (!AUTHORIZED_IMAGE_MIME_TYPES.includes(fileMimeType)) {
 				throw buildError({
 					code: WRONG_FILE_FORMAT_ERROR,
 					message: 'Wrong file format.',
@@ -69,7 +72,7 @@ export const PUT = async (request: NextRequest) => {
 
 		const shareWithAdminSetting = await findSettingByName(SETTING_NAMES.SHARE_WITH_ADMIN_SETTING);
 
-		const rolesWhiteList: ('admin' | 'owner')[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ 'owner', 'admin' ] : [ 'owner' ];
+		const rolesWhiteList: Role[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ Role.OWNER, Role.ADMIN ] : [ Role.OWNER ];
 
 		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList });
 

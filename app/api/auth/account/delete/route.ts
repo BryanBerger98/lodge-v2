@@ -6,6 +6,7 @@ import { findSettingByName } from '@/database/setting/setting.repository';
 import { deleteUserById, findUserWithPasswordById } from '@/database/user/user.repository';
 import { deleteFileFromKey } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
+import { Role } from '@/schemas/role.schema';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { FORBIDDEN_ERROR, INTERNAL_ERROR, PASSWORD_REQUIRED_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
@@ -32,7 +33,7 @@ export const POST = async (request: NextRequest) => {
 		const body = await request.json();
 		const { password } = deleteUserEmailSchema.parse(body);
 
-		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'admin', 'user' ] });
+		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.ADMIN, Role.USER ] });
 
 		const userData = await findUserWithPasswordById(currentUser.id);
 
@@ -41,6 +42,14 @@ export const POST = async (request: NextRequest) => {
 				code: USER_NOT_FOUND_ERROR,
 				message: 'User not found.',
 				status: 404,
+			}));
+		}
+
+		if (!userData.password) {
+			return sendError(buildError({
+				code: INTERNAL_ERROR,
+				message: 'User password not found.', // TODO: Create a dedicated error code for this.
+				status: 500,
 			}));
 		}
 

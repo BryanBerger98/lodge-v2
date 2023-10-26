@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createFile, deleteFileById, findFileById } from '@/database/file/file.repository';
 import { findUserById, updateUser } from '@/database/user/user.repository';
 import { deleteFileFromKey, getFieldSignedURL, uploadImageToS3 } from '@/lib/bucket';
+import { ImageMimeTypeSchema } from '@/schemas/file/mime-type.schema';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendBuiltError } from '@/utils/error';
 import { FILE_NOT_FOUND_ERROR, FILE_TOO_LARGE_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
@@ -57,7 +58,8 @@ export const PUT = async (request: NextRequest) => {
 			});
 		}
 
-		if (!AUTHORIZED_IMAGE_MIME_TYPES.includes(file.type)) {
+		const fileMimeType = ImageMimeTypeSchema.parse(file.type);
+		if (!AUTHORIZED_IMAGE_MIME_TYPES.includes(fileMimeType)) {
 			throw buildError({
 				code: WRONG_FILE_FORMAT_ERROR,
 				message: 'Wrong file format.',

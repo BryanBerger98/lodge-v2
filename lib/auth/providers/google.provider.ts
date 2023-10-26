@@ -2,6 +2,8 @@ import Google, { GoogleProfile } from 'next-auth/providers/google';
 
 import { createFile } from '@/database/file/file.repository';
 import { connectToDatabase } from '@/lib/database';
+import { AuthenticationProvider } from '@/schemas/authentication-provider';
+import { Role } from '@/schemas/role.schema';
 
 const GoogleProvider = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET ?
 	Google({
@@ -14,7 +16,7 @@ const GoogleProvider = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT
 				url: profile.picture,
 				created_by: null,
 				size: 0,
-				mimetype: '',
+				mime_type: '',
 				original_name: '',
 				custom_name: '',
 				extension: '',
@@ -26,9 +28,8 @@ const GoogleProvider = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT
 				username: profile.name,
 				email: profile.email,
 				photo: file,
-				photo_file: null,
-				role: 'user',
-				provider_data: 'google',
+				role: Role.USER,
+				provider_data: AuthenticationProvider.GOOGLE,
 				is_disabled: false,
 				has_email_verified: profile.email_verified,
 				phone_number: '',
@@ -36,9 +37,7 @@ const GoogleProvider = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT
 				updated_at: null,
 				created_by: null,
 				updated_by: null,
-				photo_key: null,
 				last_login_date: new Date(),
-				has_password: false,
 			};
 		},
 	}) : null;

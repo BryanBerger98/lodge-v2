@@ -8,11 +8,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { AuthProvider, IUserPopulated } from '@/types/user.type';
+import { AuthenticationProvider } from '@/schemas/authentication-provider';
+import { UserPopulated } from '@/schemas/user';
 
 import RowMenu from './RowMenu';
 
-export type UserColumn = IUserPopulated;
+
+export type UserColumn = UserPopulated;
 
 export const COLUMN_NAMES = {
 	username: 'username',
@@ -24,13 +26,13 @@ export const COLUMN_NAMES = {
 	created_at: 'created at',
 };
 
-const getProviderIcon = (provider: AuthProvider) => {
+const getProviderIcon = (provider: AuthenticationProvider) => {
 	switch (provider) {
-		case 'email':
+		case AuthenticationProvider.EMAIL:
 			return <Mail size="16" />;
-		case 'google':
+		case AuthenticationProvider.GOOGLE:
 			return <GoogleIcon size="16" />;
-		case 'apple':
+		case AuthenticationProvider.APPLE:
 			return <AppleIcon size="16" />;
 		default:
 			return <KeyRound size="16" />;
@@ -231,7 +233,9 @@ export const columns: ColumnDef<UserColumn>[] = [
 				</Button>
 			);
 		},
-		cell: ({ row }) => <span>{ new Date(row.original.created_at).toLocaleDateString('fr') } { new Date(row.original.created_at).toLocaleTimeString('fr') }</span>,
+		cell: ({ row }) => {
+			row.original.created_at ? <span>{ new Date(row.original.created_at).toLocaleDateString('fr') } { new Date(row.original.created_at).toLocaleTimeString('fr') }</span> : null; 
+		},
 	},
 	{
 		id: 'actions',

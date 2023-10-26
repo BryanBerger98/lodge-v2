@@ -53,6 +53,14 @@ export const PUT = async (request: NextRequest) => {
 			});
 		}
 
+		if (!userData.password) {
+			throw buildError({
+				code: INTERNAL_ERROR,
+				message: 'User password not found.', // TODO: Create a dedicated error code for this.
+				status: 500,
+			});
+		}
+
 		const isPasswordValid = await verifyPassword(password, userData.password);
 
 		if (!isPasswordValid) {

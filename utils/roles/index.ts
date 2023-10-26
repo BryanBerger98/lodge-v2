@@ -1,4 +1,4 @@
-import { UserRoleWithOwner } from '@/types/user.type';
+import { Role } from '@/schemas/role.schema';
 
-export type Permission = Record<UserRoleWithOwner, boolean>;
+export type Permission = Record<Role, boolean>;
 export type Actions = Record<string, Permission>;

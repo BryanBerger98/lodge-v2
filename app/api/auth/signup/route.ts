@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ZodError, z } from 'zod';
+import { z } from 'zod';
 
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { createToken } from '@/database/token/token.repository';
 import { createUser, findUserByEmail } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
 import { generateToken } from '@/lib/jwt';
+import { AuthenticationProvider } from '@/schemas/authentication-provider';
+import { Role } from '@/schemas/role.schema';
+import { TokenAction } from '@/schemas/token.schema';
 import { sendAccountVerificationEmail } from '@/utils/email';
-import { buildError, sendError } from '@/utils/error';
-import { FORBIDDEN_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_ALREADY_EXISTS_ERROR } from '@/utils/error/error-codes';
+import { buildError, sendBuiltErrorWithSchemaValidation } from '@/utils/error';
+import { FORBIDDEN_ERROR, INTERNAL_ERROR, USER_ALREADY_EXISTS_ERROR } from '@/utils/error/error-codes';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules, hashPassword } from '@/utils/password.util';
 import { SETTING_NAMES } from '@/utils/settings';
 
@@ -22,11 +25,11 @@ export const POST = async (request: NextRequest) => {
 		const newUserSignUpSetting = await findSettingByName(SETTING_NAMES.NEW_USERS_SIGNUP_SETTING);
 
 		if (newUserSignUpSetting && newUserSignUpSetting.data_type === 'boolean' && !newUserSignUpSetting.value) {
-			return sendError(buildError({
+			throw buildError({
 				code: FORBIDDEN_ERROR,
 				message: 'Forbidden.',
 				status: 403,
-			}));
+			});
 		}
 
 		const passwordLowercaseMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_LOWERCASE_MIN_SETTING);
@@ -52,11 +55,11 @@ export const POST = async (request: NextRequest) => {
 		const existingUser = await findUserByEmail(email);
 
 		if (existingUser) {
-			return sendError(buildError({
+			throw buildError({
 				code: USER_ALREADY_EXISTS_ERROR,
 				message: 'User already exists.',
 				status: 422,
-			}));
+			});
 		}
 
 		const hashedPassword = await hashPassword(password);
@@ -64,17 +67,16 @@ export const POST = async (request: NextRequest) => {
 		const createdUser = await createUser({
 			email,
 			password: hashedPassword,
-			provider_data: 'email',
-			role: 'user',
-			has_password: true,
+			provider_data: AuthenticationProvider.EMAIL,
+			role: Role.USER,
 		});
 
 		if (!createdUser) {
-			return sendError(buildError({
+			throw buildError({
 				code: INTERNAL_ERROR,
 				message: 'User not created.',
 				status: 500,
-			}));
+			});
 		}
 
 		if (createdUser.has_email_verified) {
@@ -82,11 +84,11 @@ export const POST = async (request: NextRequest) => {
 		}
 
 		const expirationDate = Math.floor(Date.now() / 1000) + (60 * 60 * 24);
-		const token = generateToken(createdUser, expirationDate, 'email_verification');
+		const token = generateToken(createdUser, expirationDate, TokenAction.EMAIL_VERIFICATION);
 		const savedToken = await createToken({
 			token,
 			expiration_date: new Date(expirationDate),
-			action: 'email_verification',
+			action: TokenAction.EMAIL_VERIFICATION,
 			created_by: createdUser.id,
 			target_id: createdUser.id,
 		});
@@ -96,19 +98,6 @@ export const POST = async (request: NextRequest) => {
 		return NextResponse.json(createdUser, { status: 201 });
 	} catch (error: any) {
 		console.error(error);
-		if (error.name && error.name === 'ZodError') {
-			return sendError(buildError({
-				code: INVALID_INPUT_ERROR,
-				message: 'Invalid input.',
-				status: 422,
-				data: error as ZodError,
-			}));
-		}
-		return sendError(buildError({
-			code: INTERNAL_ERROR,
-			message: error.message || 'An error occured.',
-			status: 500,
-			data: error,
-		}));
+		return sendBuiltErrorWithSchemaValidation(error);
 	}
 };

@@ -7,10 +7,10 @@ import { Tailwind } from '@react-email/tailwind';
 import { Text } from '@react-email/text';
 import * as React from 'react';
 
-import { IUser, IUserPopulated } from '@/types/user.type';
+import { User, UserPopulated } from '@/schemas/user';
 
 type EmailVerificationProps = {
-	user: Partial<IUser | IUserPopulated>;
+	user: Partial<User | UserPopulated>;
 	tokenLink: string;
 	appName?: string;
 };

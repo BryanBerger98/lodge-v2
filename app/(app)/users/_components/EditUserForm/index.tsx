@@ -20,14 +20,15 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
+import { Role } from '@/schemas/role.schema';
+import { UserPopulated } from '@/schemas/user';
 import { createUser, updateUser } from '@/services/users.service';
-import { IUserPopulated, UserRole } from '@/types/user.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
 import useUsers from '../../_context/users/useUsers';
 
 type EditUserFormProps = {
-	user?: IUserPopulated;
+	user?: UserPopulated;
 	csrfToken: string;
 };
 
@@ -47,7 +48,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 		username: string().min(1, 'Required.'),
 		email: string().email('Please, provide a valid email address.').min(1, 'Required.'),
 		phone_number: string(),
-		role: z.enum([ 'user', 'admin', 'owner' ]),
+		role: z.nativeEnum(Role),
 		is_disabled: boolean(),
 	});
 
@@ -57,7 +58,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 			username: user?.username || '',
 			email: user?.email || '',
 			phone_number: user?.phone_number || '',
-			role: user?.role || 'user',
+			role: user?.role || Role.USER,
 			is_disabled: user?.is_disabled || false,
 		},
 		mode: 'onTouched',
@@ -250,7 +251,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 							render={ ({ field }) => {
 
 								const handleChange = (value: string) => {
-									field.onChange(value as UserRole);
+									field.onChange(value as Role);
 								};
 
 								return (

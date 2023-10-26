@@ -4,6 +4,7 @@ import { deleteFileById, findFileById } from '@/database/file/file.repository';
 import { deleteUserById, findUserById } from '@/database/user/user.repository';
 import { deleteFileFromKey } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
+import { Role } from '@/schemas/role.schema';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { FORBIDDEN_ERROR, INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
@@ -23,7 +24,7 @@ export const DELETE = async (_: any, { params }: { params: { user_id: string } }
 
 		await connectToDatabase();
 
-		await setServerAuthGuard({ rolesWhiteList: [ 'owner', 'admin' ] });
+		await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
 
 		const userData = await findUserById(user_id);
 

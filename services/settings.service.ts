@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 import { UpdateImageSettingSchema } from '@/app/api/settings/_schemas/update-image.setting.schema';
 import fetcher, { FetcherOptions } from '@/lib/fetcher';
+import { User } from '@/schemas/user';
 import { ISetting, ISettingPopulated, IUnregisteredSetting } from '@/types/setting.type';
-import { IUser } from '@/types/user.type';
 import { objectToFormData } from '@/utils/object.utils';
 import { SettingImageName } from '@/utils/settings';
 import { buildQueryUrl } from '@/utils/url.util';
@@ -13,7 +13,7 @@ export type ShareSettings = {
 		shareWithAdmin: ISetting,
 		owner: ISetting,
 	},
-	ownerUser: IUser,
+	ownerUser: User,
 };
 
 export const getShareSettings = async (): Promise<ShareSettings> => {

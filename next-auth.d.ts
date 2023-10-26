@@ -2,39 +2,28 @@ import type { Awaitable } from 'next-auth';
 import type { AdapterUser as NextAuthAdapterUser, Adapter as NextAuthAdapter } from 'next-auth/adapters';
 import { JWT } from 'next-auth/jwt';
 
-import { AuthProvider, IUserPopulated, UserRole } from '@/types/user.type';
-
-import { TokenAction } from './types/token.type';
+import { Role } from './schemas/role.schema';
+import { UserPopulated } from './schemas/user';
 
 declare module 'next-auth' {
   /**
    * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
    */
 
-	interface User extends IUserPopulated {
-		id: string;
-		provider_data: AuthProvider;
-		email: string;
-	}
+	interface User extends UserPopulated {}
 
-  interface Session {
-    user: User
-	token: JWT & IUserPopulated & {
-		id: string;
-		action?: TokenAction;
-		provider_data: AuthProvider;
-		email: string;
+	interface Session {
+		user: User
+		token: JWT & UserPopulated & {
+			action?: TokenAction;
+		}
 	}
-  }
 }
 
 declare module 'next-auth/jwt' {
 	/** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
-	interface JWT extends IUserPopulated {
-		id: string;
+	interface JWT extends UserPopulated {
 		action?: TokenAction;
-		provider_data: AuthProvider;
-		email: string;
 	}
 }
 
@@ -42,7 +31,7 @@ declare module 'next-auth/adapters' {
 
 	interface AdapterUser extends NextAuthAdapterUser {
 		emailVerified?: Date | null;
-		role: UserRole;
+		role: Role;
 	}
 
 	interface Adapter extends NextAuthAdapter {
