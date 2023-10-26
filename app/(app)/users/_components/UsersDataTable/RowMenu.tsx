@@ -138,14 +138,14 @@ const RowMenu = ({ rowData }: RowMenuProps) => {
 		try {
 			setIsLoading(true);
 			if (confirmationModalState.action === 'delete') {
-				await deleteUser(rowData.id, csrfToken);
+				await deleteUser(rowData.id, { csrfToken });
 				refetchUsers();
 			}
 			if (confirmationModalState.action === 'suspend') {
 				await updateUserQuery({
 					id: rowData.id,
 					is_disabled: true,
-				}, csrfToken);
+				}, { csrfToken });
 				updateUsers({
 					...rowData,
 					is_disabled: true, 
@@ -155,17 +155,17 @@ const RowMenu = ({ rowData }: RowMenuProps) => {
 				await updateUserQuery({
 					id: rowData.id,
 					is_disabled: false,
-				}, csrfToken);
+				}, { csrfToken });
 				updateUsers({
 					...rowData,
 					is_disabled: false, 
 				});
 			}
 			if (confirmationModalState.action === 'reset-password') {
-				await sendResetPasswordTokenToUser(rowData.id, csrfToken);
+				await sendResetPasswordTokenToUser(rowData.id, { csrfToken });
 			}
 			if (confirmationModalState.action === 'verify-email') {
-				await sendVerificationTokenToUser(rowData.id, csrfToken);
+				await sendVerificationTokenToUser(rowData.id, { csrfToken });
 			}
 			setConfirmationModalState({
 				...confirmationModalState,

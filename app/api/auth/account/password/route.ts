@@ -4,11 +4,11 @@ import { ZodError, z } from 'zod';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { findUserWithPasswordById, updateUserPassword } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
+import { SettingName } from '@/schemas/setting';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules, hashPassword, verifyPassword } from '@/utils/password.util';
-import { SETTING_NAMES } from '@/utils/settings';
 
 export const PUT = async (request: NextRequest) => {
 
@@ -18,12 +18,12 @@ export const PUT = async (request: NextRequest) => {
 
 		const body = await request.json();
 
-		const passwordLowercaseMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_LOWERCASE_MIN_SETTING);
-		const passwordUppercaseMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_UPPERCASE_MIN_SETTING);
-		const passwordNumbersMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_NUMBERS_MIN_SETTING);
-		const passwordSymbolsMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_SYMBOLS_MIN_SETTING);
-		const passwordMinLengthSetting = await findSettingByName(SETTING_NAMES.PASSWORD_MIN_LENGTH_SETTING);
-		const passwordUniqueCharsSetting = await findSettingByName(SETTING_NAMES.PASSWORD_UNIQUE_CHARS_SETTING);
+		const passwordLowercaseMinSetting = await findSettingByName(SettingName.PASSWORD_LOWERCASE_MIN);
+		const passwordUppercaseMinSetting = await findSettingByName(SettingName.PASSWORD_UPPERCASE_MIN);
+		const passwordNumbersMinSetting = await findSettingByName(SettingName.PASSWORD_NUMBERS_MIN);
+		const passwordSymbolsMinSetting = await findSettingByName(SettingName.PASSWORD_SYMBOLS_MIN);
+		const passwordMinLengthSetting = await findSettingByName(SettingName.PASSWORD_MIN_LENGTH);
+		const passwordUniqueCharsSetting = await findSettingByName(SettingName.PASSWORD_UNIQUE_CHARS);
 
 		const passwordRules = {
 			uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,

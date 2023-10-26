@@ -5,21 +5,20 @@ import { createToken, deleteTokenById, getTokenFromTargetId, getTokenFromTokenSt
 import { findUserByEmail, findUserById, updateUser } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
 import { generateToken, verifyToken } from '@/lib/jwt';
-import { TokenAction } from '@/schemas/token.schema';
-import { IToken } from '@/types/token.type';
+import { SettingName } from '@/schemas/setting';
+import { Token, TokenAction } from '@/schemas/token.schema';
 import { Optional } from '@/types/utils';
 import { setServerAuthGuard } from '@/utils/auth';
 import { sendAccountVerificationEmail } from '@/utils/email';
 import { buildError, sendBuiltError, sendError } from '@/utils/error';
 import { EMAIL_ALREADY_VERIFIED_ERROR, FORBIDDEN_ERROR, INVALID_TOKEN_ERROR, TOKEN_ALREADY_SENT_ERROR, TOKEN_EXPIRED_ERROR, TOKEN_NOT_FOUND_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
-import { SETTING_NAMES } from '@/utils/settings';
 
 export const GET = async () => {
 
 	try {
 		await connectToDatabase();
 
-		const userVerifyEmailSetting = await findSettingByName(SETTING_NAMES.USER_VERIFY_EMAIL_SETTING);
+		const userVerifyEmailSetting = await findSettingByName(SettingName.USER_VERIFY_EMAIL);
 
 		if (userVerifyEmailSetting && userVerifyEmailSetting.data_type === 'boolean' && !userVerifyEmailSetting.value) {
 			throw buildError({
@@ -59,7 +58,7 @@ export const GET = async () => {
 			});
 		}
 
-		const safeTokenData: Optional<IToken, 'token'> = tokenData;
+		const safeTokenData: Optional<Token, 'token'> = tokenData;
 		delete safeTokenData.token;
 
 		return NextResponse.json(safeTokenData);
@@ -75,7 +74,7 @@ export const POST = async () => {
 	try {
 		await connectToDatabase();
 
-		const userVerifyEmailSetting = await findSettingByName(SETTING_NAMES.USER_VERIFY_EMAIL_SETTING);
+		const userVerifyEmailSetting = await findSettingByName(SettingName.USER_VERIFY_EMAIL);
 
 		if (userVerifyEmailSetting && userVerifyEmailSetting.data_type === 'boolean' && !userVerifyEmailSetting.value) {
 			throw buildError({
@@ -133,7 +132,7 @@ export const POST = async () => {
 
 		await sendAccountVerificationEmail(userData, savedToken);
 
-		const safeTokenData: Optional<IToken, 'token'> = savedToken;
+		const safeTokenData: Optional<Token, 'token'> = savedToken;
 		delete safeTokenData.token;
 
 		return NextResponse.json(safeTokenData);

@@ -5,42 +5,50 @@ import { redirect } from 'next/navigation';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
-import { SETTING_NAMES, findDefaultSettingByName } from '@/utils/settings';
+import { SettingName, UnregisteredSettingBooleanPopulatedSchema, UnregisteredSettingNumberPopulatedSchema } from '@/schemas/setting';
 
 
-const DynamicSignUpForm = dynamic(() => import('./_components/SignUpForm'));
+const SignUpForm = dynamic(() => import('./_components/SignUpForm'));
 
 const SignUpPage = async () => {
 	const csrfToken = await getCsrfToken(headers());
 
 	await connectToDatabase();
 
-	const newUserSignUpSetting = await findSettingByName(SETTING_NAMES.NEW_USERS_SIGNUP_SETTING);
+	const newUserSignUpSettingData = await findSettingByName(SettingName.NEW_USERS_SIGNUP);
+	const newUserSignUpSetting = UnregisteredSettingBooleanPopulatedSchema.parse(newUserSignUpSettingData);
 	
 	if (newUserSignUpSetting && newUserSignUpSetting.data_type === 'boolean' && !newUserSignUpSetting.value) {
 		redirect('/signin');
 	}
 
-	const userVerifyEmailSetting = await findSettingByName(SETTING_NAMES.USER_VERIFY_EMAIL_SETTING);
+	const userVerifyEmailSettingData = await findSettingByName(SettingName.USER_VERIFY_EMAIL);
+	const userVerifyEmailSetting = UnregisteredSettingBooleanPopulatedSchema.parse(userVerifyEmailSettingData);
 
-	const passwordLowercaseMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_LOWERCASE_MIN_SETTING);
-	const passwordUppercaseMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_UPPERCASE_MIN_SETTING);
-	const passwordNumbersMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_NUMBERS_MIN_SETTING);
-	const passwordSymbolsMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_SYMBOLS_MIN_SETTING);
-	const passwordMinLengthSetting = await findSettingByName(SETTING_NAMES.PASSWORD_MIN_LENGTH_SETTING);
-	const passwordUniqueCharsSetting = await findSettingByName(SETTING_NAMES.PASSWORD_UNIQUE_CHARS_SETTING);
+	const passwordLowercaseMinSettingData = await findSettingByName(SettingName.PASSWORD_LOWERCASE_MIN);
+	const passwordLowercaseMinSetting = UnregisteredSettingNumberPopulatedSchema.parse(passwordLowercaseMinSettingData);
+	const passwordUppercaseMinSettingData = await findSettingByName(SettingName.PASSWORD_UPPERCASE_MIN);
+	const passwordUppercaseMinSetting = UnregisteredSettingNumberPopulatedSchema.parse(passwordUppercaseMinSettingData);
+	const passwordNumbersMinSettingData = await findSettingByName(SettingName.PASSWORD_NUMBERS_MIN);
+	const passwordNumbersMinSetting = UnregisteredSettingNumberPopulatedSchema.parse(passwordNumbersMinSettingData);
+	const passwordSymbolsMinSettingData = await findSettingByName(SettingName.PASSWORD_SYMBOLS_MIN);
+	const passwordSymbolsMinSetting = UnregisteredSettingNumberPopulatedSchema.parse(passwordSymbolsMinSettingData);
+	const passwordMinLengthSettingData = await findSettingByName(SettingName.PASSWORD_MIN_LENGTH);
+	const passwordMinLengthSetting = UnregisteredSettingNumberPopulatedSchema.parse(passwordMinLengthSettingData);
+	const passwordUniqueCharsSettingData = await findSettingByName(SettingName.PASSWORD_UNIQUE_CHARS);
+	const passwordUniqueCharsSetting = UnregisteredSettingBooleanPopulatedSchema.parse(passwordUniqueCharsSettingData);
 
-	const googleAuthSetting = await findSettingByName(SETTING_NAMES.GOOGLE_AUTH_SETTING);
-	const defaultGoogleAuthSetting = await findDefaultSettingByName(SETTING_NAMES.GOOGLE_AUTH_SETTING);
-	const appleAuthSetting = await findSettingByName(SETTING_NAMES.APPLE_AUTH_SETTING);
-	const defaultAppleAuthSetting = await findDefaultSettingByName(SETTING_NAMES.APPLE_AUTH_SETTING);
+	const googleAuthSettingData = await findSettingByName(SettingName.GOOGLE_AUTH);
+	const googleAuthSetting = UnregisteredSettingBooleanPopulatedSchema.parse(googleAuthSettingData);
+	const appleAuthSettingData = await findSettingByName(SettingName.APPLE_AUTH);
+	const appleAuthSetting = UnregisteredSettingBooleanPopulatedSchema.parse(appleAuthSettingData);
 
 	return (
 		<div className="min-h-screen flex justify-center items-center">
-			<DynamicSignUpForm
-				appleAuthSetting={ appleAuthSetting || defaultAppleAuthSetting || null }
+			<SignUpForm
+				appleAuthSetting={ appleAuthSetting }
 				csrfToken={ csrfToken }
-				googleAuthSetting={ googleAuthSetting || defaultGoogleAuthSetting || null }
+				googleAuthSetting={ googleAuthSetting }
 				passwordRules={ {
 					uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,
 					lowercase_min: passwordLowercaseMinSetting?.value !== undefined && passwordLowercaseMinSetting?.data_type === 'number' ? passwordLowercaseMinSetting?.value : 0,

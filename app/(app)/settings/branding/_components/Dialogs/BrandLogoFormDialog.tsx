@@ -8,9 +8,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from '@/components/ui/use-toast';
 import useCsrf from '@/context/csrf/useCsrf';
 import useSettings from '@/context/settings/useSettings';
+import { SettingName } from '@/schemas/setting';
 import { deleteImageSetting, updateImageSetting } from '@/services/settings.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
-import { SETTING_NAMES } from '@/utils/settings';
 
 type BrandLogoFormDialogProps = {
 	isOpen: boolean;
@@ -31,7 +31,7 @@ const BrandLogoFormDialog = ({ isOpen }: BrandLogoFormDialogProps) => {
 	const { csrfToken } = useCsrf();
 	const { getSetting, loading, refetchSettings } = useSettings();
 
-	const brandLogoSetting = getSetting(SETTING_NAMES.BRAND_LOGO_SETTING);
+	const brandLogoSetting = getSetting(SettingName.BRAND_LOGO);
 
 	const { toast } = useToast();
 
@@ -47,9 +47,9 @@ const BrandLogoFormDialog = ({ isOpen }: BrandLogoFormDialogProps) => {
 			setIsLoading(true);
 			await updateImageSetting(
 				{
-					name: SETTING_NAMES.BRAND_LOGO_SETTING,
+					name: SettingName.BRAND_LOGO,
 					value: fileToUpload,
-				}, csrfToken);
+				}, { csrfToken });
 			refetchSettings();
 			handleClose();
 		} catch (error) {
@@ -76,7 +76,7 @@ const BrandLogoFormDialog = ({ isOpen }: BrandLogoFormDialogProps) => {
 		try {
 			if (!csrfToken) return;
 			setIsDeletionLoading(true);
-			await deleteImageSetting(SETTING_NAMES.BRAND_LOGO_SETTING, csrfToken);
+			await deleteImageSetting(SettingName.BRAND_LOGO, { csrfToken });
 			refetchSettings();
 			handleClose();
 		} catch (error) {

@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-import { UserSchema } from '../user';
-
 import { MimeTypeSchema } from './mime-type.schema';
 
 export const FileSchema = z.object({
@@ -20,9 +18,3 @@ export const FileSchema = z.object({
 	updated_by: z.string().min(1, 'Cannot be empty.').nullable(),
 });
 export type IFile = z.infer<typeof FileSchema>;
-
-export const FilePopulatedSchema = FileSchema.extend({
-	created_by: UserSchema.nullable(),
-	updated_by: UserSchema.nullable(),
-});
-export type IFilePopulated = z.infer<typeof FilePopulatedSchema>;

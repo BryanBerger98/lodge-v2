@@ -7,7 +7,7 @@ import ButtonList from '@/components/ui/Button/ButtonList';
 import ButtonItem from '@/components/ui/Button/ButtonList/ButtonItem';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import useSettings from '@/context/settings/useSettings';
-import { SETTING_NAMES } from '@/utils/settings';
+import { SettingName } from '@/schemas/setting';
 
 import BrandFaviconFormDialog from './Dialogs/BrandFaviconFormDialog';
 import BrandLogoFormDialog from './Dialogs/BrandLogoFormDialog';
@@ -25,9 +25,9 @@ const BrandSettingsForm = () => {
 
 	const { getSetting, loading } = useSettings();
 
-	const brandNameSetting = getSetting(SETTING_NAMES.BRAND_NAME_SETTING);
-	const brandLogoSetting = getSetting(SETTING_NAMES.BRAND_LOGO_SETTING);
-	const brandFaviconSetting = getSetting(SETTING_NAMES.BRAND_FAVICON_SETTING);
+	const brandNameSetting = getSetting(SettingName.BRAND_NAME);
+	const brandLogoSetting = getSetting(SettingName.BRAND_LOGO);
+	const brandFaviconSetting = getSetting(SettingName.BRAND_FAVICON);
 
 	const handleClickSettingButton = (settingName: string) => () => { 
 		const params = new URLSearchParams(searchParams);

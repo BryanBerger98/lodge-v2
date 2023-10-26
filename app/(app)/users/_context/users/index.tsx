@@ -4,7 +4,7 @@ import { createContext } from 'react';
 import { KeyedMutator } from 'swr';
 
 import { FetchUsersResponse } from '@/hooks/users/useFetchUsers';
-import { UserPopulated } from '@/schemas/user';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 import { LoadingStateError, LoadingState } from '@/types/utils/loading.type';
 
 import { SetUsersStatePayload } from './users.actions';

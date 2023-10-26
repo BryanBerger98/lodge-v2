@@ -1,4 +1,4 @@
-import { UserPopulated } from '@/schemas/user';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 
 import { UsersState } from './users.reducer';
 

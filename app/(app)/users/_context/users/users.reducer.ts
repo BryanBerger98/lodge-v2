@@ -1,6 +1,6 @@
 import { Reducer } from 'react';
 
-import { UserPopulated } from '@/schemas/user';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 import { LoadingState } from '@/types/utils/loading.type';
 
 import { USERS_ERROR_ACTION, USERS_IDLE_ACTION, USERS_PENDING_ACTION, USERS_SET_STATE_ACTION, USERS_UPDATE_ACTION, UsersReducerAction } from './users.actions';

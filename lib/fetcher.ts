@@ -1,10 +1,15 @@
 import { CSRF_TOKEN_HEADER } from './csrf';
 
+
 export type FetcherOptions = RequestInit & {
 	csrfToken?: string | null;
 }
 
-const fetcher = async (input: RequestInfo | URL, options?: FetcherOptions) => {
+export type FetcherOptionsWithCsrf = FetcherOptions & {
+	csrfToken: string;
+};
+
+const fetcher = async (input: RequestInfo | URL, options?: FetcherOptions | FetcherOptionsWithCsrf) => {
 
 	try {
 

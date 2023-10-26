@@ -7,7 +7,8 @@ import { Tailwind } from '@react-email/tailwind';
 import { Text } from '@react-email/text';
 import * as React from 'react';
 
-import { User, UserPopulated } from '@/schemas/user';
+import { User } from '@/schemas/user';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 
 type EmailVerificationProps = {
 	user: Partial<User | UserPopulated>;

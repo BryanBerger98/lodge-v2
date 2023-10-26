@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { UserPopulated } from '@/schemas/user';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 import { getCurrentLoggedInUser } from '@/services/auth.service';
 import { LoadingState } from '@/types/utils/loading.type';
 import { ApiError } from '@/utils/error';

@@ -8,8 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
+import { SettingName } from '@/schemas/setting/name.shema';
 import { setServerAuthGuard } from '@/utils/auth';
-import { PASSWORD_LOWERCASE_MIN_SETTING, PASSWORD_MIN_LENGTH_SETTING, PASSWORD_NUMBERS_MIN_SETTING, PASSWORD_SYMBOLS_MIN_SETTING, PASSWORD_UNIQUE_CHARS_SETTING, PASSWORD_UPPERCASE_MIN_SETTING, USER_ACCOUNT_DELETION_SETTING } from '@/utils/settings';
 
 const PageTitle = dynamic(() => import('@/components/layout/Header/PageTitle'));
 const DynamicSignOutButton = dynamic(() => import('./_components/SignOutButton'), { ssr: false });
@@ -28,16 +28,16 @@ const AccountPage = async () => {
 
 	const { user: currentUser } = await setServerAuthGuard();
 
-	const userAccountDeletionSetting = await findSettingByName(USER_ACCOUNT_DELETION_SETTING);
+	const userAccountDeletionSetting = await findSettingByName(SettingName.USER_ACCOUNT_DELETION);
 
 	const canDeleteAccount = userAccountDeletionSetting && userAccountDeletionSetting.data_type === 'boolean' && userAccountDeletionSetting.value;
 
-	const passwordLowercaseMinSetting = await findSettingByName(PASSWORD_LOWERCASE_MIN_SETTING);
-	const passwordUppercaseMinSetting = await findSettingByName(PASSWORD_UPPERCASE_MIN_SETTING);
-	const passwordNumbersMinSetting = await findSettingByName(PASSWORD_NUMBERS_MIN_SETTING);
-	const passwordSymbolsMinSetting = await findSettingByName(PASSWORD_SYMBOLS_MIN_SETTING);
-	const passwordMinLengthSetting = await findSettingByName(PASSWORD_MIN_LENGTH_SETTING);
-	const passwordUniqueCharsSetting = await findSettingByName(PASSWORD_UNIQUE_CHARS_SETTING);
+	const passwordLowercaseMinSetting = await findSettingByName(SettingName.PASSWORD_LOWERCASE_MIN);
+	const passwordUppercaseMinSetting = await findSettingByName(SettingName.PASSWORD_UPPERCASE_MIN);
+	const passwordNumbersMinSetting = await findSettingByName(SettingName.PASSWORD_NUMBERS_MIN);
+	const passwordSymbolsMinSetting = await findSettingByName(SettingName.PASSWORD_SYMBOLS_MIN);
+	const passwordMinLengthSetting = await findSettingByName(SettingName.PASSWORD_MIN_LENGTH);
+	const passwordUniqueCharsSetting = await findSettingByName(SettingName.PASSWORD_UNIQUE_CHARS);
 
 	return (
 		<>

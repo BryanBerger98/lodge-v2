@@ -13,10 +13,9 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } fr
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
 import useSettings from '@/context/settings/useSettings';
+import { SettingName, SettingDataType, UnregisteredSetting } from '@/schemas/setting';
 import { updateSettings } from '@/services/settings.service';
-import { UnregisteredSetting } from '@/types/setting.type';
 import { ApiError, getErrorMessage } from '@/utils/error';
-import { SETTING_NAMES } from '@/utils/settings';
 
 const usersSettingsFormSchema = z.object({
 	can_new_user_signup: z.boolean().default(true),
@@ -34,9 +33,9 @@ const UsersManagementSettings = ({ csrfToken }: UsersManagementSettingsProps) =>
 
 	const { getSetting, loading, refetchSettings } = useSettings();
 
-	const newUserSignupSetting = getSetting(SETTING_NAMES.NEW_USERS_SIGNUP_SETTING);
-	const userVerifyEmailSetting = getSetting(SETTING_NAMES.USER_VERIFY_EMAIL_SETTING);
-	const userAccountDeletionSetting = getSetting(SETTING_NAMES.USER_ACCOUNT_DELETION_SETTING);
+	const newUserSignupSetting = getSetting(SettingName.NEW_USERS_SIGNUP);
+	const userVerifyEmailSetting = getSetting(SettingName.USER_VERIFY_EMAIL);
+	const userAccountDeletionSetting = getSetting(SettingName.USER_ACCOUNT_DELETION);
 
 	const { toast } = useToast();
 
@@ -70,25 +69,25 @@ const UsersManagementSettings = ({ csrfToken }: UsersManagementSettingsProps) =>
 			setIsLoading(true);
 			const settingsValues: (UnregisteredSetting & { settingName: string, settingValue: boolean | string | number | undefined })[] = [
 				{
-					settingName: newUserSignupSetting?.name || SETTING_NAMES.NEW_USERS_SIGNUP_SETTING,
+					settingName: newUserSignupSetting?.name || SettingName.NEW_USERS_SIGNUP,
 					settingValue: newUserSignupSetting?.value,
-					name: SETTING_NAMES.NEW_USERS_SIGNUP_SETTING,
+					name: SettingName.NEW_USERS_SIGNUP,
 					value: can_new_user_signup,
-					data_type: 'boolean',
+					data_type: SettingDataType.BOOLEAN,
 				},
 				{
-					settingName: userVerifyEmailSetting?.name || SETTING_NAMES.USER_VERIFY_EMAIL_SETTING,
+					settingName: userVerifyEmailSetting?.name || SettingName.USER_VERIFY_EMAIL,
 					settingValue: userVerifyEmailSetting?.value,
-					name: SETTING_NAMES.USER_VERIFY_EMAIL_SETTING,
+					name: SettingName.USER_VERIFY_EMAIL,
 					value: should_verify_email,
-					data_type: 'boolean',
+					data_type: SettingDataType.BOOLEAN,
 				},
 				{
-					settingName: userAccountDeletionSetting?.name || SETTING_NAMES.USER_ACCOUNT_DELETION_SETTING,
+					settingName: userAccountDeletionSetting?.name || SettingName.USER_ACCOUNT_DELETION,
 					settingValue: userAccountDeletionSetting?.value,
-					name: SETTING_NAMES.USER_ACCOUNT_DELETION_SETTING,
+					name: SettingName.USER_ACCOUNT_DELETION,
 					value: can_user_delete_account,
-					data_type: 'boolean',
+					data_type: SettingDataType.BOOLEAN,
 				},
 			];
 			const settingsToUpdate: UnregisteredSetting[] = settingsValues
@@ -98,7 +97,7 @@ const UsersManagementSettings = ({ csrfToken }: UsersManagementSettingsProps) =>
 					value: setting.value,
 					data_type: setting.data_type,
 				})) as UnregisteredSetting[];
-			await updateSettings(settingsToUpdate, csrfToken);
+			await updateSettings(settingsToUpdate, { csrfToken });
 			await refetchSettings();
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;

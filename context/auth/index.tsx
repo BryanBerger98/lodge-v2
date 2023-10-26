@@ -3,7 +3,7 @@
 import { type Session } from 'next-auth';
 import { createContext } from 'react';
 
-import { UserPopulated } from '@/schemas/user';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 import { LoadingState } from '@/types/utils/loading.type';
 import { Permission } from '@/utils/roles';
 

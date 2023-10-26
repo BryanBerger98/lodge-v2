@@ -1,7 +1,8 @@
 import { FilterQuery } from 'mongoose';
 
 import { newId, UpdateQueryOptions, QueryOptions } from '@/lib/database';
-import { User, UserPopulated, UserPopulatedWithPassword, UserWithPassword } from '@/schemas/user';
+import { User, UserWithPassword } from '@/schemas/user';
+import { UserPopulated, UserPopulatedWithPassword } from '@/schemas/user/populated.schema';
 import { Optional } from '@/types/utils';
 
 import { CreateUserDTO, UpdateUserDTO } from './user.dto';
@@ -35,7 +36,7 @@ export const findUsersCount = async (searchRequest: FilterQuery<User>): Promise<
 export const findOwnerUser = async (): Promise<User | null> => {
 	try {
 		const ownerUser = await UserModel.findOne({ role: 'owner' }, { password: 0 });
-		return ownerUser?.toObject() || null;
+		return ownerUser?.toJSON() || null;
 	} catch (error) {
 		throw error;
 	}
@@ -76,7 +77,7 @@ export const findUserById = async (user_id: string): Promise<UserPopulated | nul
 export const findUserWithPasswordById = async (user_id: string): Promise<UserWithPassword | null> => {
 	try {
 		const user = await UserModel.findById(newId(user_id));
-		return user?.toObject() || null;
+		return user?.toJSON() || null;
 	} catch (error) {
 		throw error;
 	}
@@ -102,7 +103,7 @@ export const updateUser = async (userToUpdate: UpdateUserDTO, options?: UpdateQu
 		}, { new: options?.newDocument || false });
 		const document = await UserModel.findById(newId(userToUpdate.id), { password: 0 }).populate(populateUser);
 		if (!document) return null;
-		return document.toObject();
+		return document.toJSON();
 	} catch (error) {
 		throw error;
 	}
@@ -126,7 +127,7 @@ export const updateUserPassword = async (user_id: string, newHashedPassword: str
 export const deleteUserById = async (user_id: string): Promise<User | null> => {
 	try {
 		const deletedUserDoc = await UserModel.findByIdAndDelete(newId(user_id));
-		const deletedUser: Optional<UserWithPassword, 'password'> | null = deletedUserDoc?.toObject() || null;
+		const deletedUser: Optional<UserWithPassword, 'password'> | null = deletedUserDoc?.toJSON() || null;
 		if (deletedUser) {
 			delete deletedUser.password;
 		}

@@ -69,7 +69,10 @@ const UpdatePasswordForm = ({ csrfToken, passwordRules }: UpdatePasswordFormProp
 		try {
 			setIsPasswordModalOpen(openState);
 			setIsLoading(true);
-			await updateUserPassword(password, newPassword, csrfToken);
+			await updateUserPassword({
+				password,
+				newPassword, 
+			}, { csrfToken });
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
 			if (apiError.code === 'invalid-input') {

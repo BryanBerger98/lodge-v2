@@ -5,9 +5,9 @@ import { findSettingByName, updateSetting } from '@/database/setting/setting.rep
 import { deleteFileFromKey } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
 import { Role } from '@/schemas/role.schema';
+import { SettingDataType, SettingName } from '@/schemas/setting';
 import { setServerAuthGuard } from '@/utils/auth';
 import { sendBuiltErrorWithSchemaValidation } from '@/utils/error';
-import { SETTING_NAMES } from '@/utils/settings';
 
 import { DeleteImageSettingSchema } from './_schemas/delete-image-setting.schema';
 
@@ -18,7 +18,7 @@ export const DELETE = async (_: any, { params }: { params: { setting_name: strin
 
 		await connectToDatabase();
 
-		const shareWithAdminSetting = await findSettingByName(SETTING_NAMES.SHARE_WITH_ADMIN_SETTING);
+		const shareWithAdminSetting = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
 
 		const rolesWhiteList: Role[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ Role.OWNER, Role.ADMIN ] : [ Role.OWNER ];
 
@@ -26,7 +26,7 @@ export const DELETE = async (_: any, { params }: { params: { setting_name: strin
 
 		const settingData = await findSettingByName(name);
 
-		if (settingData && settingData.value && settingData.value.id) {
+		if (settingData && settingData.data_type === SettingDataType.IMAGE && settingData.value && 'id' in settingData.value && settingData.value.id) {
 			const oldFile = await findFileById(settingData.value.id);
 			if (oldFile) {
 				await deleteFileFromKey(oldFile.key);

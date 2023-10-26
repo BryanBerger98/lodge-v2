@@ -3,13 +3,13 @@ import { z } from 'zod';
 import { FileSchema } from '../file';
 import { UserSchema } from '../user';
 
-import { SettingDataType } from './data-type.schema';
+import { SettingDataType, SettingDataTypeSchema } from './data-type.schema';
 
 export const UnregisteredSettingBaseSchema = z.object({
 	id: z.string().min(1, 'Cannot be empty.').optional(),
 	name: z.string().min(1, 'Cannot be empty.'),
 	value: z.any(),
-	data_type: z.nativeEnum(SettingDataType),
+	data_type: SettingDataTypeSchema,
 	created_at: z.date().nullable().optional(),
 	updated_at: z.date().nullable().optional(),
 	created_by: z.string().min(1, 'Cannot be empty.').nullable().optional(),
@@ -42,7 +42,7 @@ export type UnregisteredSettingNumber = z.infer<typeof UnregisteredSettingNumber
 
 export const UnregisteredSettingObjectIdSchema = UnregisteredSettingBaseSchema.extend({
 	value: z.string().nullable(),
-	data_type: z.literal(SettingDataType.STRING),
+	data_type: z.literal(SettingDataType.OBJECT_ID),
 });
 export type UnregisteredSettingObjectId = z.infer<typeof UnregisteredSettingObjectIdSchema>;
 
@@ -61,7 +61,14 @@ export const UnregisteredSettingSchema = z.discriminatedUnion('data_type', [
 	UnregisteredSettingDateSchema,
 ]);
 
-export type UnregisteredSetting = z.infer<typeof UnregisteredSettingSchema>;
+export type UnregisteredSetting<T = SettingDataType> = 
+	T extends SettingDataType.BOOLEAN ? UnregisteredSettingBoolean
+	: T extends SettingDataType.STRING ? UnregisteredSettingString
+	: T extends SettingDataType.NUMBER ? UnregisteredSettingNumber
+	: T extends SettingDataType.OBJECT_ID ? UnregisteredSettingObjectId
+	: T extends SettingDataType.DATE ? UnregisteredSettingDate
+	: T extends SettingDataType.IMAGE ? UnregisteredSettingImage
+	: z.infer<typeof UnregisteredSettingSchema>;
 
 export const UnregisteredSettingBasePopulatedSchema = UnregisteredSettingBaseSchema.extend({
 	created_by: UserSchema.nullable().optional(),
@@ -94,7 +101,7 @@ export type UnregisteredSettingNumberPopulated = z.infer<typeof UnregisteredSett
 
 export const UnregisteredSettingObjectIdPopulatedSchema = UnregisteredSettingBasePopulatedSchema.extend({
 	value: z.string().nullable(),
-	data_type: z.literal(SettingDataType.STRING),
+	data_type: z.literal(SettingDataType.OBJECT_ID),
 });
 export type UnregisteredSettingObjectIdPopulated = z.infer<typeof UnregisteredSettingObjectIdPopulatedSchema>;
 
@@ -112,4 +119,21 @@ export const UnregisteredSettingPopulatedSchema = z.discriminatedUnion('data_typ
 	UnregisteredSettingObjectIdPopulatedSchema,
 	UnregisteredSettingDatePopulatedSchema,
 ]);
-export type UnregisteredSettingPopulated = z.infer<typeof UnregisteredSettingPopulatedSchema>;
+
+export type UnregisteredSettingPopulated<T = SettingDataType> = 
+	T extends SettingDataType.BOOLEAN ? UnregisteredSettingBooleanPopulated
+	: T extends SettingDataType.STRING ? UnregisteredSettingStringPopulated
+	: T extends SettingDataType.NUMBER ? UnregisteredSettingNumberPopulated
+	: T extends SettingDataType.OBJECT_ID ? UnregisteredSettingObjectIdPopulated
+	: T extends SettingDataType.DATE ? UnregisteredSettingDatePopulated
+	: T extends SettingDataType.IMAGE ? UnregisteredSettingImagePopulated
+	: z.infer<typeof UnregisteredSettingPopulatedSchema>;
+
+export type UpdateUnregisteredSettingPopulated<T = SettingDataType> =
+	T extends SettingDataType.BOOLEAN ? UnregisteredSettingBooleanPopulated
+	: T extends SettingDataType.STRING ? UnregisteredSettingStringPopulated
+	: T extends SettingDataType.NUMBER ? UnregisteredSettingNumberPopulated
+	: T extends SettingDataType.OBJECT_ID ? UnregisteredSettingObjectIdPopulated
+	: T extends SettingDataType.DATE ? UnregisteredSettingDatePopulated
+	: T extends SettingDataType.IMAGE ? UnregisteredSettingImagePopulated
+	: z.infer<typeof UnregisteredSettingPopulatedSchema>;

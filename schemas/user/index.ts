@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 import { AuthenticationProviderSchema } from '../authentication-provider';
-import { FileSchema } from '../file';
 import { RoleSchema } from '../role.schema';
 
 import { GenderSchema } from './gender.schema';
@@ -31,13 +30,3 @@ export type User = z.infer<typeof UserSchema>;
 
 export const UserWithPasswordSchema = UserSchema.extend({ password: z.string().min(1, 'Cannot be empty.').nullable() });
 export type UserWithPassword = z.infer<typeof UserWithPasswordSchema>;
-
-export const UserPopulatedSchema = UserSchema.extend({
-	created_by: UserSchema.nullable(),
-	updated_by: UserSchema.nullable(),
-	photo: FileSchema.nullable(),
-});
-export type UserPopulated = z.infer<typeof UserPopulatedSchema>;
-
-export const UserPopulatedWithPasswordSchema = UserPopulatedSchema.extend({ password: z.string().min(1, 'Cannot be empty.').nullable() });
-export type UserPopulatedWithPassword = z.infer<typeof UserPopulatedWithPasswordSchema>;

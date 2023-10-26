@@ -3,7 +3,7 @@ import type { AdapterUser as NextAuthAdapterUser, Adapter as NextAuthAdapter } f
 import { JWT } from 'next-auth/jwt';
 
 import { Role } from './schemas/role.schema';
-import { UserPopulated } from './schemas/user';
+import { UserPopulated } from './schemas/user/populated.schema';
 
 declare module 'next-auth' {
   /**

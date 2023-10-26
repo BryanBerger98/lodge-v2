@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 
 import { TokenAction } from '@/schemas/token.schema';
-import { User, UserPopulated } from '@/schemas/user';
+import { User } from '@/schemas/user';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 
 export const generateToken = (user: User | UserPopulated, expirationDate: Date | number, action: TokenAction) => {
 	const { JWT_SECRET } = process.env;

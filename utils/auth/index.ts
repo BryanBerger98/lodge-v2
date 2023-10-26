@@ -5,7 +5,8 @@ import { findUserById, findUserWithPasswordById } from '@/database/user/user.rep
 import authOptions from '@/lib/auth';
 import { connectToDatabase } from '@/lib/database';
 import { Role } from '@/schemas/role.schema';
-import { User, UserPopulated } from '@/schemas/user';
+import { User } from '@/schemas/user';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 
 import { buildError } from '../error';
 import { FORBIDDEN_ERROR, MISSING_CREDENTIALS_ERROR, UNAUTHORIZED_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '../error/error-codes';

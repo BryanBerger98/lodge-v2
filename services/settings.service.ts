@@ -1,17 +1,17 @@
 import { z } from 'zod';
 
 import { UpdateImageSettingSchema } from '@/app/api/settings/_schemas/update-image.setting.schema';
-import fetcher, { FetcherOptions } from '@/lib/fetcher';
+import fetcher, { FetcherOptions, FetcherOptionsWithCsrf } from '@/lib/fetcher';
+import { Setting, SettingName, SettingPopulated } from '@/schemas/setting';
+import { UnregisteredSetting } from '@/schemas/setting/unregistered-setting.schema';
 import { User } from '@/schemas/user';
-import { ISetting, ISettingPopulated, IUnregisteredSetting } from '@/types/setting.type';
 import { objectToFormData } from '@/utils/object.utils';
-import { SettingImageName } from '@/utils/settings';
 import { buildQueryUrl } from '@/utils/url.util';
 
 export type ShareSettings = {
 	settings: {
-		shareWithAdmin: ISetting,
-		owner: ISetting,
+		shareWithAdmin: Setting,
+		owner: Setting,
 	},
 	ownerUser: User,
 };
@@ -29,7 +29,7 @@ export type FetchSettingsOptions = {
 	name?: string | string[]
 } & FetcherOptions;
 
-export const fetchSettings = async (options?: FetchSettingsOptions): Promise<ISetting[]> => {
+export const fetchSettings = async (options?: FetchSettingsOptions): Promise<Setting[]> => {
 
 	const { name = '', ...restOptions } = options ? options : { name: '' };
 
@@ -42,13 +42,13 @@ export const fetchSettings = async (options?: FetchSettingsOptions): Promise<ISe
 	}
 };
 
-export const updateSettings = async (settings: IUnregisteredSetting[], csrfToken: string): Promise<{ message: string }> => {
+export const updateSettings = async (settings: UnregisteredSetting[], options: FetcherOptionsWithCsrf): Promise<{ message: string }> => {
 	try {
 		const data = await fetcher('/api/settings', {
 			method: 'PUT',
 			body: JSON.stringify({ settings }),
 			headers: { 'Content-Type': 'application/json' },
-			csrfToken,
+			...options,
 		});
 		return data;
 	} catch (error) {
@@ -56,13 +56,13 @@ export const updateSettings = async (settings: IUnregisteredSetting[], csrfToken
 	}
 };
 
-export const updateImageSetting = async (setting: z.infer<typeof UpdateImageSettingSchema>, csrfToken: string): Promise<{ message: string }> => {
+export const updateImageSetting = async (setting: z.infer<typeof UpdateImageSettingSchema>, options: FetcherOptionsWithCsrf): Promise<{ message: string }> => {
 	try {
 		const formData = objectToFormData({ ...setting });
 		const data = await fetcher('/api/settings/image', {
 			method: 'PUT',
 			body: formData,
-			csrfToken,
+			...options,
 		});
 		return data;
 	} catch (error) {
@@ -70,11 +70,11 @@ export const updateImageSetting = async (setting: z.infer<typeof UpdateImageSett
 	}
 };
 
-export const deleteImageSetting = async (setting_name: SettingImageName, csrfToken: string): Promise<ISettingPopulated | null> => {
+export const deleteImageSetting = async (setting_name: SettingName, options: FetcherOptionsWithCsrf): Promise<SettingPopulated | null> => {
 	try {
 		const data = await fetcher(`/api/settings/image/${ setting_name }`, {
 			method: 'DELETE',
-			csrfToken,
+			...options,
 		});
 		return data;
 	} catch (error) {
@@ -82,7 +82,7 @@ export const deleteImageSetting = async (setting_name: SettingImageName, csrfTok
 	}
 };
 
-export const updateShareSettings = async (settings: IUnregisteredSetting[], csrfToken: string, password: string): Promise<{ message: string }> => {
+export const updateShareSettings = async ({ settings, password }: { settings: UnregisteredSetting[], password: string }, options: FetcherOptionsWithCsrf): Promise<{ message: string }> => {
 	try {
 		const data = await fetcher('/api/settings/share', {
 			method: 'PUT',
@@ -91,7 +91,7 @@ export const updateShareSettings = async (settings: IUnregisteredSetting[], csrf
 				password, 
 			}),
 			headers: { 'Content-Type': 'application/json' },
-			csrfToken,
+			...options,
 		});
 		return data;
 	} catch (error) {

@@ -1,12 +1,12 @@
 import { Reducer } from 'react';
 
-import { SettingDataType, IUnregisteredSettingPopulated } from '@/types/setting.type';
+import { SettingDataType, UnregisteredSettingPopulated } from '@/schemas/setting';
 import { LoadingState } from '@/types/utils/loading.type';
 
 import { SETTINGS_ERROR_ACTION, SETTINGS_IDLE_ACTION, SETTINGS_PENDING_ACTION, SETTINGS_SET_STATE_ACTION, SETTINGS_UPDATE_ACTION, SettingsReducerAction } from './settings.actions';
 
 export type SettingsState<T = SettingDataType> = {
-	settings: IUnregisteredSettingPopulated<T>[];
+	settings: UnregisteredSettingPopulated<T>[];
 	loading: LoadingState;
 	error?: string;
 }

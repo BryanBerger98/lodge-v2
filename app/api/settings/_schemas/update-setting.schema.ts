@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-import { SettingDataTypes } from '@/types/setting.type';
+import { SettingDataType } from '@/schemas/setting';
 
 export const UpdateSettingSchema = z.object({
-	name: z.coerce.string().nonempty('Required.'),
+	name: z.coerce.string().min(1, 'Cannot be empty'),
 	value: z.any(),
-	data_type: z.enum(SettingDataTypes),
+	data_type: z.nativeEnum(SettingDataType),
 	id: z.string().optional(),
 });

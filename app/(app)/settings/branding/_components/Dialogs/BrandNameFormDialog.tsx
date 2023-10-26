@@ -14,9 +14,9 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import useCsrf from '@/context/csrf/useCsrf';
 import useSettings from '@/context/settings/useSettings';
+import { SettingDataType, SettingName } from '@/schemas/setting';
 import { updateSettings } from '@/services/settings.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
-import { SETTING_NAMES } from '@/utils/settings';
 
 type BrandNameFormDialogProps = {
 	isOpen: boolean;
@@ -35,7 +35,7 @@ const BrandNameFormDialog = ({ isOpen }: BrandNameFormDialogProps) => {
 	const { csrfToken } = useCsrf();
 	const { getSetting, loading, refetchSettings } = useSettings();
 
-	const brandNameSetting = getSetting(SETTING_NAMES.BRAND_NAME_SETTING);
+	const brandNameSetting = getSetting(SettingName.BRAND_NAME);
 
 	const { toast } = useToast();
 
@@ -68,11 +68,11 @@ const BrandNameFormDialog = ({ isOpen }: BrandNameFormDialogProps) => {
 			setIsLoading(true);
 			await updateSettings([
 				{
-					name: SETTING_NAMES.BRAND_NAME_SETTING,
+					name: SettingName.BRAND_NAME,
 					value: brand_name,
-					data_type: 'string',
+					data_type: SettingDataType.STRING,
 				},
-			], csrfToken);
+			], { csrfToken });
 			refetchSettings();
 			handleClose();
 		} catch (error) {

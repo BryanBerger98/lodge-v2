@@ -7,18 +7,18 @@ import { deleteUserById, findUserWithPasswordById } from '@/database/user/user.r
 import { deleteFileFromKey } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
 import { Role } from '@/schemas/role.schema';
+import { SettingName } from '@/schemas/setting';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendError } from '@/utils/error';
 import { FORBIDDEN_ERROR, INTERNAL_ERROR, PASSWORD_REQUIRED_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
 import { verifyPassword } from '@/utils/password.util';
-import { SETTING_NAMES } from '@/utils/settings';
 
 export const POST = async (request: NextRequest) => {
 	try {
 
 		await connectToDatabase();
 
-		const userAccountDeletionSetting = await findSettingByName(SETTING_NAMES.USER_ACCOUNT_DELETION_SETTING);
+		const userAccountDeletionSetting = await findSettingByName(SettingName.USER_ACCOUNT_DELETION);
 
 		if (userAccountDeletionSetting && userAccountDeletionSetting.data_type === 'boolean' && !userAccountDeletionSetting.value) {
 			return sendError(buildError({

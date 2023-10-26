@@ -1,8 +1,9 @@
 import { render } from '@react-email/render';
 
 import { MailOptions, SMTPTransport, sendMail } from '@/lib/mailer';
-import { User, UserPopulated } from '@/schemas/user';
-import { IToken } from '@/types/token.type';
+import { Token } from '@/schemas/token.schema';
+import { User } from '@/schemas/user';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 
 import EmailVerification from './templates/EmailVerification';
 import MagicLinkSignIn from './templates/MagicLinkSignIn';
@@ -43,7 +44,7 @@ export const sendMagicLinkSignInEmail = (user: User, url: string) => {
 	});
 };
 
-export const sendAccountVerificationEmail = (user: User | UserPopulated, token: IToken) => {
+export const sendAccountVerificationEmail = (user: User | UserPopulated, token: Token) => {
 	return new Promise((resolve, reject) => {
 		const tokenLink = `${ process.env.FRONT_URL }/verify-email/${ token.token }`;
 		const htmlBody = render(EmailVerification({
@@ -58,7 +59,7 @@ export const sendAccountVerificationEmail = (user: User | UserPopulated, token: 
 	});
 };
 
-export const sendResetPasswordEmail = (user: User | UserPopulated, token: IToken) => {
+export const sendResetPasswordEmail = (user: User | UserPopulated, token: Token) => {
 	return new Promise((resolve, reject) => {
 		const tokenLink = `${ process.env.FRONT_URL }/forgot-password/${ token.token }`;
 		const htmlBody = render(ResetPassword({

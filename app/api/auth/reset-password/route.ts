@@ -6,14 +6,13 @@ import { createToken, deleteTokenById, getTokenFromTargetId, getTokenFromTokenSt
 import { findUserByEmail, findUserById, updateUserPassword } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
 import { generateToken, verifyToken } from '@/lib/jwt';
-import { TokenAction } from '@/schemas/token.schema';
-import { IToken } from '@/types/token.type';
+import { SettingName } from '@/schemas/setting';
+import { Token, TokenAction } from '@/schemas/token.schema';
 import { Optional } from '@/types/utils';
 import { sendResetPasswordEmail } from '@/utils/email';
 import { buildError, sendBuiltErrorWithSchemaValidation } from '@/utils/error';
 import { INVALID_TOKEN_ERROR, TOKEN_ALREADY_SENT_ERROR, TOKEN_NOT_FOUND_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules, hashPassword } from '@/utils/password.util';
-import { SETTING_NAMES } from '@/utils/settings';
 
 export const POST = async (request: NextRequest) => {
 
@@ -64,7 +63,7 @@ export const POST = async (request: NextRequest) => {
 
 		await sendResetPasswordEmail(userData, savedToken);
 
-		const safeTokenData: Optional<IToken, 'token'> = savedToken;
+		const safeTokenData: Optional<Token, 'token'> = savedToken;
 		delete safeTokenData.token;
 
 		return NextResponse.json(safeTokenData);
@@ -80,12 +79,12 @@ export const PUT = async (request: NextRequest) => {
 	try {
 		await connectToDatabase();
 
-		const passwordLowercaseMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_LOWERCASE_MIN_SETTING);
-		const passwordUppercaseMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_UPPERCASE_MIN_SETTING);
-		const passwordNumbersMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_NUMBERS_MIN_SETTING);
-		const passwordSymbolsMinSetting = await findSettingByName(SETTING_NAMES.PASSWORD_SYMBOLS_MIN_SETTING);
-		const passwordMinLengthSetting = await findSettingByName(SETTING_NAMES.PASSWORD_MIN_LENGTH_SETTING);
-		const passwordUniqueCharsSetting = await findSettingByName(SETTING_NAMES.PASSWORD_UNIQUE_CHARS_SETTING);
+		const passwordLowercaseMinSetting = await findSettingByName(SettingName.PASSWORD_LOWERCASE_MIN);
+		const passwordUppercaseMinSetting = await findSettingByName(SettingName.PASSWORD_UPPERCASE_MIN);
+		const passwordNumbersMinSetting = await findSettingByName(SettingName.PASSWORD_NUMBERS_MIN);
+		const passwordSymbolsMinSetting = await findSettingByName(SettingName.PASSWORD_SYMBOLS_MIN);
+		const passwordMinLengthSetting = await findSettingByName(SettingName.PASSWORD_MIN_LENGTH);
+		const passwordUniqueCharsSetting = await findSettingByName(SettingName.PASSWORD_UNIQUE_CHARS);
 
 		const passwordRules = {
 			uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,

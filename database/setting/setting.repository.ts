@@ -1,13 +1,15 @@
 import { FilterQuery } from 'mongoose';
 
 import { UpdateQueryOptions, newId } from '@/lib/database';
-import { ISetting, ISettingPopulated, IUnregisteredSettingPopulated } from '@/types/setting.type';
-import { SettingName, SettingNameType, findDefaultSettingByName } from '@/utils/settings';
+import { Setting, SettingPopulated, SettingName, SettingDataType } from '@/schemas/setting';
+import { UnregisteredSettingPopulated } from '@/schemas/setting/unregistered-setting.schema';
+import { SettingNameType, findDefaultSettingByName } from '@/utils/settings';
 
+import { populateSetting } from './populate-setting';
 import { CreateSettingDTO, UpdateSettingDTO } from './setting.dto';
-import SettingModels from './setting.model';
+import SettingModels, { getSettingModel } from './setting.model';
 
-export const findSettingByName = async <T extends SettingName = SettingName>(name: T): Promise<ISettingPopulated<SettingNameType<T>> | IUnregisteredSettingPopulated<SettingNameType<T>> | null> => {
+export const findSettingByName = async <T extends SettingName>(name: T): Promise<SettingPopulated<SettingNameType<T>> | UnregisteredSettingPopulated<SettingNameType<T>> | null> => {
 	try {
 		const [ document ] = await SettingModels.default
 			.aggregate([
@@ -140,7 +142,7 @@ export const findSettingByName = async <T extends SettingName = SettingName>(nam
 	}
 };
 
-export const findSettings = async (query: FilterQuery<ISetting>): Promise<ISettingPopulated[]> => {
+export const findSettings = async (query: FilterQuery<Setting>): Promise<SettingPopulated[]> => {
 	try {
 		const settings = await SettingModels.default
 			.aggregate([
@@ -272,22 +274,23 @@ export const findSettings = async (query: FilterQuery<ISetting>): Promise<ISetti
 	}
 };
 
-export const createSetting = async (settingToCreate: CreateSettingDTO): Promise<ISetting> => {
+export const createSetting = async (settingToCreate: CreateSettingDTO): Promise<Setting> => {
 	try {
-		const newSetting = new SettingModels[ settingToCreate.data_type ](settingToCreate);
+		const SettingModel = getSettingModel(settingToCreate.data_type);
+		const newSetting = new SettingModel(settingToCreate);
 		const document = await newSetting.save();
-		return document.toObject();
+		return document.toJSON();
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const updateSetting = async (settingToUpdate: UpdateSettingDTO, options?: UpdateQueryOptions): Promise<ISettingPopulated | null> => {
+export const updateSetting = async (settingToUpdate: UpdateSettingDTO, options?: UpdateQueryOptions): Promise<SettingPopulated | null> => {
 	try {
 		const document = await SettingModels.default.findOneAndUpdate({ name: settingToUpdate.name }, {
 			$set: {
 				...settingToUpdate,
-				value: [ 'object_id', 'image' ].includes(settingToUpdate.data_type) && settingToUpdate.value ? newId(settingToUpdate.value) : settingToUpdate.value,
+				value: [ SettingDataType.OBJECT_ID, SettingDataType.IMAGE ].includes(settingToUpdate.data_type) && settingToUpdate.value ? newId(settingToUpdate.value) : settingToUpdate.value,
 				updated_by: settingToUpdate.updated_by ? newId(settingToUpdate.updated_by) : settingToUpdate.updated_by, 
 			}, 
 		}, {
@@ -295,22 +298,8 @@ export const updateSetting = async (settingToUpdate: UpdateSettingDTO, options?:
 			upsert: options?.upsert || false, 
 		});
 		if (!document) return null;
-		const populatedDocument = await document
-			.populate([
-				{
-					path: 'created_by',
-					select: { password: 0 },
-				},
-				{
-					path: 'updated_by',
-					select: { password: 0 },
-				},
-				{
-					path: 'value',
-					model: SettingModels[ settingToUpdate.data_type ], 
-				},
-			]);
-		return populatedDocument.toObject();
+		const populatedDocument = await document.populate(populateSetting(settingToUpdate.data_type));
+		return populatedDocument.toJSON();
 	} catch (error) {
 		throw error;
 	}

@@ -120,14 +120,14 @@ const Menu = ({ rowsData = [] }: MenuProps) => {
 		try {
 			setIsLoading(true);
 			if (confirmationModalState.action === 'delete') {
-				await deleteMultipleUsers(rowsData.filter(row => row.original.role !== 'owner').map(row => row.original.id), csrfToken);
+				await deleteMultipleUsers(rowsData.filter(row => row.original.role !== 'owner').map(row => row.original.id), { csrfToken });
 				refetchUsers();
 			}
 			if (confirmationModalState.action === 'suspend') {
 				await updateMultipleUsers(rowsData.filter(row => row.original.role !== 'owner').map(row => ({
 					id: row.original.id,
 					is_disabled: true, 
-				})), csrfToken);
+				})), { csrfToken });
 				updateUsers(...rowsData.filter(row => row.original.role !== 'owner').map(row => ({
 					id: row.original.id,
 					is_disabled: true, 
@@ -137,7 +137,7 @@ const Menu = ({ rowsData = [] }: MenuProps) => {
 				await updateMultipleUsers(rowsData.filter(row => row.original.role !== 'owner').map(row => ({
 					id: row.original.id,
 					is_disabled: false, 
-				})), csrfToken);
+				})), { csrfToken });
 				updateUsers(...rowsData.filter(row => row.original.role !== 'owner').map(row => ({
 					id: row.original.id,
 					is_disabled: false, 

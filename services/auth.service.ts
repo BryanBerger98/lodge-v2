@@ -1,7 +1,7 @@
-import fetcher from '@/lib/fetcher';
-import { User, UserPopulated } from '@/schemas/user';
-import { SafeTokenData } from '@/types/token.type';
-
+import fetcher, { FetcherOptionsWithCsrf } from '@/lib/fetcher';
+import { SafeToken } from '@/schemas/token.schema';
+import { User } from '@/schemas/user';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 
 export const getCurrentLoggedInUser = async (): Promise<UserPopulated> => {
 	try {
@@ -12,7 +12,7 @@ export const getCurrentLoggedInUser = async (): Promise<UserPopulated> => {
 	}
 };
 
-export const signUpUser = async (email: string, password: string, csrfToken?: string | null): Promise<User> => {
+export const signUpUser = async ({ email, password }: { email: string, password: string }, options: FetcherOptionsWithCsrf): Promise<User> => {
 	try {
 		const data = await fetcher('/api/auth/signup', {
 			method: 'POST',
@@ -21,7 +21,7 @@ export const signUpUser = async (email: string, password: string, csrfToken?: st
 				password, 
 			}),
 			headers: { 'Content-Type': 'application/json' },
-			csrfToken,
+			...options,
 		});
 		return data;
 	} catch (error) {
@@ -29,7 +29,7 @@ export const signUpUser = async (email: string, password: string, csrfToken?: st
 	}
 };
 
-export const getSentEmailVerificationToken = async (): Promise<SafeTokenData> => {
+export const getSentEmailVerificationToken = async (): Promise<SafeToken> => {
 	try {
 		const data = await fetcher('/api/auth/verify-email');
 		return data;
@@ -38,11 +38,11 @@ export const getSentEmailVerificationToken = async (): Promise<SafeTokenData> =>
 	}
 };
 
-export const sendEmailVerificationToken = async (csrfToken: string): Promise<SafeTokenData> => {
+export const sendEmailVerificationToken = async (options: FetcherOptionsWithCsrf): Promise<SafeToken> => {
 	try {
 		const data = await fetcher('/api/auth/verify-email', {
 			method: 'POST',
-			csrfToken, 
+			...options,
 		});
 		return data;
 	} catch (error) {
@@ -64,7 +64,7 @@ export const verifyUserEmail = async (token: string, csrfToken: string) => {
 	}
 };
 
-export const resetUserPassword = async (token: string, password: string, csrfToken: string) => {
+export const resetUserPassword = async ({ password, token }: { token: string, password: string }, options: FetcherOptionsWithCsrf) => {
 	try {
 		const data = await fetcher('/api/auth/reset-password', {
 			method: 'PUT',
@@ -73,7 +73,7 @@ export const resetUserPassword = async (token: string, password: string, csrfTok
 				password, 
 			}),
 			headers: { 'Content-Type': 'application/json' },
-			csrfToken,
+			...options,
 		});
 		return data;
 	} catch (error) {
@@ -81,13 +81,13 @@ export const resetUserPassword = async (token: string, password: string, csrfTok
 	}
 };
 
-export const sendResetPasswordToken = async (email: string, csrfToken: string) => {
+export const sendResetPasswordToken = async (email: string, options: FetcherOptionsWithCsrf) => {
 	try {
 		const data = await fetcher('/api/auth/reset-password', {
 			method: 'POST',
 			body: JSON.stringify({ email }),
 			headers: { 'Content-Type': 'application/json' },
-			csrfToken,
+			...options,
 		});
 		return data;
 	} catch (error) {
@@ -95,13 +95,13 @@ export const sendResetPasswordToken = async (email: string, csrfToken: string) =
 	}
 };
 
-export const updateAccount = async (valuesToUpdate: { phone_number?: string, username?: string }, csrfToken: string): Promise<UserPopulated> => {
+export const updateAccount = async (valuesToUpdate: { phone_number?: string, username?: string }, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account', {
 			method: 'PUT',
 			body: JSON.stringify({ ...valuesToUpdate }),
 			headers: { 'Content-Type': 'application/json' },
-			csrfToken,
+			...options,
 		});
 		return data;
 	} catch (error) {
@@ -109,7 +109,7 @@ export const updateAccount = async (valuesToUpdate: { phone_number?: string, use
 	}
 };
 
-export const updateUserPassword = async (password: string, newPassword: string, csrfToken: string | null): Promise<UserPopulated> => {
+export const updateUserPassword = async ({ password, newPassword }: { password: string, newPassword: string }, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account/password', {
 			method: 'PUT',
@@ -118,7 +118,7 @@ export const updateUserPassword = async (password: string, newPassword: string, 
 				newPassword, 
 			}),
 			headers: { 'Content-Type': 'application/json' },
-			csrfToken,
+			...options,
 		});
 		return data;
 	} catch (error) {
@@ -126,7 +126,7 @@ export const updateUserPassword = async (password: string, newPassword: string, 
 	}
 };
 
-export const updateUserEmail = async (email: string, password: string, csrfToken: string | null): Promise<UserPopulated> => {
+export const updateUserEmail = async ({ email, password }: { email: string, password: string }, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account/email', {
 			method: 'PUT',
@@ -135,7 +135,7 @@ export const updateUserEmail = async (email: string, password: string, csrfToken
 				password, 
 			}),
 			headers: { 'Content-Type': 'application/json' },
-			csrfToken,
+			...options,
 		});
 		return data;
 	} catch (error) {
@@ -143,14 +143,14 @@ export const updateUserEmail = async (email: string, password: string, csrfToken
 	}
 };
 
-export const updateUserAvatar = async (file: File, csrfToken: string): Promise<UserPopulated | null> => {
+export const updateUserAvatar = async (file: File, options: FetcherOptionsWithCsrf): Promise<UserPopulated | null> => {
 	try {
 		const formData = new FormData();
 		formData.append('avatar', file);
 		const data = await fetcher('/api/auth/account/avatar', {
 			method: 'PUT',
 			body: formData,
-			csrfToken,
+			...options,
 		});
 		return data;
 	} catch (error) {
@@ -167,13 +167,13 @@ export const getAvatar = async (): Promise<{ photoUrl: string }> => {
 	}
 };
 
-export const deleteUserAccount = async (csrfToken: string, password: string) => {
+export const deleteUserAccount = async (password: string, options: FetcherOptionsWithCsrf) => {
 	try {
 		await fetcher('/api/auth/account/delete', {
 			method: 'POST',
 			body: JSON.stringify({ password }),
 			headers: { 'Content-Type': 'application/json' },
-			csrfToken,
+			...options,
 		});
 		return;
 	} catch (error) {

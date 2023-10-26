@@ -3,14 +3,15 @@ import { z } from 'zod';
 
 import { CreateUserSchema } from '@/app/api/users/_schemas/create-user.schema';
 import { UpdateUserSchema } from '@/app/api/users/_schemas/update-user.schema';
-import fetcher, { FetcherOptions } from '@/lib/fetcher';
+import fetcher, { FetcherOptions, FetcherOptionsWithCsrf } from '@/lib/fetcher';
 import { Role } from '@/schemas/role.schema';
-import { User, UserPopulated } from '@/schemas/user';
-import { SafeTokenData } from '@/types/token.type';
+import { SafeToken } from '@/schemas/token.schema';
+import { User } from '@/schemas/user';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 import { objectToFormData } from '@/utils/object.utils';
 import { buildQueryUrl } from '@/utils/url.util';
 
-export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema> & { avatar?: File | Blob | null }, csrfToken: string, options?: FetcherOptions): Promise<UserPopulated> => {
+export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema> & { avatar?: File | Blob | null }, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
 	try {
 		const formData = new FormData();
 		formData.append('username', userToCreate.username);
@@ -25,7 +26,6 @@ export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema> 
 			method: 'POST',
 			body: formData,
 			...options,
-			csrfToken,
 		});
 		return data;
 	} catch (error) {
@@ -33,14 +33,13 @@ export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema> 
 	}
 };
 
-export const updateUser = async (userToUpdate: z.infer<typeof UpdateUserSchema> & { avatar?: File | Blob | null }, csrfToken: string, options?: FetcherOptions): Promise<UserPopulated> => {
+export const updateUser = async (userToUpdate: z.infer<typeof UpdateUserSchema> & { avatar?: File | Blob | null }, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
 	try {
 		const formData = objectToFormData({ ...userToUpdate });
 		const data = await fetcher('/api/users', {
 			method: 'PUT',
 			body: formData,
 			...options,
-			csrfToken,
 		});
 		return data;
 	} catch (error) {
@@ -48,14 +47,13 @@ export const updateUser = async (userToUpdate: z.infer<typeof UpdateUserSchema> 
 	}
 };
 
-export const updateMultipleUsers = async (usersToUpdate: z.infer<typeof UpdateUserSchema>[], csrfToken: string, options?: FetcherOptions): Promise<User> => {
+export const updateMultipleUsers = async (usersToUpdate: z.infer<typeof UpdateUserSchema>[], options: FetcherOptionsWithCsrf): Promise<User> => {
 	try {
 		const data = await fetcher('/api/users/bulk', {
 			method: 'PUT',
 			body: JSON.stringify(usersToUpdate),
 			headers: { 'Content-Type': 'application/json' },
 			...options,
-			csrfToken,
 		});
 		return data;
 	} catch (error) {
@@ -97,12 +95,11 @@ export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: 
 	}
 };
 
-export const deleteUser = async (user_id: string, csrfToken: string, options?: FetcherOptions): Promise<void> => {
+export const deleteUser = async (user_id: string, options: FetcherOptionsWithCsrf): Promise<void> => {
 	try {
 		await fetcher(`/api/users/${ user_id }`, {
 			method: 'DELETE',
 			...options,
-			csrfToken,
 		});
 		return;
 	} catch (error) {
@@ -110,12 +107,11 @@ export const deleteUser = async (user_id: string, csrfToken: string, options?: F
 	}
 };
 
-export const deleteMultipleUsers = async (user_ids: (string)[], csrfToken: string, options?: FetcherOptions): Promise<void> => {
+export const deleteMultipleUsers = async (user_ids: (string)[], options: FetcherOptionsWithCsrf): Promise<void> => {
 	try {
 		await fetcher(`/api/users/bulk/${ user_ids.join(',') }`, {
 			method: 'DELETE',
 			...options,
-			csrfToken,
 		});
 		return;
 	} catch (error) {
@@ -123,11 +119,11 @@ export const deleteMultipleUsers = async (user_ids: (string)[], csrfToken: strin
 	}
 };
 
-export const sendResetPasswordTokenToUser = async (user_id: string, csrfToken: string): Promise<SafeTokenData> => {
+export const sendResetPasswordTokenToUser = async (user_id: string, options: FetcherOptionsWithCsrf): Promise<SafeToken> => {
 	try {
 		const data = await fetcher(`/api/users/${ user_id }/reset-password`, {
 			method: 'POST',
-			csrfToken, 
+			...options, 
 		});
 		return data;
 	} catch (error) {
@@ -135,11 +131,11 @@ export const sendResetPasswordTokenToUser = async (user_id: string, csrfToken: s
 	}
 };
 
-export const sendVerificationTokenToUser = async (user_id: string, csrfToken: string): Promise<SafeTokenData> => {
+export const sendVerificationTokenToUser = async (user_id: string, options: FetcherOptionsWithCsrf): Promise<SafeToken> => {
 	try {
 		const data = await fetcher(`/api/users/${ user_id }/verify-email`, {
 			method: 'POST',
-			csrfToken, 
+			...options, 
 		});
 		return data;
 	} catch (error) {

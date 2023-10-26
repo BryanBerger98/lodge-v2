@@ -6,7 +6,7 @@ import { AlertCircle, Loader2, LogIn, Send } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { ZodError, object, string, z } from 'zod';
+import { object, string, z } from 'zod';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { sendResetPasswordToken } from '@/services/auth.service';
-import { ApiError, getErrorMessage } from '@/utils/error';
+import { ApiError, buildFormError, getErrorMessage } from '@/utils/error';
 
 type EmailFormProps = {
 	csrfToken: string;
@@ -40,20 +40,11 @@ const EmailForm = ({ csrfToken }: EmailFormProps) => {
 		try {
 			setIsLoading(true);
 			setError(null);
-			await sendResetPasswordToken(email, csrfToken);
+			await sendResetPasswordToken(email, { csrfToken });
 			setMessage('We have sent an email to your inbox. If you have not receive it, wait at least 1 minute to send it again.');
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
-			if (apiError.code === 'invalid-input') {
-				const { data } = apiError as ApiError<ZodError>;
-				if (data) {
-					data.issues.forEach(issue => {
-						type IssueName = keyof z.infer<typeof emailFormSchema>;
-						const [ inputName ] = issue.path;
-						form.setError(inputName.toString() as IssueName, { message: issue.message });
-					});
-				}
-			}
+			buildFormError(apiError, { form });
 			setError(getErrorMessage(apiError));
 		} finally {
 			setIsLoading(false);

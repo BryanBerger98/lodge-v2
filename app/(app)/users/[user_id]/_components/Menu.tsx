@@ -10,7 +10,7 @@ import ConfirmationFormModal, { ConfirmationModalOpenChangeEvent } from '@/compo
 import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal';
 import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
-import { UserPopulated } from '@/schemas/user';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 import { deleteUser, sendResetPasswordTokenToUser, sendVerificationTokenToUser } from '@/services/users.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
@@ -108,14 +108,14 @@ const Menu = ({ userData, csrfToken }: MenuProps) => {
 		try {
 			setIsLoading(true);
 			if (confirmationModalState.action === 'delete') {
-				await deleteUser(userData.id, csrfToken);
+				await deleteUser(userData.id, { csrfToken });
 				refetchUsers();
 			}
 			if (confirmationModalState.action === 'reset-password') {
-				await sendResetPasswordTokenToUser(userData.id, csrfToken);
+				await sendResetPasswordTokenToUser(userData.id, { csrfToken });
 			}
 			if (confirmationModalState.action === 'verify-email') {
-				await sendVerificationTokenToUser(userData.id, csrfToken);
+				await sendVerificationTokenToUser(userData.id, { csrfToken });
 			}
 			setConfirmationModalState({
 				...confirmationModalState,

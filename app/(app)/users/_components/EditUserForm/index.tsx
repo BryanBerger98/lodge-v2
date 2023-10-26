@@ -21,7 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
 import { Role } from '@/schemas/role.schema';
-import { UserPopulated } from '@/schemas/user';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 import { createUser, updateUser } from '@/services/users.service';
 import { ApiError, getErrorMessage } from '@/utils/error';
 
@@ -91,7 +91,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 					role: values.role,
 					id: user.id,
 					avatar: fileToUpload,
-				}, csrfToken);
+				}, { csrfToken });
 				updateUsers(updatedUser);
 				return;
 			}
@@ -99,7 +99,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 				...values,
 				role: values.role,
 				avatar: fileToUpload, 
-			}, csrfToken);
+			}, { csrfToken });
 			router.replace(`/users/${ createdUser.id }`);
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;

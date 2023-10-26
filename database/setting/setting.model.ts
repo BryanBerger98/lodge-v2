@@ -1,43 +1,44 @@
 import { Schema, model, Types, Model, models } from 'mongoose';
 import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 
-import { ISettingBase, ISettingString, ISettingBoolean, ISettingDate, ISettingImage, ISettingNumber, ISettingObjectId } from '@/types/setting.type';
+import { SettingBase, SettingBoolean, SettingDataType, SettingDate, SettingImage, SettingNumber, SettingObjectId, SettingString } from '@/schemas/setting';
 
 import FileModel from '../file/file.model';
 import UserModel from '../user/user.model';
 
-interface ISettingBaseDocument extends Omit<ISettingBase, 'created_by' | 'updated_by'> {
+
+interface ISettingBaseDocument extends Omit<SettingBase, 'created_by' | 'updated_by'> {
 	created_by: Types.ObjectId | null;
 	updated_by: Types.ObjectId | null;
 }
 
-interface IStringSettingDocument extends Omit<ISettingString, 'created_by' | 'updated_by'> {
+interface IStringSettingDocument extends Omit<SettingString, 'created_by' | 'updated_by'> {
 	created_by: Types.ObjectId | null;
 	updated_by: Types.ObjectId | null;
 };
 
-interface ISettingBooleanDocument extends Omit<ISettingBoolean, 'created_by' | 'updated_by'> {
+interface ISettingBooleanDocument extends Omit<SettingBoolean, 'created_by' | 'updated_by'> {
 	created_by: Types.ObjectId | null;
 	updated_by: Types.ObjectId | null;
 };
 
-interface ISettingDateDocument extends Omit<ISettingDate, 'created_by' | 'updated_by'> {
+interface ISettingDateDocument extends Omit<SettingDate, 'created_by' | 'updated_by'> {
 	created_by: Types.ObjectId | null;
 	updated_by: Types.ObjectId | null;
 };
 
-interface ISettingImageDocument extends Omit<ISettingImage, 'created_by' | 'updated_by' | 'value'> {
+interface ISettingImageDocument extends Omit<SettingImage, 'created_by' | 'updated_by' | 'value'> {
 	value: Types.ObjectId | null;
 	created_by: Types.ObjectId | null;
 	updated_by: Types.ObjectId | null;
 };
 
-interface ISettingNumberDocument extends Omit<ISettingNumber, 'created_by' | 'updated_by'> {
+interface ISettingNumberDocument extends Omit<SettingNumber, 'created_by' | 'updated_by'> {
 	created_by: Types.ObjectId | null;
 	updated_by: Types.ObjectId | null;
 };
 
-interface ISettingObjectIdDocument extends Omit<ISettingObjectId, 'created_by' | 'updated_by' | 'value'> {
+interface ISettingObjectIdDocument extends Omit<SettingObjectId, 'created_by' | 'updated_by' | 'value'> {
 	value: Types.ObjectId | null;
 	created_by: Types.ObjectId | null;
 	updated_by: Types.ObjectId | null;
@@ -142,13 +143,33 @@ export const NumberSettingModel: Model<ISettingNumberDocument> = SettingModel.di
 export const ObjectIdSettingModel: Model<ISettingObjectIdDocument> = SettingModel.discriminators?.object_id || SettingModel.discriminator('object_id', objectIdSettingSchema);
 
 const SettingModels = {
-	string: StringSettingModel,
-	boolean: BooleanSettingModel,
-	date: DateSettingModel,
-	image: ImageSettingModel,
-	number: NumberSettingModel,
-	object_id: ObjectIdSettingModel,
+	[ SettingDataType.STRING ]: StringSettingModel,
+	[ SettingDataType.BOOLEAN ]: BooleanSettingModel,
+	[ SettingDataType.DATE ]: DateSettingModel,
+	[ SettingDataType.IMAGE ]: ImageSettingModel,
+	[ SettingDataType.NUMBER ]: NumberSettingModel,
+	[ SettingDataType.OBJECT_ID ]: ObjectIdSettingModel,
 	default: SettingModel,
 } as const;
+
+
+export const getSettingModel = (dataType: SettingDataType) => {
+	switch (dataType) {
+		case SettingDataType.STRING:
+			return StringSettingModel;
+		case SettingDataType.BOOLEAN:
+			return BooleanSettingModel;
+		case SettingDataType.DATE:
+			return DateSettingModel;
+		case SettingDataType.IMAGE:
+			return ImageSettingModel;
+		case SettingDataType.NUMBER:
+			return NumberSettingModel;
+		case SettingDataType.OBJECT_ID:
+			return ObjectIdSettingModel;
+		default:
+			return SettingModel;
+	}
+};
 
 export default SettingModels;

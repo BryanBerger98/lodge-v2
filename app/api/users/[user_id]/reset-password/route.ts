@@ -5,8 +5,7 @@ import { findUserById } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
 import { generateToken } from '@/lib/jwt';
 import { Role } from '@/schemas/role.schema';
-import { TokenAction } from '@/schemas/token.schema';
-import { IToken } from '@/types/token.type';
+import { Token, TokenAction } from '@/schemas/token.schema';
 import { Optional } from '@/types/utils';
 import { setServerAuthGuard } from '@/utils/auth';
 import { sendResetPasswordEmail } from '@/utils/email';
@@ -69,7 +68,7 @@ export const POST = async (_: any, { params }: { params: { user_id: string } }) 
 
 		await sendResetPasswordEmail(userData, savedToken);
 
-		const safeTokenData: Optional<IToken, 'token'> = savedToken;
+		const safeTokenData: Optional<Token, 'token'> = savedToken;
 		delete safeTokenData.token;
 
 		return NextResponse.json(safeTokenData);

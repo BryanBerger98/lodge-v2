@@ -6,18 +6,24 @@ import { deleteFileFromKey, getFieldSignedURL, uploadImageToS3 } from '@/lib/buc
 import { connectToDatabase } from '@/lib/database';
 import { ImageMimeTypeSchema } from '@/schemas/file/mime-type.schema';
 import { Role } from '@/schemas/role.schema';
-import { UserPopulated } from '@/schemas/user';
-import { ISettingImage, ISettingImagePopulated, IUnregisteredSettingImage, IUnregisteredSettingImagePopulated } from '@/types/setting.type';
+import { Setting, SettingDataType, SettingName, SettingPopulated, UnregisteredSetting, UnregisteredSettingPopulated } from '@/schemas/setting';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendBuiltErrorWithSchemaValidation } from '@/utils/error';
 import { FILE_TOO_LARGE_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
 import { AUTHORIZED_IMAGE_MIME_TYPES, AUTHORIZED_IMAGE_SIZE, convertFileRequestObjetToModel } from '@/utils/file.util';
-import { SETTING_NAMES } from '@/utils/settings';
 
 import { UpdateImageSettingSchema } from '../_schemas/update-image.setting.schema';
 
-const uploadPhotoFile = async (currentUser: UserPopulated, photoFile?: Blob | null, setting?: ISettingImagePopulated | ISettingImage | IUnregisteredSettingImage | IUnregisteredSettingImagePopulated | null) => {
+const uploadPhotoFile = async (currentUser: UserPopulated, photoFile?: Blob | null, setting?: SettingPopulated | Setting | UnregisteredSetting | UnregisteredSettingPopulated | null) => {
 	try {
+		if (!setting || setting.data_type !== SettingDataType.IMAGE) {
+			throw buildError({
+				code: 'SETTING_NOT_FOUND',
+				message: 'Setting not found.',
+				status: 404,
+			});
+		};
 		if (photoFile) {
 			const fileMimeType = ImageMimeTypeSchema.parse(photoFile.type);
 			if (!AUTHORIZED_IMAGE_MIME_TYPES.includes(fileMimeType)) {
@@ -36,7 +42,7 @@ const uploadPhotoFile = async (currentUser: UserPopulated, photoFile?: Blob | nu
 				});
 			}
 	
-			if (setting && setting.value && typeof setting.value !== 'string' && setting.value.id) {
+			if (setting.value && typeof setting.value !== 'string' && 'id' in setting.value && setting.value.id) {
 				const oldFile = await findFileById(setting.value.id);
 				if (oldFile) {
 					await deleteFileFromKey(oldFile.key);
@@ -70,7 +76,7 @@ export const PUT = async (request: NextRequest) => {
 		
 		await connectToDatabase();
 
-		const shareWithAdminSetting = await findSettingByName(SETTING_NAMES.SHARE_WITH_ADMIN_SETTING);
+		const shareWithAdminSetting = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
 
 		const rolesWhiteList: Role[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ Role.OWNER, Role.ADMIN ] : [ Role.OWNER ];
 
@@ -88,7 +94,7 @@ export const PUT = async (request: NextRequest) => {
 			...settingData,
 			name,
 			data_type: 'image',
-			value: photoFileData?.id || settingData?.value?.id || null,
+			value: photoFileData?.id || (settingData?.data_type === SettingDataType.IMAGE && settingData?.value && 'id' in settingData.value && settingData.value.id) || null,
 			updated_by: currentUser.id,
 		}, { upsert: true });
 		
