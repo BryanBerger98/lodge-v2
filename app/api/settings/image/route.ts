@@ -93,7 +93,7 @@ export const PUT = async (request: NextRequest) => {
 		const updatedSetting = await updateSetting({
 			...settingData,
 			name,
-			data_type: 'image',
+			data_type: SettingDataType.IMAGE,
 			value: photoFileData?.id || (settingData?.data_type === SettingDataType.IMAGE && settingData?.value && 'id' in settingData.value && settingData.value.id) || null,
 			updated_by: currentUser.id,
 		}, { upsert: true });

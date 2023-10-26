@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ZodError, object, string } from 'zod';
+import { object, string } from 'zod';
 
 import { deleteFileById, findFileByKey } from '@/database/file/file.repository';
 import { findSettingByName } from '@/database/setting/setting.repository';
@@ -9,8 +9,8 @@ import { connectToDatabase } from '@/lib/database';
 import { Role } from '@/schemas/role.schema';
 import { SettingName } from '@/schemas/setting';
 import { setServerAuthGuard } from '@/utils/auth';
-import { buildError, sendError } from '@/utils/error';
-import { FORBIDDEN_ERROR, INTERNAL_ERROR, PASSWORD_REQUIRED_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
+import { buildError, sendBuiltErrorWithSchemaValidation, sendError } from '@/utils/error';
+import { FORBIDDEN_ERROR, INTERNAL_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
 import { verifyPassword } from '@/utils/password.util';
 
 export const POST = async (request: NextRequest) => {
@@ -75,19 +75,6 @@ export const POST = async (request: NextRequest) => {
 		return NextResponse.json({ message: 'Account deleted.' });
 	} catch (error: any) {
 		console.error(error);
-		if (error.name && error.name === 'ZodError') {
-			return sendError(buildError({
-				code: PASSWORD_REQUIRED_ERROR,
-				message: 'Password required.',
-				status: 422,
-				data: error as ZodError,
-			}));
-		}
-		return sendError(buildError({
-			code: INTERNAL_ERROR,
-			message: error.message || 'An error occured.',
-			status: 500,
-			data: error,
-		}));
+		return sendBuiltErrorWithSchemaValidation(error);
 	}
 };

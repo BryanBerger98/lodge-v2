@@ -5,9 +5,9 @@ import { CreateUserSchema } from '@/app/api/users/_schemas/create-user.schema';
 import { UpdateUserSchema } from '@/app/api/users/_schemas/update-user.schema';
 import fetcher, { FetcherOptions, FetcherOptionsWithCsrf } from '@/lib/fetcher';
 import { Role } from '@/schemas/role.schema';
-import { SafeToken } from '@/schemas/token.schema';
-import { User } from '@/schemas/user';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { SafeToken, SafeTokenSchema } from '@/schemas/token.schema';
+import { User, UserSchema } from '@/schemas/user';
+import { UserPopulated, UserPopulatedSchema } from '@/schemas/user/populated.schema';
 import { objectToFormData } from '@/utils/object.utils';
 import { buildQueryUrl } from '@/utils/url.util';
 
@@ -27,7 +27,7 @@ export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema> 
 			body: formData,
 			...options,
 		});
-		return data;
+		return UserPopulatedSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -41,7 +41,7 @@ export const updateUser = async (userToUpdate: z.infer<typeof UpdateUserSchema> 
 			body: formData,
 			...options,
 		});
-		return data;
+		return UserPopulatedSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -55,7 +55,7 @@ export const updateMultipleUsers = async (usersToUpdate: z.infer<typeof UpdateUs
 			headers: { 'Content-Type': 'application/json' },
 			...options,
 		});
-		return data;
+		return UserSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -89,7 +89,11 @@ export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: 
 
 	try {
 		const data = await fetcher(`/api/users/${ query }`, restOptions);
-		return data;
+		return z.object({
+			users: z.array(UserPopulatedSchema),
+			total: z.number(),
+			count: z.number(),
+		}).parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -125,7 +129,7 @@ export const sendResetPasswordTokenToUser = async (user_id: string, options: Fet
 			method: 'POST',
 			...options, 
 		});
-		return data;
+		return SafeTokenSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -137,7 +141,7 @@ export const sendVerificationTokenToUser = async (user_id: string, options: Fetc
 			method: 'POST',
 			...options, 
 		});
-		return data;
+		return SafeTokenSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}

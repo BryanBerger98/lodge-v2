@@ -2,24 +2,26 @@ import { z } from 'zod';
 
 import { UpdateImageSettingSchema } from '@/app/api/settings/_schemas/update-image.setting.schema';
 import fetcher, { FetcherOptions, FetcherOptionsWithCsrf } from '@/lib/fetcher';
-import { Setting, SettingName, SettingPopulated } from '@/schemas/setting';
-import { UnregisteredSetting } from '@/schemas/setting/unregistered-setting.schema';
-import { User } from '@/schemas/user';
+import { SettingName, SettingPopulated, SettingPopulatedSchema } from '@/schemas/setting';
+import { UnregisteredSetting, UnregisteredSettingBooleanPopulatedSchema, UnregisteredSettingObjectIdPopulatedSchema } from '@/schemas/setting/unregistered-setting.schema';
+import { UserSchema } from '@/schemas/user';
 import { objectToFormData } from '@/utils/object.utils';
 import { buildQueryUrl } from '@/utils/url.util';
 
-export type ShareSettings = {
-	settings: {
-		shareWithAdmin: Setting,
-		owner: Setting,
-	},
-	ownerUser: User,
-};
+const ShareSettingsSchema = z.object({
+	settings: z.object({
+		shareWithAdmin: UnregisteredSettingBooleanPopulatedSchema,
+		owner: UnregisteredSettingObjectIdPopulatedSchema,
+	}),
+	ownerUser: UserSchema,
+});
+
+export type ShareSettings = z.infer<typeof ShareSettingsSchema>;
 
 export const getShareSettings = async (): Promise<ShareSettings> => {
 	try {
 		const data = await fetcher('/api/settings/share');
-		return data;
+		return ShareSettingsSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -29,14 +31,14 @@ export type FetchSettingsOptions = {
 	name?: string | string[]
 } & FetcherOptions;
 
-export const fetchSettings = async (options?: FetchSettingsOptions): Promise<Setting[]> => {
+export const fetchSettings = async (options?: FetchSettingsOptions): Promise<SettingPopulated[]> => {
 
 	const { name = '', ...restOptions } = options ? options : { name: '' };
 
 	const query = buildQueryUrl({ name: name && Array.isArray(name) ? name.join(',') : name && typeof name === 'string' ? name : '' });
 	try {
 		const data = await fetcher(`/api/settings${ query }`, restOptions);
-		return data;
+		return z.array(SettingPopulatedSchema).parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -50,7 +52,7 @@ export const updateSettings = async (settings: UnregisteredSetting[], options: F
 			headers: { 'Content-Type': 'application/json' },
 			...options,
 		});
-		return data;
+		return z.object({ message: z.string() }).parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -64,7 +66,7 @@ export const updateImageSetting = async (setting: z.infer<typeof UpdateImageSett
 			body: formData,
 			...options,
 		});
-		return data;
+		return z.object({ message: z.string() }).parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -76,7 +78,7 @@ export const deleteImageSetting = async (setting_name: SettingName, options: Fet
 			method: 'DELETE',
 			...options,
 		});
-		return data;
+		return SettingPopulatedSchema.or(z.null()).parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -93,7 +95,7 @@ export const updateShareSettings = async ({ settings, password }: { settings: Un
 			headers: { 'Content-Type': 'application/json' },
 			...options,
 		});
-		return data;
+		return z.object({ message: z.string() }).parse(data);
 	} catch (error) {
 		throw error;
 	}

@@ -1,12 +1,14 @@
+import { z } from 'zod';
+
 import fetcher, { FetcherOptionsWithCsrf } from '@/lib/fetcher';
-import { SafeToken } from '@/schemas/token.schema';
-import { User } from '@/schemas/user';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { SafeToken, SafeTokenSchema } from '@/schemas/token.schema';
+import { User, UserSchema } from '@/schemas/user';
+import { UserPopulated, UserPopulatedSchema } from '@/schemas/user/populated.schema';
 
 export const getCurrentLoggedInUser = async (): Promise<UserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account');
-		return data;
+		return UserPopulatedSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -23,7 +25,7 @@ export const signUpUser = async ({ email, password }: { email: string, password:
 			headers: { 'Content-Type': 'application/json' },
 			...options,
 		});
-		return data;
+		return UserSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -32,7 +34,7 @@ export const signUpUser = async ({ email, password }: { email: string, password:
 export const getSentEmailVerificationToken = async (): Promise<SafeToken> => {
 	try {
 		const data = await fetcher('/api/auth/verify-email');
-		return data;
+		return SafeTokenSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -44,13 +46,13 @@ export const sendEmailVerificationToken = async (options: FetcherOptionsWithCsrf
 			method: 'POST',
 			...options,
 		});
-		return data;
+		return SafeTokenSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const verifyUserEmail = async (token: string, csrfToken: string) => {
+export const verifyUserEmail = async (token: string, csrfToken: string): Promise<UserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/verify-email', {
 			method: 'PUT',
@@ -58,13 +60,13 @@ export const verifyUserEmail = async (token: string, csrfToken: string) => {
 			headers: { 'Content-Type': 'application/json' },
 			csrfToken,
 		});
-		return data;
+		return UserPopulatedSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const resetUserPassword = async ({ password, token }: { token: string, password: string }, options: FetcherOptionsWithCsrf) => {
+export const resetUserPassword = async ({ password, token }: { token: string, password: string }, options: FetcherOptionsWithCsrf): Promise<{ message: string }> => {
 	try {
 		const data = await fetcher('/api/auth/reset-password', {
 			method: 'PUT',
@@ -75,7 +77,7 @@ export const resetUserPassword = async ({ password, token }: { token: string, pa
 			headers: { 'Content-Type': 'application/json' },
 			...options,
 		});
-		return data;
+		return z.object({ message: z.string() }).parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -103,7 +105,7 @@ export const updateAccount = async (valuesToUpdate: { phone_number?: string, use
 			headers: { 'Content-Type': 'application/json' },
 			...options,
 		});
-		return data;
+		return UserPopulatedSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -120,7 +122,7 @@ export const updateUserPassword = async ({ password, newPassword }: { password: 
 			headers: { 'Content-Type': 'application/json' },
 			...options,
 		});
-		return data;
+		return UserPopulatedSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -137,7 +139,7 @@ export const updateUserEmail = async ({ email, password }: { email: string, pass
 			headers: { 'Content-Type': 'application/json' },
 			...options,
 		});
-		return data;
+		return UserPopulatedSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -152,7 +154,7 @@ export const updateUserAvatar = async (file: File, options: FetcherOptionsWithCs
 			body: formData,
 			...options,
 		});
-		return data;
+		return UserPopulatedSchema.or(z.null()).parse(data);
 	} catch (error) {
 		throw error;
 	}
@@ -161,21 +163,21 @@ export const updateUserAvatar = async (file: File, options: FetcherOptionsWithCs
 export const getAvatar = async (): Promise<{ photoUrl: string }> => {
 	try {
 		const data = await fetcher('/api/auth/account/avatar');
-		return data;
+		return z.object({ photoUrl: z.string() }).parse(data);
 	} catch (error) {
 		throw error;
 	}
 };
 
-export const deleteUserAccount = async (password: string, options: FetcherOptionsWithCsrf) => {
+export const deleteUserAccount = async (password: string, options: FetcherOptionsWithCsrf): Promise<{ message: string }> => {
 	try {
-		await fetcher('/api/auth/account/delete', {
+		const data = await fetcher('/api/auth/account/delete', {
 			method: 'POST',
 			body: JSON.stringify({ password }),
 			headers: { 'Content-Type': 'application/json' },
 			...options,
 		});
-		return;
+		return z.object({ message: z.string() }).parse(data);
 	} catch (error) {
 		throw error;
 	}

@@ -1,7 +1,7 @@
 import { FilterQuery } from 'mongoose';
 
 import { UpdateQueryOptions, newId } from '@/lib/database';
-import { Setting, SettingPopulated, SettingName, SettingDataType } from '@/schemas/setting';
+import { Setting, SettingPopulated, SettingName } from '@/schemas/setting';
 import { UnregisteredSettingPopulated } from '@/schemas/setting/unregistered-setting.schema';
 import { SettingNameType, findDefaultSettingByName } from '@/utils/settings';
 
@@ -289,8 +289,8 @@ export const updateSetting = async (settingToUpdate: UpdateSettingDTO, options?:
 	try {
 		const document = await SettingModels.default.findOneAndUpdate({ name: settingToUpdate.name }, {
 			$set: {
-				...settingToUpdate,
-				value: [ SettingDataType.OBJECT_ID, SettingDataType.IMAGE ].includes(settingToUpdate.data_type) && settingToUpdate.value ? newId(settingToUpdate.value) : settingToUpdate.value,
+				value: settingToUpdate.value,
+				data_type: settingToUpdate.data_type,
 				updated_by: settingToUpdate.updated_by ? newId(settingToUpdate.updated_by) : settingToUpdate.updated_by, 
 			}, 
 		}, {

@@ -120,11 +120,7 @@ settingSchema.virtual('id').get(function getVirtualId() {
 	return this._id.toHexString();
 });
 
-settingSchema.set('toObject', {
-	virtuals: true,
-	flattenObjectIds: true,
-	versionKey: false, 
-});
+settingSchema.set('toObject', { virtuals: true });
 settingSchema.set('toJSON', {
 	virtuals: true,
 	flattenObjectIds: true,

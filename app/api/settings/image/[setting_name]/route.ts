@@ -37,7 +37,7 @@ export const DELETE = async (_: any, { params }: { params: { setting_name: strin
 		const updatedSetting = await updateSetting({
 			...settingData,
 			name,
-			data_type: 'image',
+			data_type: SettingDataType.IMAGE,
 			value: null,
 			updated_by: currentUser.id,
 		}, { upsert: true });

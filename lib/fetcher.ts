@@ -9,7 +9,7 @@ export type FetcherOptionsWithCsrf = FetcherOptions & {
 	csrfToken: string;
 };
 
-const fetcher = async (input: RequestInfo | URL, options?: FetcherOptions | FetcherOptionsWithCsrf) => {
+const fetcher = async <Data = unknown>(input: RequestInfo | URL, options?: FetcherOptions | FetcherOptionsWithCsrf): Promise<Data> => {
 
 	try {
 
@@ -27,7 +27,7 @@ const fetcher = async (input: RequestInfo | URL, options?: FetcherOptions | Fetc
 			throw data;
 		}
 
-		return data;
+		return data as Data;
 	} catch (error) {
 		throw error;
 	}

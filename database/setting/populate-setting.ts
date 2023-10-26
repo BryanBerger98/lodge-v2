@@ -5,7 +5,7 @@ import { SettingDataType } from '@/schemas/setting';
 import SettingModels from './setting.model';
 
 export const populateSetting = (settingDataType: SettingDataType): PopulateOptions[] => {
-	return [
+	const populateArray: PopulateOptions[] = [
 		{
 			path: 'created_by',
 			select: { password: 0 },
@@ -14,9 +14,12 @@ export const populateSetting = (settingDataType: SettingDataType): PopulateOptio
 			path: 'updated_by',
 			select: { password: 0 },
 		},
-		{
+	];
+	if ([ SettingDataType.OBJECT_ID, SettingDataType.IMAGE ].includes(settingDataType)) {
+		populateArray.push({
 			path: 'value',
 			model: SettingModels[ settingDataType ], 
-		},
-	];
+		});
+	}
+	return populateArray;
 };

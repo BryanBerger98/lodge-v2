@@ -92,11 +92,15 @@ export const PUT = async (request: NextRequest) => {
 			});
 		}
 
+		console.log('SETTINGS TO UPDATE >>> ', settingsToUpdate);
 		for (const setting of settingsToUpdate) {
 			await updateSetting({
 				...setting,
 				updated_by: currentUser.id,
-			}, { upsert: true });
+			}, {
+				upsert: true,
+				newDocument: true, 
+			});
 		}
 
 		return NextResponse.json({ message: 'Updated.' });
