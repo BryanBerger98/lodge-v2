@@ -8,6 +8,7 @@ import { findSettingByName } from '@/database/setting/setting.repository';
 import { findUserById } from '@/database/user/user.repository';
 import authOptions from '@/lib/auth';
 import { connectToDatabase } from '@/lib/database';
+import { UnregisteredSettingBooleanPopulatedSchema, UnregisteredSettingImagePopulatedSchema, UnregisteredSettingStringPopulatedSchema } from '@/schemas/setting';
 import { SettingName } from '@/schemas/setting/name.shema';
 
 const Sidebar = dynamic(() => import('@/components/layout/Sidebar'));
@@ -32,20 +33,24 @@ const AppLayout = async ({ children }: AppLayoutProps) => {
 		redirect('/signin');
 	}
 
-	const userVerifyEmailSetting = await findSettingByName(SettingName.USER_VERIFY_EMAIL);
+	const userVerifyEmailSettingData = await findSettingByName(SettingName.USER_VERIFY_EMAIL);
+	const userVerifyEmailSetting = UnregisteredSettingBooleanPopulatedSchema.parse(userVerifyEmailSettingData);
 
-	if ((!userVerifyEmailSetting && !currentUser?.has_email_verified) || (userVerifyEmailSetting && userVerifyEmailSetting.data_type === 'boolean' && userVerifyEmailSetting.value && !currentUser?.has_email_verified)) {
+	if ((!userVerifyEmailSetting && !currentUser?.has_email_verified) || (userVerifyEmailSetting && userVerifyEmailSetting.value && !currentUser?.has_email_verified)) {
 		redirect('/verify-email');
 	}
 
-	const shareWithAdminSetting = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
+	const shareWithAdminSettingData = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
+	const shareWithAdminSetting = UnregisteredSettingBooleanPopulatedSchema.parse(shareWithAdminSettingData);
 
-	const hasSettingsAccess = currentUser?.role === 'owner' || (shareWithAdminSetting?.data_type === 'boolean' && shareWithAdminSetting?.value);
+	const hasSettingsAccess = currentUser?.role === 'owner' || shareWithAdminSetting?.value;
 
-	const brandNameSetting = await findSettingByName(SettingName.BRAND_NAME);
-	const bandName: string = brandNameSetting && brandNameSetting.data_type === 'string' ? brandNameSetting.value : 'Lodge';
+	const brandNameSettingData = await findSettingByName(SettingName.BRAND_NAME);
+	const brandNameSetting = UnregisteredSettingStringPopulatedSchema.parse(brandNameSettingData);
+	const bandName: string = brandNameSetting.value;
 
-	const brandLogoSetting = await findSettingByName(SettingName.BRAND_LOGO);
+	const brandLogoSettingData = await findSettingByName(SettingName.BRAND_LOGO);
+	const brandLogoSetting = UnregisteredSettingImagePopulatedSchema.parse(brandLogoSettingData);
 	const brandLogo: string = brandLogoSetting?.value?.url || '';
 
 	return (

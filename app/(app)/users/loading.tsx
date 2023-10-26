@@ -1,15 +1,5 @@
-import { Loader2 } from 'lucide-react';
+import PageLoader from '@/components/layout/PageLoader';
 
-const UsersLoading = () => {
-
-	return (
-		<div className="flex items-center w-full">
-			<Loader2
-				className="animate-spin"
-				size="32"
-			/>
-		</div>
-	);
-};
+const UsersLoading = () => <PageLoader />;
 
 export default UsersLoading;

@@ -44,8 +44,8 @@ const GoogleAuthEnvironmentSchema = z.object({
 const EnvSchema = z.object({
 	APP_NAME: z.string().optional(),
 	NEXT_PUBLIC_APP_NAME: z.string().optional(),
-	ENVIRONMENT: z.nativeEnum(Environment),
-	NEXT_PUBLIC_ENVIRONMENT: z.nativeEnum(Environment),
+	ENVIRONMENT: z.nativeEnum(Environment).optional(),
+	NEXT_PUBLIC_ENVIRONMENT: z.nativeEnum(Environment).optional(),
 })
 	.merge(DatabaseEnvironmentSchema)
 	.merge(EmailEnvironmentSchema)

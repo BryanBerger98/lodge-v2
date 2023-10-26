@@ -8,7 +8,7 @@ import { getCsrfToken } from '@/lib/csrf';
 
 import UsersProvider from '../_context/users/users.provider';
 
-const DynamicEditUserForm = dynamic(() => import('../_components/EditUserForm'));
+const EditUserForm = dynamic(() => import('../_components/EditUserForm'));
 
 const CreateUserPage = async () => {
 
@@ -23,7 +23,7 @@ const CreateUserPage = async () => {
 			<UsersProvider>
 				<div className="grid gird-cols-1 lg:grid-cols-3">
 					<div className="lg:col-span-2 flex flex-col gap-8">
-						<DynamicEditUserForm csrfToken={ csrfToken } />
+						<EditUserForm csrfToken={ csrfToken } />
 					</div>
 				</div>
 			</UsersProvider>
