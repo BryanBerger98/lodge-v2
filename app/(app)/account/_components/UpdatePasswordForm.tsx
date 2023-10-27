@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Save } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { ZodError, object, string, z } from 'zod';
+import { object, string, z } from 'zod';
 
 import PasswordModal, { PasswordModalOpenChangeEvent } from '@/components/features/auth/PasswordModal';
 import PasswordValidationCheckList from '@/components/features/auth/PasswordValidationCheckList';
@@ -13,9 +13,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/components/ui/use-toast';
+import useErrorToast from '@/hooks/error/useErrorToast';
 import { updateUserPassword } from '@/services/auth.service';
-import { ApiError, getErrorMessage } from '@/utils/error';
+import { ApiError } from '@/utils/api/error';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules } from '@/utils/password.util';
 
 type UpdatePasswordFormProps = {
@@ -32,7 +32,7 @@ type UpdatePasswordFormProps = {
 
 const UpdatePasswordForm = ({ csrfToken, passwordRules }: UpdatePasswordFormProps) => {
 
-	const { toast } = useToast();
+	const { triggerErrorToast } = useErrorToast();
 
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 	const [ isPasswordModalOpen, setIsPasswordModalOpen ] = useState<boolean>(false);
@@ -75,23 +75,7 @@ const UpdatePasswordForm = ({ csrfToken, passwordRules }: UpdatePasswordFormProp
 			}, { csrfToken });
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
-			if (apiError.code === 'invalid-input') {
-				const { data } = apiError as ApiError<ZodError>;
-				if (data) {
-					data.issues.forEach(issue => {
-						type IssueName = keyof z.infer<typeof passwordFormSchema>;
-						const [ inputName ] = issue.path;
-						if (inputName) {
-							form.setError(inputName.toString() as IssueName, { message: issue.message });
-						}
-					});
-				}
-			}
-			toast({
-				title: 'Error',
-				description: getErrorMessage(apiError),
-				variant: 'destructive',
-			});
+			triggerErrorToast(apiError, form);
 		} finally {
 			setIsLoading(false);
 			form.reset();

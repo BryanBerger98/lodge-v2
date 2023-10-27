@@ -84,7 +84,7 @@ export const authenticateUserWithPassword = async (userToAuthenticate: User | Us
 		if (!user.password) {
 			throw buildApiError({
 				code: ApiErrorCode.WRONG_AUTH_METHOD,
-				status: StatusCode.UNPROCESSABLE_ENTITY,
+				status: StatusCode.CONFLICT,
 			});
 		}
 

@@ -9,6 +9,7 @@ export enum ApiErrorCode {
 	TOKEN_NOT_FOUND = 'token-not-found',
 	TOKEN_ALREADY_SENT = 'token-already-sent',
 	INVALID_TOKEN = 'invalid-token',
+	INVALID_CSRF_TOKEN = 'invalid-csrf-token',
 	EMAIL_ALREADY_VERIFIED = 'email-already-verified',
 	INVALID_INPUT = 'invalid-input',
 	PASSWORD_REQUIRED = 'password-required',

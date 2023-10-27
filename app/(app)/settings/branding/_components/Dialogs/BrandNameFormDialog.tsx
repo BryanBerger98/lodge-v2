@@ -16,7 +16,8 @@ import useCsrf from '@/context/csrf/useCsrf';
 import useSettings from '@/context/settings/useSettings';
 import { SettingDataType, SettingName } from '@/schemas/setting';
 import { updateSettings } from '@/services/settings.service';
-import { ApiError, getErrorMessage } from '@/utils/error';
+import { ApiError } from '@/utils/api/error';
+import { getErrorMessage } from '@/utils/api/error/error-messages.util';
 
 type BrandNameFormDialogProps = {
 	isOpen: boolean;

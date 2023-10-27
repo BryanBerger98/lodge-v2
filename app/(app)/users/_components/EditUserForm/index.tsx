@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { ChangeEventHandler, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { isValidPhoneNumber } from 'react-phone-number-input';
-import { ZodError, boolean, object, string, z } from 'zod';
+import { boolean, object, string, z } from 'zod';
 
 import InputPhone from '@/components/forms/Input/InputPhone';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -19,11 +19,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { useToast } from '@/components/ui/use-toast';
+import useErrorToast from '@/hooks/error/useErrorToast';
 import { Role } from '@/schemas/role.schema';
 import { UserPopulated } from '@/schemas/user/populated.schema';
 import { createUser, updateUser } from '@/services/users.service';
-import { ApiError, getErrorMessage } from '@/utils/error';
+import { ApiError } from '@/utils/api/error';
 
 import useUsers from '../../_context/users/useUsers';
 
@@ -34,7 +34,7 @@ type EditUserFormProps = {
 
 const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 
-	const { toast } = useToast();
+	const { triggerErrorToast } = useErrorToast();
 
 	const { updateUsers } = useUsers();
 
@@ -77,10 +77,9 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 			return;
 		}
 		if (values.role === 'owner') {
-			return toast({
+			return triggerErrorToast({
 				title: 'Error',
 				description: 'The "Owner" role is not assignable to a user.',
-				variant: 'destructive',
 			});
 		}
 		try {
@@ -103,23 +102,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 			router.replace(`/users/${ createdUser.id }`);
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
-			if (apiError.code === 'invalid-input') {
-				const { data } = apiError as ApiError<ZodError>;
-				if (data) {
-					data.issues.forEach(issue => {
-						type IssueName = keyof z.infer<typeof editUserFormSchema>;
-						const [ inputName ] = issue.path;
-						if (inputName) {
-							form.setError(inputName.toString() as IssueName, { message: issue.message });
-						}
-					});
-				}
-			}
-			toast({
-				title: 'Error',
-				description: getErrorMessage(apiError),
-				variant: 'destructive',
-			});
+			triggerErrorToast(apiError, form);
 		} finally {
 			setIsLoading(false);
 		}

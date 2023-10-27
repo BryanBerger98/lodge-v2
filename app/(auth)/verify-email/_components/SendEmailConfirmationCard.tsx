@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { SafeToken } from '@/schemas/token.schema';
 import { getSentEmailVerificationToken, sendEmailVerificationToken } from '@/services/auth.service';
-import { ApiError, getErrorMessage } from '@/utils/error';
-import { TOKEN_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
+import { ApiError } from '@/utils/api/error';
+import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
+import { getErrorMessage } from '@/utils/api/error/error-messages.util';
 
 let intervalId: NodeJS.Timer | null = null;
 
@@ -31,7 +32,7 @@ const SendEmailConfirmationCard = ({ csrfToken }: SendEmailConfirmationCardProps
 				setEmailVerificationTokenData(tokenData);
 			} catch (error) {
 				const apiError = error as ApiError<unknown>;
-				if (apiError.code === TOKEN_NOT_FOUND_ERROR) {
+				if (apiError.code === ApiErrorCode.TOKEN_NOT_FOUND) {
 					const tokenData = await sendEmailVerificationToken({ csrfToken });
 					setEmailVerificationTokenData(tokenData);
 				} else {

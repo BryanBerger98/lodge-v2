@@ -13,7 +13,8 @@ import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
 import useCsrf from '@/context/csrf/useCsrf';
 import { deleteUser, sendResetPasswordTokenToUser, sendVerificationTokenToUser, updateUser as updateUserQuery } from '@/services/users.service';
-import { ApiError, getErrorMessage } from '@/utils/error';
+import { ApiError } from '@/utils/api/error';
+import { getErrorMessage } from '@/utils/api/error/error-messages.util';
 
 import useUsers from '../../_context/users/useUsers';
 

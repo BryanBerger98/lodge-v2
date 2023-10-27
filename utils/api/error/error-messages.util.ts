@@ -2,6 +2,8 @@ import { StatusCode, getReasonPhrase } from '../http-status';
 
 import { ApiErrorCode } from './error-codes.util';
 
+import { ApiError } from '.';
+
 const DEFAULT_ERROR_MESSAGE = {
 	en: 'An error occured.',
 	fr: 'Une erreur s\'est produite.',
@@ -134,7 +136,8 @@ export const errorMessages: Partial<Record<(ApiErrorCode | StatusCode), { en: st
 	},
 };
 
-export const getErrorMessage = (code: ApiErrorCode | StatusCode, options?: { locale: 'fr' | 'en' }): string => {
-	const errorMessageObject = errorMessages[ code ];
-	return errorMessageObject ? errorMessageObject[ options?.locale || 'en' ] : `${ getReasonPhrase(code) }.`;
+export const getErrorMessage = (apiError: ApiError<unknown>, options?: { locale: 'fr' | 'en' }): string => {
+	const code = apiError.code || apiError.status;
+	const errorMessageObject = code ? errorMessages[ code ] : undefined;
+	return errorMessageObject ? errorMessageObject[ options?.locale || 'en' ] : code ? `${ getReasonPhrase(code) }.` : DEFAULT_ERROR_MESSAGE[ options?.locale || 'en' ];
 };

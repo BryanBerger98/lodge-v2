@@ -15,13 +15,13 @@ export const ApiErrorSchema = z.object({
 	data: z.any().nullable().optional(),
 });
 
-export type ApiError<D = unknown> = z.infer<typeof ApiErrorSchema> & {
+export type ApiError<D = unknown> = Omit<z.infer<typeof ApiErrorSchema>, 'data'> & {
 	data?: D | null;
 };
 
 export const buildApiError = <D = unknown>(apiError: ApiError<D>): ApiError<D> => ({
 	...apiError,
-	message: apiError.message || getErrorMessage(apiError.code || apiError.status || StatusCode.INTERNAL_SERVER_ERROR),
+	message: apiError.message || getErrorMessage(apiError),
 	status: apiError.status || StatusCode.INTERNAL_SERVER_ERROR,
 });
 
@@ -29,7 +29,6 @@ export const sendApiError = (error: any) => {
 	if (error.name && error.name === 'ZodError') {
 		const zodError = buildApiError({
 			code: ApiErrorCode.INVALID_INPUT,
-			message: getErrorMessage(ApiErrorCode.INVALID_INPUT),
 			status: StatusCode.UNPROCESSABLE_ENTITY,
 			data: error as ZodError,
 		});

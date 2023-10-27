@@ -20,7 +20,9 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { SettingPopulatedBoolean, UnregisteredSettingBooleanPopulated } from '@/schemas/setting';
 import { signUpUser } from '@/services/auth.service';
-import { ApiError, buildFormError, getErrorMessage } from '@/utils/error';
+import { ApiError } from '@/utils/api/error';
+import { getErrorMessage } from '@/utils/api/error/error-messages.util';
+import { buildFormError } from '@/utils/error';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules } from '@/utils/password.util';
 
 import AppleAuthButton from '../../_components/ProvidersButtons/AppleAuthButton';

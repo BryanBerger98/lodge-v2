@@ -1,80 +1,58 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { ZodError } from 'zod';
+import { NextResponse } from 'next/server';
 
 import { findUserWithPasswordById, updateUser } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
+import { routeHandler } from '@/utils/api';
+import { buildApiError } from '@/utils/api/error';
+import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
+import { StatusCode } from '@/utils/api/http-status';
 import { setServerAuthGuard } from '@/utils/auth';
-import { buildError, sendError } from '@/utils/error';
-import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
 import { verifyPassword } from '@/utils/password.util';
 
 import { UpdateUserEmailSchema } from './_schemas/update-user-email.schema';
 
 
-export const PUT = async (request: NextRequest) => {
+export const PUT = routeHandler(async (request) => {
 
-	try {
+	await connectToDatabase();
 
-		await connectToDatabase();
+	const body = await request.json();
 
-		const body = await request.json();
+	const { email, password } = UpdateUserEmailSchema.parse(body);
 
-		const { email, password } = UpdateUserEmailSchema.parse(body);
+	const { user: currentUser } = await setServerAuthGuard();
 
-		const { user: currentUser } = await setServerAuthGuard();
+	const user = await findUserWithPasswordById(currentUser.id);
 
-		const user = await findUserWithPasswordById(currentUser.id);
-
-		if (!user) {
-			return sendError(buildError({
-				code: USER_NOT_FOUND_ERROR,
-				message: 'User not found.',
-				status: 404,
-			}));
-		}
-
-		if (!user.password) {
-			return sendError(buildError({
-				code: INTERNAL_ERROR,
-				message: 'User password not found.', // TODO: Create a dedicated error code for this.
-				status: 500,
-			}));
-		}
-
-		const isPasswordValid = await verifyPassword(password, user.password);
-
-		if (!isPasswordValid) {
-			return sendError(buildError({
-				message: 'Wrong password.',
-				code: WRONG_PASSWORD_ERROR,
-				status: 401,
-			}));
-		}
-
-		const updatedUser = await updateUser({
-			id: currentUser.id,
-			email,
-			has_email_verified: false,
-			updated_by: currentUser.id,
-		}, { newDocument: true });
-
-		return NextResponse.json(updatedUser);
-	} catch (error: any) {
-		console.error(error);
-		if (error.name && error.name === 'ZodError') {
-			return sendError(buildError({
-				code: INVALID_INPUT_ERROR,
-				message: 'Invalid input.',
-				status: 422,
-				data: error as ZodError,
-			}));
-		}
-		return sendError(buildError({
-			code: error.code || INTERNAL_ERROR,
-			message: error.message || 'An error occured.',
-			status: error.status || 500,
-			data: error,
-		}));
+	if (!user) {
+		throw buildApiError({
+			code: ApiErrorCode.USER_NOT_FOUND,
+			status: StatusCode.NOT_FOUND,
+		});
 	}
 
-};
+	if (!user.password) {
+		throw buildApiError({
+			code: ApiErrorCode.WRONG_AUTH_METHOD,
+			status: StatusCode.CONFLICT,
+		});
+	}
+
+	const isPasswordValid = await verifyPassword(password, user.password);
+
+	if (!isPasswordValid) {
+		throw buildApiError({
+			code: ApiErrorCode.WRONG_PASSWORD,
+			status: StatusCode.UNAUTHORIZED,
+		});
+	}
+
+	const updatedUser = await updateUser({
+		id: currentUser.id,
+		email,
+		has_email_verified: false,
+		updated_by: currentUser.id,
+	}, { newDocument: true });
+
+	return NextResponse.json(updatedUser);
+});

@@ -6,45 +6,50 @@ import { deleteFileFromKey } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
 import { Role } from '@/schemas/role.schema';
 import { SettingDataType, SettingName } from '@/schemas/setting';
+import { routeHandler } from '@/utils/api';
+import { buildApiError } from '@/utils/api/error';
+import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
+import { StatusCode } from '@/utils/api/http-status';
 import { setServerAuthGuard } from '@/utils/auth';
-import { sendBuiltErrorWithSchemaValidation } from '@/utils/error';
 
 import { DeleteImageSettingSchema } from './_schemas/delete-image-setting.schema';
 
-export const DELETE = async (_: any, { params }: { params: { setting_name: string } }) => {
-	try {
-		
-		const { name } = DeleteImageSettingSchema.parse({ name: params.setting_name });
+export const DELETE = routeHandler(async (_, { params }) => {
 
-		await connectToDatabase();
+	const { name } = DeleteImageSettingSchema.parse({ name: params.setting_name });
 
-		const shareWithAdminSetting = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
+	await connectToDatabase();
 
-		const rolesWhiteList: Role[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ Role.OWNER, Role.ADMIN ] : [ Role.OWNER ];
+	const shareWithAdminSetting = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
 
-		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList });
+	const rolesWhiteList: Role[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ Role.OWNER, Role.ADMIN ] : [ Role.OWNER ];
 
-		const settingData = await findSettingByName(name);
+	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList });
 
-		if (settingData && settingData.data_type === SettingDataType.IMAGE && settingData.value && 'id' in settingData.value && settingData.value.id) {
-			const oldFile = await findFileById(settingData.value.id);
-			if (oldFile) {
-				await deleteFileFromKey(oldFile.key);
-				await deleteFileById(oldFile.id);
-			}
-		}
+	const settingData = await findSettingByName(name);
 
-		const updatedSetting = await updateSetting({
-			...settingData,
-			name,
-			data_type: SettingDataType.IMAGE,
-			value: null,
-			updated_by: currentUser.id,
-		}, { upsert: true });
-		
-		return NextResponse.json(updatedSetting);
-	} catch (error) {
-		console.error(error);
-		sendBuiltErrorWithSchemaValidation(error);
+	if (!settingData) {
+		throw buildApiError({
+			code: ApiErrorCode.SETTING_NOT_FOUND,
+			status: StatusCode.NOT_FOUND,
+		});
 	}
-};
+
+	if (settingData && settingData.data_type === SettingDataType.IMAGE && settingData.value && 'id' in settingData.value && settingData.value.id) {
+		const oldFile = await findFileById(settingData.value.id);
+		if (oldFile) {
+			await deleteFileFromKey(oldFile.key);
+			await deleteFileById(oldFile.id);
+		}
+	}
+
+	const updatedSetting = await updateSetting({
+		...settingData,
+		name,
+		data_type: SettingDataType.IMAGE,
+		value: null,
+		updated_by: currentUser.id,
+	}, { upsert: true });
+		
+	return NextResponse.json(updatedSetting);
+});
