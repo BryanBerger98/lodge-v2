@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { createToken, deleteTokenById, getTokenFromTargetId, getTokenFromTokenString } from '@/database/token/token.repository';
@@ -8,224 +8,181 @@ import { generateToken, verifyToken } from '@/lib/jwt';
 import { SettingName } from '@/schemas/setting';
 import { Token, TokenAction } from '@/schemas/token.schema';
 import { Optional } from '@/types/utils';
+import { routeHandler } from '@/utils/api';
+import { buildApiError } from '@/utils/api/error';
+import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
+import { StatusCode } from '@/utils/api/http-status';
 import { setServerAuthGuard } from '@/utils/auth';
 import { sendAccountVerificationEmail } from '@/utils/email';
-import { buildError, sendBuiltError, sendError } from '@/utils/error';
-import { EMAIL_ALREADY_VERIFIED_ERROR, FORBIDDEN_ERROR, INVALID_TOKEN_ERROR, TOKEN_ALREADY_SENT_ERROR, TOKEN_EXPIRED_ERROR, TOKEN_NOT_FOUND_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
 
-export const GET = async () => {
+export const GET = routeHandler(async () => {
 
-	try {
-		await connectToDatabase();
+	await connectToDatabase();
 
-		const userVerifyEmailSetting = await findSettingByName(SettingName.USER_VERIFY_EMAIL);
+	const userVerifyEmailSetting = await findSettingByName(SettingName.USER_VERIFY_EMAIL);
 
-		if (userVerifyEmailSetting && userVerifyEmailSetting.data_type === 'boolean' && !userVerifyEmailSetting.value) {
-			throw buildError({
-				code: FORBIDDEN_ERROR,
-				message: 'Forbidden.',
-				status: 403,
-			});
-		}
-
-		const { user: currentUser } = await setServerAuthGuard();
-
-		const userData = await findUserById(currentUser.id);
-
-		if (!userData) {
-			throw buildError({
-				code: USER_NOT_FOUND_ERROR,
-				message: 'User not found.',
-				status: 404,
-			});
-		}
-
-		if (userData.has_email_verified) {
-			throw buildError({
-				code: EMAIL_ALREADY_VERIFIED_ERROR,
-				message: 'Email already verified.',
-				status: 500,
-			});
-		}
-
-		const tokenData = await getTokenFromTargetId(userData.id, { action: TokenAction.EMAIL_VERIFICATION });
-
-		if (!tokenData) {
-			throw buildError({
-				code: TOKEN_NOT_FOUND_ERROR,
-				message: 'Token not found.',
-				status: 404,
-			});
-		}
-
-		const safeTokenData: Optional<Token, 'token'> = tokenData;
-		delete safeTokenData.token;
-
-		return NextResponse.json(safeTokenData);
-	} catch (error: any) {
-		console.error(error);
-		return sendBuiltError(error);
+	if (userVerifyEmailSetting && !userVerifyEmailSetting.value) {
+		throw buildApiError({ status: StatusCode.FORBIDDEN });
 	}
 
-};
+	const { user: currentUser } = await setServerAuthGuard();
 
-export const POST = async () => {
+	const userData = await findUserById(currentUser.id);
 
-	try {
-		await connectToDatabase();
-
-		const userVerifyEmailSetting = await findSettingByName(SettingName.USER_VERIFY_EMAIL);
-
-		if (userVerifyEmailSetting && userVerifyEmailSetting.data_type === 'boolean' && !userVerifyEmailSetting.value) {
-			throw buildError({
-				code: FORBIDDEN_ERROR,
-				message: 'Forbidden.',
-				status: 403,
-			});
-		}
-
-		const { user: currentUser } = await setServerAuthGuard();
-
-		const userData = await findUserById(currentUser.id);
-
-		if (!userData) {
-			throw buildError({
-				code: USER_NOT_FOUND_ERROR,
-				message: 'User not found.',
-				status: 404,
-			});
-		}
-
-		if (userData.has_email_verified) {
-			throw buildError({
-				code: EMAIL_ALREADY_VERIFIED_ERROR,
-				message: 'Email already verified.',
-				status: 500,
-			});
-		}
-
-		const oldToken = await getTokenFromTargetId(userData.id, { action: TokenAction.EMAIL_VERIFICATION });
-
-		if (oldToken) {
-			const tokenCreationTimestamp = oldToken.created_at.getTime();
-			const now = Date.now();
-			const timeDiff = Math.round((now - tokenCreationTimestamp) / 1000);
-			if (timeDiff < 60) {
-				return sendError(buildError({
-					code: TOKEN_ALREADY_SENT_ERROR,
-					message: 'Wait a minute before sending a new verification email',
-					status: 403,
-				}));
-			}
-			await deleteTokenById(oldToken.id);
-		}
-
-		const expirationDate = Math.floor(Date.now() / 1000) + (60 * 60 * 24);
-		const token = generateToken(userData, expirationDate, TokenAction.EMAIL_VERIFICATION);
-		const savedToken = await createToken({
-			token,
-			expiration_date: new Date(expirationDate),
-			action: TokenAction.EMAIL_VERIFICATION,
-			created_by: currentUser.id,
-			target_id: currentUser.id,
+	if (!userData) {
+		throw buildApiError({
+			code: ApiErrorCode.USER_NOT_FOUND,
+			status: StatusCode.NOT_FOUND,
 		});
-
-		await sendAccountVerificationEmail(userData, savedToken);
-
-		const safeTokenData: Optional<Token, 'token'> = savedToken;
-		delete safeTokenData.token;
-
-		return NextResponse.json(safeTokenData);
-	} catch (error: any) {
-		console.error(error);
-		return sendBuiltError(error);
 	}
-};
 
-export const PUT = async (request: NextRequest) => {
+	if (userData.has_email_verified) {
+		throw buildApiError({
+			code: ApiErrorCode.EMAIL_ALREADY_VERIFIED,
+			status: StatusCode.CONFLICT,
+		});
+	}
 
-	try {
-		await connectToDatabase();
+	const tokenData = await getTokenFromTargetId(userData.id, { action: TokenAction.EMAIL_VERIFICATION });
 
-		const { token } = await request.json();
+	if (!tokenData) {
+		throw buildApiError({
+			code: ApiErrorCode.TOKEN_NOT_FOUND,
+			status: StatusCode.NOT_FOUND,
+		});
+	}
 
-		if (!token) {
-			throw buildError({
-				code: INVALID_TOKEN_ERROR,
-				message: 'Invalid token.',
-				status: 401,
+	const safeTokenData: Optional<Token, 'token'> = tokenData;
+	delete safeTokenData.token;
+
+	return NextResponse.json(safeTokenData);
+});
+
+export const POST = routeHandler(async () => {
+	await connectToDatabase();
+
+	const userVerifyEmailSetting = await findSettingByName(SettingName.USER_VERIFY_EMAIL);
+
+	if (userVerifyEmailSetting && !userVerifyEmailSetting.value) {
+		throw buildApiError({ status: StatusCode.FORBIDDEN });
+	}
+
+	const { user: currentUser } = await setServerAuthGuard();
+
+	const userData = await findUserById(currentUser.id);
+
+	if (!userData) {
+		throw buildApiError({
+			code: ApiErrorCode.USER_NOT_FOUND,
+			status: StatusCode.NOT_FOUND,
+		});
+	}
+
+	if (userData.has_email_verified) {
+		throw buildApiError({
+			code: ApiErrorCode.EMAIL_ALREADY_VERIFIED,
+			status: StatusCode.CONFLICT,
+		});
+	}
+
+	const oldToken = await getTokenFromTargetId(userData.id, { action: TokenAction.EMAIL_VERIFICATION });
+
+	if (oldToken) {
+		const tokenCreationTimestamp = oldToken.created_at.getTime();
+		const now = Date.now();
+		const timeDiff = Math.round((now - tokenCreationTimestamp) / 1000);
+		if (timeDiff < 60) {
+			throw buildApiError({
+				code: ApiErrorCode.TOKEN_ALREADY_SENT,
+				message: 'Wait a minute before sending a new verification email',
+				status: StatusCode.FORBIDDEN,
 			});
 		}
+		await deleteTokenById(oldToken.id);
+	}
 
-		const { user: currentUser } = await setServerAuthGuard();
+	const expirationDate = Math.floor(Date.now() / 1000) + (60 * 60 * 24);
+	const token = generateToken(userData, expirationDate, TokenAction.EMAIL_VERIFICATION);
+	const savedToken = await createToken({
+		token,
+		expiration_date: new Date(expirationDate),
+		action: TokenAction.EMAIL_VERIFICATION,
+		created_by: currentUser.id,
+		target_id: currentUser.id,
+	});
 
-		const savedToken = await getTokenFromTokenString(token);
+	await sendAccountVerificationEmail(userData, savedToken);
 
-		if (!savedToken) {
-			throw buildError({
-				code: TOKEN_NOT_FOUND_ERROR,
-				message: 'Token not found.',
-				status: 404,
-			});
-		}
+	const safeTokenData: Optional<Token, 'token'> = savedToken;
+	delete safeTokenData.token;
 
-		const tokenPayload = verifyToken(savedToken.token);
-		if (typeof tokenPayload === 'string') {
-			throw buildError({
-				code: INVALID_TOKEN_ERROR,
-				message: 'Invalid token.',
-				status: 401,
-			}); 
-		}
-		const userData = await findUserByEmail(tokenPayload.email);
+	return NextResponse.json(safeTokenData);
+});
 
+export const PUT = routeHandler(async (request) => {
+	await connectToDatabase();
+
+	const { token } = await request.json();
+
+	if (!token) {
+		throw buildApiError({
+			code: ApiErrorCode.INVALID_TOKEN,
+			status: StatusCode.UNAUTHORIZED,
+		});
+	}
+
+	const { user: currentUser } = await setServerAuthGuard();
+
+	const savedToken = await getTokenFromTokenString(token);
+
+	if (!savedToken) {
+		throw buildApiError({
+			code: ApiErrorCode.TOKEN_NOT_FOUND,
+			status: StatusCode.NOT_FOUND,
+		});
+	}
+
+	const tokenPayload = verifyToken(savedToken.token);
+	if (typeof tokenPayload === 'string') {
+		throw buildApiError({
+			code: ApiErrorCode.INVALID_TOKEN,
+			status: StatusCode.UNAUTHORIZED,
+		});
+	}
+	const userData = await findUserByEmail(tokenPayload.email);
+
+	if (!userData) {
+		throw buildApiError({
+			code: ApiErrorCode.USER_NOT_FOUND,
+			status: StatusCode.NOT_FOUND,
+		});
+	}
+
+	await deleteTokenById(savedToken.id);
+
+	if (typeof userData.id === 'string' && userData.id !== currentUser.id || typeof userData.id !== 'string' && userData.id !== currentUser.id) {
 		if (!userData) {
-			throw buildError({
-				code: USER_NOT_FOUND_ERROR,
-				message: 'User not found.',
-				status: 404,
+			throw buildApiError({
+				code: ApiErrorCode.INVALID_TOKEN,
+				status: StatusCode.UNAUTHORIZED,
 			});
 		}
-
-		await deleteTokenById(savedToken.id);
-
-		if (typeof userData.id === 'string' && userData.id !== currentUser.id || typeof userData.id !== 'string' && userData.id !== currentUser.id) {
-			if (!userData) {
-				throw buildError({
-					code: INVALID_TOKEN_ERROR,
-					message: 'Invalid token.',
-					status: 401,
-				});
-			}
-		}
-
-		if (userData.has_email_verified) {
-			if (!userData) {
-				throw buildError({
-					code: EMAIL_ALREADY_VERIFIED_ERROR,
-					message: 'Email already verified.',
-					status: 500,
-				});
-			}
-		}
-
-		const updatedUser = await updateUser({
-			id: userData.id,
-			has_email_verified: true,
-			updated_by: currentUser.id,
-		}, { newDocument: true });
-
-		return NextResponse.json(updatedUser);
-	} catch (error: any) {
-		console.error(error);
-		if (error.name && error.name === 'TokenExpiredError') {
-			return sendError(buildError({
-				code: TOKEN_EXPIRED_ERROR,
-				message: 'Token expired',
-				status: 500,
-				data: error,
-			}));
-		}
-		return sendBuiltError(error);
 	}
-};
+
+	if (userData.has_email_verified) {
+		if (!userData) {
+			throw buildApiError({
+				code: ApiErrorCode.EMAIL_ALREADY_VERIFIED,
+				status: StatusCode.CONFLICT,
+			});
+		}
+	}
+
+	const updatedUser = await updateUser({
+		id: userData.id,
+		has_email_verified: true,
+		updated_by: currentUser.id,
+	}, { newDocument: true });
+
+	return NextResponse.json(updatedUser);
+});

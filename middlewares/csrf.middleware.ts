@@ -1,8 +1,9 @@
-// middleware/withLogging.ts
 import csrf from 'edge-csrf';
 import { NextFetchEvent, NextRequest } from 'next/server';
 
-import { buildError, sendError } from '@/utils/error';
+import { buildApiError, sendApiError } from '@/utils/api/error';
+import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
+import { StatusCode } from '@/utils/api/http-status';
 
 import { MiddlewareFactory } from './middleware.type';
 
@@ -27,10 +28,9 @@ export const csrfMiddleware: MiddlewareFactory = (next, response) => {
 			const csrfError = await csrfProtect(request, response);
 	
 			if (csrfError) {
-				return sendError(buildError({
-					message: 'Invalid CSRF token.',
-					status: 403,
-					code: 'invalid-csrf-token',
+				return sendApiError(buildApiError({
+					status: StatusCode.FORBIDDEN,
+					code: ApiErrorCode.INVALID_CSRF_TOKEN,
 					data: csrfError,
 				}));
 			}

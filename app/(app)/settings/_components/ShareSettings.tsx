@@ -22,7 +22,8 @@ import { SettingName } from '@/schemas/setting/name.shema';
 import { User } from '@/schemas/user';
 import { updateShareSettings } from '@/services/settings.service';
 import { fetchUsers } from '@/services/users.service';
-import { ApiError, getErrorMessage } from '@/utils/error';
+import { ApiError } from '@/utils/api/error';
+import { getErrorMessage } from '@/utils/api/error/error-messages.util';
 
 const shareSettingsFormSchema = z.object({
 	share_with_admin: z.boolean().default(false).optional(),

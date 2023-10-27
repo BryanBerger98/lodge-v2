@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import useAuth from '@/context/auth/useAuth';
 import { verifyUserEmail } from '@/services/auth.service';
-import { ApiError, getErrorMessage } from '@/utils/error';
+import { ApiError } from '@/utils/api/error';
+import { getErrorMessage } from '@/utils/api/error/error-messages.util';
 
 type ConfirmEmailCardProps = {
 	csrfToken: string;

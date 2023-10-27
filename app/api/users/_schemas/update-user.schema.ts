@@ -8,5 +8,4 @@ export const UpdateUserSchema = z.object({
 	phone_number: z.coerce.string().optional(),
 	role: z.nativeEnum(Role).optional(),
 	is_disabled: z.enum([ 'true', 'false' ]).transform(value => value === 'true').optional(),
-	id: z.coerce.string().min(1, 'Required.'),
 });

@@ -15,7 +15,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { sendResetPasswordToken } from '@/services/auth.service';
-import { ApiError, buildFormError, getErrorMessage } from '@/utils/error';
+import { ApiError } from '@/utils/api/error';
+import { getErrorMessage } from '@/utils/api/error/error-messages.util';
+import { buildFormError } from '@/utils/error';
 
 type EmailFormProps = {
 	csrfToken: string;

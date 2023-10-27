@@ -17,7 +17,7 @@ type SettingsContextValues = SettingsState & {
 	setLoadingState: <T extends LoadingState, E extends LoadingStateError<T>>(loading: T, ...error: E) => void;
 	refetchSettings: KeyedMutator<FetchSettingsResponse>;
 	getSetting: <T extends SettingName>(name: T) => UnregisteredSettingPopulated<SettingNameType<T>> | SettingPopulated<SettingNameType<T>> | undefined;
-}
+};
 
 const SettingsContext = createContext<SettingsContextValues | null>(null);
 export default SettingsContext;

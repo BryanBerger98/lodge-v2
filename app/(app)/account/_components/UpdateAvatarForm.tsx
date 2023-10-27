@@ -9,10 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
+import useErrorToast from '@/hooks/error/useErrorToast';
 import { updateUserAvatar } from '@/services/auth.service';
-import { ApiError, getErrorMessage } from '@/utils/error';
+import { ApiError } from '@/utils/api/error';
 import { optimizeImage } from '@/utils/file.util';
 
 type UpdateAvatarFormProps = {
@@ -26,7 +26,7 @@ const UpdateAvatarForm = ({ csrfToken }: UpdateAvatarFormProps) => {
 	
 	const { currentUser, updateCurrentUser } = useAuth();
 	
-	const { toast } = useToast();
+	const { triggerErrorToast } = useErrorToast({ logError: true });
 
 	const handleUpdateFile: ChangeEventHandler<HTMLInputElement> = (event) => {
 		const { files } = event.target;
@@ -48,12 +48,7 @@ const UpdateAvatarForm = ({ csrfToken }: UpdateAvatarFormProps) => {
 					await updateCurrentUser(updatedUser);
 				}
 			} catch (error) {
-				console.error(error);
-				toast({
-					title: 'Error',
-					description: getErrorMessage(error as ApiError<unknown>),
-					variant: 'destructive',
-				});
+				triggerErrorToast(error as ApiError<unknown>);
 			} finally {
 				setIsLoading(false);
 			}

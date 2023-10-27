@@ -4,9 +4,10 @@ import { type JWT } from 'next-auth/jwt';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { findUserById, findUserByEmail } from '@/database/user/user.repository';
 import { SettingDataType, SettingName } from '@/schemas/setting';
+import { buildApiError } from '@/utils/api/error';
+import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
+import { StatusCode } from '@/utils/api/http-status';
 import { Env, Environment } from '@/utils/env.util';
-import { buildError } from '@/utils/error';
-import { FORBIDDEN_ERROR, MISSING_CREDENTIALS_ERROR } from '@/utils/error/error-codes';
 
 import { connectToDatabase } from '../database';
 
@@ -60,10 +61,9 @@ const authOptions: NextAuthOptions = {
 				await connectToDatabase();
 				
 				if (!user.email) {
-					throw buildError({
-						code: MISSING_CREDENTIALS_ERROR,
-						message: 'Credentials are missing.',
-						status: 422,
+					throw buildApiError({
+						code: ApiErrorCode.MISSING_CREDENTIALS,
+						status: StatusCode.UNPROCESSABLE_ENTITY,
 					});
 				}
 
@@ -97,10 +97,9 @@ const authOptions: NextAuthOptions = {
 					if (!googleUserExists) {
 						return true;
 					}
-					throw buildError({
-						code: FORBIDDEN_ERROR,
-						message: `Account already registered with ${ googleUserExists?.provider_data }`,
-						status: 403,
+					throw buildApiError({
+						code: ApiErrorCode.WRONG_AUTH_METHOD,
+						status: StatusCode.CONFLICT,
 					});
 				}
 

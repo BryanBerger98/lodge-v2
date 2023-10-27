@@ -6,9 +6,9 @@ import { useState } from 'react';
 
 import PasswordModal, { PasswordModalOpenChangeEvent } from '@/components/features/auth/PasswordModal';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
+import useErrorToast from '@/hooks/error/useErrorToast';
 import { deleteUserAccount } from '@/services/auth.service';
-import { ApiError, getErrorMessage } from '@/utils/error';
+import { ApiError } from '@/utils/api/error';
 
 type DeleteAccountButtonProps = {
 	csrfToken: string;
@@ -20,7 +20,7 @@ const DeleteAccountButton = ({ className, csrfToken }: DeleteAccountButtonProps)
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 	const [ isPasswordModalOpen, setIsPasswordModalOpen ] = useState<boolean>(false);
 
-	const { toast } = useToast();
+	const { triggerErrorToast } = useErrorToast({ logError: true });
 
 	const handleDeleteAccount = () => setIsPasswordModalOpen(true);
 
@@ -37,12 +37,7 @@ const DeleteAccountButton = ({ className, csrfToken }: DeleteAccountButtonProps)
 			await deleteUserAccount(password, { csrfToken });
 			await signOut({ redirect: false });
 		} catch (error) {
-			const apiError = error as ApiError<unknown>;
-			toast({
-				title: 'Error',
-				description: getErrorMessage(apiError),
-				variant: 'destructive',
-			});
+			triggerErrorToast(error as ApiError<unknown>);
 		} finally {
 			setIsLoading(false);
 		}

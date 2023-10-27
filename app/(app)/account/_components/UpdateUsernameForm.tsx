@@ -5,16 +5,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Save } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { ZodError, object, string, z } from 'zod';
+import { object, string, z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
+import useErrorToast from '@/hooks/error/useErrorToast';
 import { updateAccount } from '@/services/auth.service';
-import { ApiError, getErrorMessage } from '@/utils/error';
+import { ApiError } from '@/utils/api/error';
 
 type UpdateUsernameFormProps = {
 	csrfToken: string;
@@ -22,7 +22,7 @@ type UpdateUsernameFormProps = {
 
 const UpdateUsernameForm = ({ csrfToken }: UpdateUsernameFormProps) => {
 
-	const { toast } = useToast();
+	const { triggerErrorToast } = useErrorToast();
 	const { currentUser, updateCurrentUser } = useAuth();
 
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
@@ -51,24 +51,7 @@ const UpdateUsernameForm = ({ csrfToken }: UpdateUsernameFormProps) => {
 			await updateCurrentUser(updatedUser);
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
-			if (apiError.code === 'invalid-input') {
-				const { data } = apiError as ApiError<ZodError>;
-				if (data) {
-					data.issues.forEach(issue => {
-						type IssueName = keyof z.infer<typeof usernameFormSchema>;
-						const [ inputName ] = issue.path;
-						if (inputName) {
-							form.setError(inputName.toString() as IssueName, { message: issue.message });
-						}
-					});
-				}
-			}
-			toast({
-				title: 'Error',
-				description: getErrorMessage(apiError),
-				variant: 'destructive',
-				
-			  });
+			triggerErrorToast(apiError, form);
 		} finally {
 			setIsLoading(false);
 		}

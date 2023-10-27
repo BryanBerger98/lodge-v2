@@ -15,7 +15,8 @@ import { useToast } from '@/components/ui/use-toast';
 import useSettings from '@/context/settings/useSettings';
 import { SettingName, SettingDataType, UnregisteredSetting } from '@/schemas/setting';
 import { updateSettings } from '@/services/settings.service';
-import { ApiError, getErrorMessage } from '@/utils/error';
+import { ApiError } from '@/utils/api/error';
+import { getErrorMessage } from '@/utils/api/error/error-messages.util';
 
 const usersSettingsFormSchema = z.object({
 	can_new_user_signup: z.boolean().default(true),
