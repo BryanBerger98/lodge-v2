@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { UpdateUserAccountSchema } from '@/app/api/auth/account/_schemas/update-user-account.schema';
 import fetcher, { FetcherOptionsWithCsrf } from '@/lib/fetcher';
 import { SafeToken, SafeTokenSchema } from '@/schemas/token.schema';
 import { User, UserSchema } from '@/schemas/user';
@@ -97,7 +98,7 @@ export const sendResetPasswordToken = async (email: string, options: FetcherOpti
 	}
 };
 
-export const updateAccount = async (valuesToUpdate: { phone_number?: string, username?: string }, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
+export const updateAccount = async (valuesToUpdate: z.infer<typeof UpdateUserAccountSchema>, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account', {
 			method: 'PUT',

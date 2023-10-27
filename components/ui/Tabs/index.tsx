@@ -24,12 +24,13 @@ TabsList.displayName = TabsPrimitive.List.displayName;
 
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> & { variant?: 'default' | 'secondary' }
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> & { variant?: 'default' | 'secondary' | 'destructive' }
 >(({ className, variant = 'default', ...props }, ref) => (
 	<TabsPrimitive.Trigger
 		className={ cn(
 			'inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm',
 			{ 'hover:bg-secondary/80 hover:text-secondary-foreground data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground': variant === 'secondary' },
+			{ 'text-destructive hover:bg-secondary/80 hover:text-destructive data-[state=active]:bg-secondary data-[state=active]:text-destructive': variant === 'destructive' },
 			className
 		) }
 		ref={ ref }

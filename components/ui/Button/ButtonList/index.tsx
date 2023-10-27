@@ -1,9 +1,15 @@
-import { PropsWithChildren } from 'react';
+import { HTMLAttributes, PropsWithChildren } from 'react';
 
-const ButtonList = ({ children }: PropsWithChildren<{}>) => {
+import { cn } from '@/utils/ui.util';
+
+
+const ButtonList = ({ children, className, ...props }: PropsWithChildren<HTMLAttributes<HTMLDivElement>>) => {
 	
 	return (
-		<div className="flex flex-col gap-0">
+		<div
+			className={ cn('flex flex-col gap-0', className) }
+			{ ...props }
+		>
 			{ children }
 		</div>
 	);

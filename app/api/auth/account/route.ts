@@ -4,7 +4,6 @@ import { updateFileURL } from '@/database/file/file.repository';
 import { findUserById, updateUser } from '@/database/user/user.repository';
 import { getFieldSignedURL } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
-import { User } from '@/schemas/user';
 import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
@@ -45,17 +44,7 @@ export const PUT = routeHandler(async (request) => {
 
 	const body = await request.json();
 
-	const { username, phone_number } = UpdateUserAccountSchema.parse(body);
-
-	const updateObject: Partial<User> = {};
-
-	if (username) {
-		updateObject.username = username;
-	}
-
-	if (phone_number) {
-		updateObject.phone_number = phone_number;
-	}
+	const values = UpdateUserAccountSchema.parse(body);
 
 	const { user: currentUser } = await setServerAuthGuard();
 
@@ -64,7 +53,7 @@ export const PUT = routeHandler(async (request) => {
 	const updatedUser = await updateUser({
 		id: currentUser.id,
 		updated_by: currentUser.id,
-		...updateObject,
+		...values,
 	}, { newDocument: true });
 
 	return NextResponse.json(updatedUser);
