@@ -8,8 +8,9 @@ import { Role } from '@/schemas/role.schema';
 import { User } from '@/schemas/user';
 import { UserPopulated } from '@/schemas/user/populated.schema';
 
-import { buildError } from '../error';
-import { FORBIDDEN_ERROR, MISSING_CREDENTIALS_ERROR, UNAUTHORIZED_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '../error/error-codes';
+import { buildApiError } from '../api/error';
+import { ApiErrorCode } from '../api/error/error-codes.util';
+import { StatusCode } from '../api/http-status';
 import { verifyPassword } from '../password.util';
 
 export interface ProtectionOptions {
@@ -32,11 +33,7 @@ export const setServerAuthGuard = async (options?: ProtectionOptions) => {
 		if (redirect) {
 			return nextRedirect(typeof redirect === 'boolean' ? '/' : redirect);
 		}
-		throw buildError({
-			code: UNAUTHORIZED_ERROR,
-			message: 'Unauthorized.',
-			status: 401,
-		});
+		throw buildApiError({ status: StatusCode.UNAUTHORIZED });
 	}
 
 	const currentUserData = await findUserById(currentUser.id);
@@ -45,11 +42,7 @@ export const setServerAuthGuard = async (options?: ProtectionOptions) => {
 		if (redirect) {
 			return nextRedirect(typeof redirect === 'boolean' ? '/' : redirect);
 		}
-		throw buildError({
-			code: UNAUTHORIZED_ERROR,
-			message: 'Unauthorized.',
-			status: 401,
-		});
+		throw buildApiError({ status: StatusCode.UNAUTHORIZED });
 	}
 
 	if (rolesWhiteList.length > 0 && (!session || !currentUser?.id || !rolesWhiteList?.includes(currentUserData.role))) {
@@ -57,18 +50,10 @@ export const setServerAuthGuard = async (options?: ProtectionOptions) => {
 			return nextRedirect(typeof redirect === 'boolean' ? '/' : redirect);
 		}
 		if (!session || !currentUser?.id) {
-			throw buildError({
-				code: UNAUTHORIZED_ERROR,
-				message: 'Unauthorized.',
-				status: 401,
-			});
+			throw buildApiError({ status: StatusCode.UNAUTHORIZED });
 		}
 		if (!rolesWhiteList?.includes(currentUserData.role)) {
-			throw buildError({
-				code: FORBIDDEN_ERROR,
-				message: 'Forbidden.',
-				status: 403,
-			});
+			throw buildApiError({ status: StatusCode.FORBIDDEN });
 		}
 	}
 
@@ -81,38 +66,34 @@ export const setServerAuthGuard = async (options?: ProtectionOptions) => {
 export const authenticateUserWithPassword = async (userToAuthenticate: User | UserPopulated, password?: string) => {
 	try {
 		if (!password) {
-			throw buildError({
-				code: MISSING_CREDENTIALS_ERROR,
-				message: 'Missing credentials.',
-				status: 401,
+			throw buildApiError({
+				code: ApiErrorCode.MISSING_CREDENTIALS,
+				status: StatusCode.UNPROCESSABLE_ENTITY,
 			});
 		}
 
 		const user = await findUserWithPasswordById(userToAuthenticate.id);
 
 		if (!user) {
-			throw buildError({
-				code: USER_NOT_FOUND_ERROR,
-				message: 'User not found.',
-				status: 404,
+			throw buildApiError({
+				code: ApiErrorCode.USER_NOT_FOUND,
+				status: StatusCode.NOT_FOUND,
 			});
 		}
 
 		if (!user.password) {
-			throw buildError({
-				code: MISSING_CREDENTIALS_ERROR, // TODO: Create a new error code for this.
-				message: 'Missing credentials.',
-				status: 401,
+			throw buildApiError({
+				code: ApiErrorCode.WRONG_AUTH_METHOD,
+				status: StatusCode.UNPROCESSABLE_ENTITY,
 			});
 		}
 
 		const isPasswordValid = await verifyPassword(password, user.password);
 
 		if (!isPasswordValid) {
-			throw buildError({
-				code: WRONG_PASSWORD_ERROR,
-				message: 'Wrong password.',
-				status: 401,
+			throw buildApiError({
+				code: ApiErrorCode.WRONG_PASSWORD,
+				status: StatusCode.UNAUTHORIZED,
 			});
 		}
 

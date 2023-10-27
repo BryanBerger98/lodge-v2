@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { FieldPath, FieldValues, UseFormReturn } from 'react-hook-form';
 import { ZodError, z } from 'zod';
 

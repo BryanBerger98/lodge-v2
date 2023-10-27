@@ -11,9 +11,13 @@ import { ImageMimeTypeSchema } from '@/schemas/file/mime-type.schema';
 import { Role } from '@/schemas/role.schema';
 import { User } from '@/schemas/user';
 import { UserPopulated } from '@/schemas/user/populated.schema';
+import { routeHandler } from '@/utils/api';
+import { buildApiError } from '@/utils/api/error';
+import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
+import { StatusCode } from '@/utils/api/http-status';
 import { setServerAuthGuard } from '@/utils/auth';
 import { buildError, sendBuiltErrorWithSchemaValidation } from '@/utils/error';
-import { FILE_TOO_LARGE_ERROR, USER_ALREADY_EXISTS_ERROR, USER_NOT_FOUND_ERROR, USER_UNEDITABLE_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
+import { FILE_TOO_LARGE_ERROR, USER_ALREADY_EXISTS_ERROR, WRONG_FILE_FORMAT_ERROR } from '@/utils/error/error-codes';
 import { AUTHORIZED_IMAGE_MIME_TYPES, AUTHORIZED_IMAGE_SIZE, convertFileRequestObjetToModel, isFileURLExpired } from '@/utils/file.util';
 import { generatePassword, hashPassword } from '@/utils/password.util';
 
@@ -120,69 +124,59 @@ export const POST = async (request: NextRequest) => {
 	}
 };
 
-export const PUT = async (request: NextRequest) => {
+export const PUT = routeHandler(async (request: NextRequest) => {
+	await connectToDatabase();
 
-	try {
+	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
 
-		await connectToDatabase();
+	const formData = await request.formData();
 
-		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
+	const file = formData.get('avatar') as Blob | null;
+	formData.delete('avatar');
+	const body = Object.fromEntries(formData.entries());
 
-		const formData = await request.formData();
+	const { email, username, phone_number, is_disabled, role, id } = UpdateUserSchema.parse(body);
 
-		const file = formData.get('avatar') as Blob | null;
-		formData.delete('avatar');
-		const body = Object.fromEntries(formData.entries());
-
-		const { email, username, phone_number, is_disabled, role, id } = UpdateUserSchema.parse(body);
-
-		const existingUser = email ? await findUserByEmail(email) : null;
+	const existingUser = email ? await findUserByEmail(email) : null;
 	
-		if (existingUser && existingUser.id.toString() !== id) {
-			throw buildError({
-				code: USER_ALREADY_EXISTS_ERROR,
-				message: 'User already exists.',
-				status: 422,
-			});
-		}
-
-		const userData = await findUserById(id);
-
-		if (!userData) {
-			throw buildError({
-				code: USER_NOT_FOUND_ERROR,
-				message: 'User not found.',
-				status: 404,
-			});
-		}
-
-		if (currentUser.role !== 'owner' && userData.role === 'owner') {
-			throw buildError({
-				code: USER_UNEDITABLE_ERROR,
-				message: 'This user is not editable',
-				status: 403,
-			});
-		}
-
-		const photoFileData = await uploadPhotoFile(currentUser, file, userData);
-	
-		const updatedUser = await updateUser({
-			id,
-			email: email || userData.email,
-			username: username || userData.username || undefined,
-			role: role || userData.role,
-			phone_number: phone_number || userData.phone_number,
-			is_disabled: is_disabled !== undefined && is_disabled !== null ? is_disabled : userData.is_disabled,
-			photo: photoFileData?.id || userData.photo?.id || null,
-			updated_by: currentUser.id,
+	if (existingUser && existingUser.id !== id) {
+		throw buildApiError({
+			code: ApiErrorCode.USER_ALREADY_EXISTS,
+			status: StatusCode.UNPROCESSABLE_ENTITY,
 		});
-		
-		return NextResponse.json(updatedUser);
-	} catch (error: any) {
-		console.error(error);
-		return sendBuiltErrorWithSchemaValidation(error);
 	}
-};
+
+	const userData = await findUserById(id);
+
+	if (!userData) {
+		throw buildApiError({
+			code: ApiErrorCode.USER_NOT_FOUND,
+			status: StatusCode.NOT_FOUND,
+		});
+	}
+
+	if (currentUser.role !== 'owner' && userData.role === 'owner') {
+		throw buildApiError({
+			code: ApiErrorCode.USER_UNEDITABLE,
+			status: StatusCode.FORBIDDEN,
+		});
+	}
+
+	const photoFileData = await uploadPhotoFile(currentUser, file, userData);
+	
+	const updatedUser = await updateUser({
+		id,
+		email: email || userData.email,
+		username: username || userData.username || undefined,
+		role: role || userData.role,
+		phone_number: phone_number || userData.phone_number,
+		is_disabled: is_disabled !== undefined && is_disabled !== null ? is_disabled : userData.is_disabled,
+		photo: photoFileData?.id || userData.photo?.id || null,
+		updated_by: currentUser.id,
+	});
+		
+	return NextResponse.json(updatedUser);
+});
 
 export const GET = async (request: NextRequest) => {
 	try {
