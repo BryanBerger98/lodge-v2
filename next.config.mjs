@@ -4,6 +4,7 @@ const withBundleAnalyzer = NextBundleAnalyzer({ enabled: process.env.ANALYZE ===
   
 export default withBundleAnalyzer({
 	eslint: { ignoreDuringBuilds: true },
+	// typescript: { ignoreBuildErrors: true },
 	images: {
 		remotePatterns: [
 			{
