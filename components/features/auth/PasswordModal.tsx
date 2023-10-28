@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-handler-names */
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Check } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 import { object, string, z } from 'zod';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/utils/ui.util';
 
 export type PasswordModalOpenChangeEvent = ({ openState, password }: { openState: boolean, password: string }) => void;
 
@@ -17,9 +18,10 @@ type PasswordModalProps = {
 	onOpenChange: PasswordModalOpenChangeEvent;
 	title?: ReactNode;
 	description?: ReactNode;
+	variant?: 'default' | 'destructive';
 }
 
-const PasswordModal = ({ isOpen, onOpenChange, title, description }: PasswordModalProps) => {
+const PasswordModal = ({ isOpen, onOpenChange, title, description, variant= 'default' }: PasswordModalProps) => {
 
 	const passwordFormSchema = object({ password: string().min(1, 'Required.') });
 
@@ -45,6 +47,14 @@ const PasswordModal = ({ isOpen, onOpenChange, title, description }: PasswordMod
 		form.reset();
 	};
 
+	const handleCancel = () => {
+		onOpenChange({
+			openState: false,
+			password: '', 
+		});
+		form.reset();
+	};
+
 	return (
 		<Dialog
 			open={ isOpen }
@@ -56,7 +66,10 @@ const PasswordModal = ({ isOpen, onOpenChange, title, description }: PasswordMod
 				<Form { ...form }>
 					<form onSubmit={ form.handleSubmit(handleSubmitPasswordForm) }>
 						<DialogHeader className="mb-4">
-							<DialogTitle>{ title || 'We keep your account safe.' }</DialogTitle>
+							<DialogTitle
+								className={ cn({ 'text-destructive': variant === 'destructive' }) }
+							>{ title || 'We keep your account safe.' }
+							</DialogTitle>
 							<DialogDescription>
 								{ description || 'We need you to enter your password to confirm this action.' }
 							</DialogDescription>
@@ -80,10 +93,20 @@ const PasswordModal = ({ isOpen, onOpenChange, title, description }: PasswordMod
 						<DialogFooter className="mt-4">
 							<Button
 								className="gap-2"
-								type="submit"
+								type="button"
+								variant="outline"
+								onClick={ handleCancel }
 							>
-								<Check />
-								Validate
+								<X size="16" />
+								Cancel
+							</Button>
+							<Button
+								className="gap-2"
+								type="submit"
+								variant={ variant }
+							>
+								<Check size="16" />
+								Confirm
 							</Button>
 						</DialogFooter>
 					</form>

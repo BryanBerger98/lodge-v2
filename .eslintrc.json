@@ -234,7 +234,7 @@
 				"react/prop-types": "off",
 				"react/no-unused-prop-types": "warn",
 				"react/forbid-prop-types": "warn",
-				"react/boolean-prop-naming": ["error", { "rule": "^(is|has|with)[A-Z]([A-Za-z0-9]?)+", "validateNested": true }],
+				"react/boolean-prop-naming": ["error", { "rule": "^(is|has|with|as|enable|disable)[A-Z]([A-Za-z0-9]?)+", "validateNested": true }],
 				"react/jsx-max-props-per-line": ["warn", { "maximum": 1 }],
 				"react/jsx-first-prop-new-line": ["warn", "multiline"],
 				"react/jsx-props-no-spreading": "off",

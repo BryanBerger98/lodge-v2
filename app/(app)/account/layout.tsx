@@ -1,4 +1,4 @@
-import { Lock, User } from 'lucide-react';
+import { AlertTriangle, Lock, User } from 'lucide-react';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import { ReactNode } from 'react';
@@ -54,7 +54,7 @@ const AccountLayout = async ({ children }: AccountLayoutProps) => {
 							variant="destructive"
 							asChild
 						>
-							<Link href="/account/danger-zone"><Lock size="16" /> Danger zone</Link>
+							<Link href="/account/danger-zone"><AlertTriangle size="16" /> Danger zone</Link>
 						</TabsTrigger>
 					</TabsList>
 				</Tabs>
