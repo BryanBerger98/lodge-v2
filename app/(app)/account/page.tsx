@@ -22,7 +22,7 @@ const AccountPage = () => {
 
 	return (
 		<>
-			<Heading4 className="gap-2 flex items-center"><User />Profile</Heading4>
+			<Heading4 className="gap-2 flex items-center"><User size="16" />Profile</Heading4>
 			<Card>
 				<CardHeader>
 					<CardTitle>Personal informations</CardTitle>
