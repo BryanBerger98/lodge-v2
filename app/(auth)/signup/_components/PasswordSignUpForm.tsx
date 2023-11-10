@@ -14,38 +14,71 @@ import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import useCsrf from '@/context/csrf/useCsrf';
+import useErrorToast from '@/hooks/error/useErrorToast';
 import { UnregisteredSettingBooleanPopulated } from '@/schemas/setting';
+import { signUpUser } from '@/services/auth.service';
+import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules } from '@/utils/password.util';
 
-import { SignInStep } from '../_context';
-import { useSignIn } from '../_context/useSignIn';
+import { SignUpStep } from '../_context';
+import { useSignUp } from '../_context/useSignUp';
 
-
-type PasswordSignInFormProps = {
+type PasswordSignUpFormProps = {
 	userVerifyEmailSetting: UnregisteredSettingBooleanPopulated | null;
-	magicLinkSignInSetting: UnregisteredSettingBooleanPopulated | null;
+	magicLinkSignUpSetting: UnregisteredSettingBooleanPopulated | null;
+	passwordRules: {
+		uppercase_min: number;
+		lowercase_min: number;
+		numbers_min: number;
+		symbols_min: number;
+		min_length: number;
+		should_contain_unique_chars: boolean;
+	};
 };
 
-const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: PasswordSignInFormProps) => {
+const PasswordSignUpForm = ({ userVerifyEmailSetting, magicLinkSignUpSetting, passwordRules }: PasswordSignUpFormProps) => {
 
-	const { isLoading, step, setStep, email, setIsLoading, setError } = useSignIn();
+	const { isLoading, step, setStep, email, setIsLoading, setError } = useSignUp();
+	const { csrfToken } = useCsrf();
+	const { triggerErrorToast } = useErrorToast();
+
+	const PasswordSignUpFormSchema = z.object({
+		password: z.string().min(passwordRules.min_length, `At least ${ passwordRules.min_length } characters.`).regex(getValidationRegexFromPasswordRules(passwordRules), { message: getErrorMessageFromPasswordRules(passwordRules) }),
+		passwordConfirm: z.string().min(1, 'Required'),
+	}).refine((data) => data.password === data.passwordConfirm, {
+		path: [ 'passwordConfirm' ],
+		message: 'Must be the same as password.',
+	});
 
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const verificationToken = searchParams.get('verification_token');
 
-	const passwordSignInFormSchema = z.object({ password: z.string().min(1, 'Required.') });
-
-	const form = useForm<z.infer<typeof passwordSignInFormSchema>>({
-		resolver: zodResolver(passwordSignInFormSchema),
-		defaultValues: { password: '' },
+	const form = useForm<z.infer<typeof PasswordSignUpFormSchema>>({
+		resolver: zodResolver(PasswordSignUpFormSchema),
+		defaultValues: {
+			password: '',
+			passwordConfirm: '', 
+		},
 		mode: 'onTouched',
 	});
 
-	const handleGoBack = () => setStep(SignInStep.EMAIL);
+	const handleGoBack = () => setStep(SignUpStep.EMAIL);
 
-	const handleSubmitEmailSignInForm = () => {
+	const handleSubmit = async () => {
+		if (!csrfToken) {
+			triggerErrorToast({
+				title: 'Error',
+				message: 'Invalid CSRF token.',
+			});
+			return;
+		};
 		setIsLoading(true);
 		setError(null);
+		await signUpUser({
+			email,
+			password: form.getValues('password'),
+		}, { csrfToken });
 		signIn('credentials', {
 			redirect: false,
 			email,
@@ -55,7 +88,7 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 				if (data?.error) {
 					setError('Incorrect credentials.');
 				} else {
-					if (!userVerifyEmailSetting || (userVerifyEmailSetting && userVerifyEmailSetting.data_type === 'boolean' && userVerifyEmailSetting.value)) {
+					if (!userVerifyEmailSetting || (userVerifyEmailSetting && userVerifyEmailSetting.value)) {
 						if (verificationToken) {
 							router.replace(`/verify-email/${ verificationToken }`);
 						} else {
@@ -75,8 +108,8 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 			});
 	};
 
-	const handleSendSignInMagicLink = () => {
-		if (!magicLinkSignInSetting || magicLinkSignInSetting.data_type !== 'boolean' || !magicLinkSignInSetting.value) {
+	const handleSendSignUpMagicLink = () => {
+		if (!magicLinkSignUpSetting || !magicLinkSignUpSetting.value) {
 			return;
 		}
 		setIsLoading(true);
@@ -91,7 +124,7 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 					console.error(data.error);
 					setError('Incorrect credentials.');
 				} else {
-					setStep(SignInStep.MAGIC_EMAIL_SENT);
+					setStep(SignUpStep.MAGIC_EMAIL_SENT);
 				}
 			})
 			.catch((error) => {
@@ -103,31 +136,31 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 			});
 	};
 
-	if (step !== 'password') {
+	if (step !== SignUpStep.PASSWORD) {
 		return null;
-	}	
+	}
 
 	return (
 		<Form { ...form }>
-			<form onSubmit={ form.handleSubmit(handleSubmitEmailSignInForm) }>
+			<form onSubmit={ form.handleSubmit(handleSubmit) }>
 				<CardHeader>
-					<CardTitle>Sign In</CardTitle>
+					<CardTitle>Sign up</CardTitle>
 					<CardDescription>
-						Sign in with <span className="font-bold">{ email }</span>.
+						Sign up with <span className="font-bold">{ email }</span>.
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
 					{
-						magicLinkSignInSetting && magicLinkSignInSetting.data_type === 'boolean' && magicLinkSignInSetting.value ?
+						magicLinkSignUpSetting && magicLinkSignUpSetting.data_type === 'boolean' && magicLinkSignUpSetting.value ?
 							<div className="flex flex-col gap-4">
 								<Button
 									className="gap-2 w-full"
 									disabled={ isLoading }
 									type="button"
-									onClick={ handleSendSignInMagicLink }
+									onClick={ handleSendSignUpMagicLink }
 								>
 									{ isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 size="16" /> }
-									Sign in with magic link
+									Sign up with magic link
 								</Button>
 								<div className="flex gap-4 items-center justify-center w-full mb-2">
 									<Separator
@@ -147,8 +180,24 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 						control={ form.control }
 						name="password"
 						render={ ({ field }) => (
-							<FormItem>
+							<FormItem className="mb-4">
 								<FormLabel>Password</FormLabel>
+								<FormControl>
+									<Input
+										type="password"
+										{ ...field }
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						) }
+					/>
+					<FormField
+						control={ form.control }
+						name="passwordConfirm"
+						render={ ({ field }) => (
+							<FormItem>
+								<FormLabel>Confirm password</FormLabel>
 								<FormControl>
 									<Input
 										type="password"
@@ -167,7 +216,7 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 						type="submit"
 					>
 						{ isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn size="16" /> }
-						Sign in
+						Sign up
 					</Button>
 					<Separator orientation="horizontal" />
 					<div className="flex w-full justify-between">
@@ -183,8 +232,8 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 							variant="link"
 							asChild
 						>
-							<Link href="/forgot-password">
-								Forgot password ?
+							<Link href="/signin">
+								Sign in
 							</Link>
 						</Button>
 					</div>
@@ -194,4 +243,4 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 	);
 };
 
-export default PasswordSignInForm;
+export default PasswordSignUpForm;

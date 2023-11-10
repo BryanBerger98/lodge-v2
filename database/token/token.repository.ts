@@ -11,7 +11,11 @@ export const createToken = async (tokenToCreate: CreateTokenDTO): Promise<Token>
 			target_id: newId(tokenToCreate.target_id),
 			created_by: tokenToCreate.created_by ? newId(tokenToCreate.created_by) : tokenToCreate.created_by, 
 		});
-		return createdToken.toJSON();
+		return createdToken.toJSON({
+			versionKey: false,
+			virtuals: true,
+			flattenObjectIds: true,
+		});
 	} catch (error) {
 		throw error;
 	}
@@ -31,7 +35,11 @@ export const getTokenFromTargetId = async (target_id: string, filter?: GetTokenF
 			...filter,
 			created_by: filter?.created_by ? newId(filter.created_by) : filter?.created_by,
 		});
-		return foundToken?.toJSON() || null;
+		return foundToken?.toJSON({
+			versionKey: false,
+			virtuals: true,
+			flattenObjectIds: true,
+		}) || null;
 	} catch (error) {
 		throw error;
 	}
@@ -51,7 +59,11 @@ export const getTokenFromCreatedBy = async (created_by: string, filter?: GetToke
 			...filter,
 			target_id: filter?.target_id ? newId(filter.target_id) : filter?.target_id,
 		});
-		return foundToken?.toJSON() || null;
+		return foundToken?.toJSON({
+			versionKey: false,
+			virtuals: true,
+			flattenObjectIds: true,
+		}) || null;
 	} catch (error) {
 		throw error;
 	}
@@ -60,7 +72,11 @@ export const getTokenFromCreatedBy = async (created_by: string, filter?: GetToke
 export const getTokenFromTokenString = async (token: string): Promise<Token | null> => {
 	try {
 		const foundToken = await TokenModel.findOne({ token });
-		return foundToken?.toJSON() || null;
+		return foundToken?.toJSON({
+			versionKey: false,
+			virtuals: true,
+			flattenObjectIds: true,
+		}) || null;
 	} catch (error) {
 		throw error;
 	}

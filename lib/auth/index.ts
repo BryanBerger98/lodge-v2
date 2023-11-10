@@ -2,8 +2,8 @@ import { NextAuthOptions } from 'next-auth';
 import { type JWT } from 'next-auth/jwt';
 
 import { findSettingByName } from '@/database/setting/setting.repository';
-import { findUserById, findUserByEmail } from '@/database/user/user.repository';
-import { SettingDataType, SettingName } from '@/schemas/setting';
+import { findUserById, findUserByEmail, updateUser } from '@/database/user/user.repository';
+import { SettingName } from '@/schemas/setting';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
 import { StatusCode } from '@/utils/api/http-status';
@@ -28,6 +28,7 @@ const authOptions: NextAuthOptions = {
 	pages: {
 		signIn: '/signin',
 		error: '/error', 
+		newUser: '/signup',
 	},
 	callbacks: {
 		async jwt ({ user, token, trigger }): Promise<JWT> {
@@ -74,13 +75,25 @@ const authOptions: NextAuthOptions = {
 				}
 
 				if (account?.provider === 'email') {
-					const registeredMagicLinkSignInSetting = await findSettingByName(SettingName.MAGIC_LINK_SIGNIN);
 
-					if (
-						email?.verificationRequest
-					&& (registeredMagicLinkSignInSetting && registeredMagicLinkSignInSetting.data_type === SettingDataType.BOOLEAN && registeredMagicLinkSignInSetting.value)
-					&& userExists
-					) {
+					const registeredMagicLinkSignInSetting = await findSettingByName(SettingName.MAGIC_LINK_SIGNIN);
+					if (!email?.verificationRequest && (registeredMagicLinkSignInSetting && registeredMagicLinkSignInSetting.value)) {
+						if (userExists && userExists.has_email_verified) {
+							return true;
+						}
+
+						if (userExists && !userExists.has_email_verified) {
+							await updateUser({
+								id: userExists.id,
+								has_email_verified: true,
+								last_login_date: new Date(),
+								updated_by: userExists.id,
+							});
+							return true;
+						}
+					}
+
+					if (email?.verificationRequest && (registeredMagicLinkSignInSetting && registeredMagicLinkSignInSetting.value)) {
 						return true;
 					}
 

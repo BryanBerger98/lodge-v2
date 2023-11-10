@@ -62,6 +62,7 @@ export const POST = routeHandler(async (request) => {
 	const createdUser = await createUser({
 		email,
 		password: hashedPassword,
+		has_password: true,
 		provider_data: AuthenticationProvider.EMAIL,
 		role: Role.USER,
 	});

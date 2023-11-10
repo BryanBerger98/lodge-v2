@@ -81,6 +81,10 @@ const userSchema = new Schema<IUserWithPasswordDocument>({
 		type: String,
 		default: null, 
 	},
+	has_password: {
+		type: Boolean,
+		default: false,
+	},
 }, {
 	timestamps: {
 		createdAt: 'created_at',

@@ -1,8 +1,12 @@
 import dynamic from 'next/dynamic';
+import { redirect } from 'next/navigation';
 
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
 import { SettingName, UnregisteredSettingBooleanPopulatedSchema } from '@/schemas/setting';
+import { getServerCurrentUser } from '@/utils/auth';
+
+import SignInProvider from './_context/provider';
 
 const SignInCard = dynamic(() => import('./_components/SignInCard'));
 const EmailSignInForm = dynamic(() => import('./_components/EmailSignInForm'));
@@ -12,6 +16,12 @@ const MagicEmailSent = dynamic(() => import('./_components/MagicEmailSent'));
 const SignInPage = async () => {
 
 	await connectToDatabase();
+
+	const currentUser = await getServerCurrentUser();
+
+	if (currentUser) {
+		redirect('/');
+	}
 
 	const newUserSignUpSettingData = await findSettingByName(SettingName.NEW_USERS_SIGNUP);
 	const newUserSignUpSetting = UnregisteredSettingBooleanPopulatedSchema.parse(newUserSignUpSettingData);
@@ -27,18 +37,20 @@ const SignInPage = async () => {
 
 	return (
 		<div className="min-h-screen flex justify-center items-center">
-			<SignInCard>
-				<EmailSignInForm
-					appleAuthSetting={ appleAuthSetting }
-					googleAuthSetting={ googleAuthSetting }
-					newUserSignUpSetting={ newUserSignUpSetting }
-				/>
-				<PasswordSignInForm
-					magicLinkSignInSetting={ magicLinkSignInSetting }
-					userVerifyEmailSetting={ userVerifyEmailSetting }
-				/>
-				<MagicEmailSent />
-			</SignInCard>
+			<SignInProvider>
+				<SignInCard>
+					<EmailSignInForm
+						appleAuthSetting={ appleAuthSetting }
+						googleAuthSetting={ googleAuthSetting }
+						newUserSignUpSetting={ newUserSignUpSetting }
+					/>
+					<PasswordSignInForm
+						magicLinkSignInSetting={ magicLinkSignInSetting }
+						userVerifyEmailSetting={ userVerifyEmailSetting }
+					/>
+					<MagicEmailSent />
+				</SignInCard>
+			</SignInProvider>
 		</div>
 	);
 };

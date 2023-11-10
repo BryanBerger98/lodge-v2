@@ -22,7 +22,7 @@ const DeleteAccountButton = () => {
 	const handleDeleteAccount = () => setIsPasswordModalOpen(true);
 
 	const handlePasswordModalOpenChange = async ({ openState, password }: { openState: boolean, password: string }) => {
-		if (!password) {
+		if (!password && !isLoading) {
 			setIsPasswordModalOpen(false);
 			return;
 		}
@@ -64,6 +64,7 @@ const DeleteAccountButton = () => {
 			</ButtonItem>
 			<PasswordModal
 				description="This action is irreversible. Please enter your password to confirm the deletion of your account."
+				isLoading={ isLoading }
 				isOpen={ isPasswordModalOpen }
 				title="Delete your account"
 				variant="destructive"

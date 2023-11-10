@@ -6,15 +6,15 @@ import { ReactNode } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card } from '@/components/ui/card';
 
-import { useSignIn } from '../_context/useSignIn';
+import { useSignUp } from '../_context/useSignUp';
 
-type SignInCardProps = {
+type SignUpCardProps = {
 	children: ReactNode;
 }
 
-const SignInCard = ({ children }: SignInCardProps) => {
+const SignUpCard = ({ children }: SignUpCardProps) => {
 
-	const { error } = useSignIn();
+	const { error } = useSignUp();
 
 	return (
 		<div className="flex flex-col gap-4 items-center">
@@ -34,4 +34,4 @@ const SignInCard = ({ children }: SignInCardProps) => {
 	);
 };
 
-export default SignInCard;
+export default SignUpCard;

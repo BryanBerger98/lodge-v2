@@ -25,6 +25,7 @@ export const UserSchema = z.object({
 	created_by: z.coerce.string().min(1, 'Cannot be empty.').nullable(),
 	updated_by: z.coerce.string().min(1, 'Cannot be empty.').nullable(),
 	last_login_date: z.coerce.date().nullable(),
+	has_password: z.coerce.boolean(),
 });
 export type User = z.infer<typeof UserSchema>;
 
