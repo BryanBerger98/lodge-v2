@@ -11,7 +11,6 @@ import { Dialog, DialogFooter, DialogHeader, DialogContent, DialogTitle, DialogT
 import useAuth from '@/context/auth/useAuth';
 import useCsrf from '@/context/csrf/useCsrf';
 import useErrorToast from '@/hooks/error/useErrorToast';
-import { AuthenticationProvider } from '@/schemas/authentication-provider';
 import { sendResetPasswordToken } from '@/services/auth.service';
 import { ApiError } from '@/utils/api/error';
 import { getErrorMessage } from '@/utils/api/error/error-messages.util';
@@ -82,7 +81,6 @@ const SetupPasswordButton = () => {
 			>
 				<DialogTrigger asChild>
 					<ButtonItem
-						disabled={ currentUser?.provider_data !== AuthenticationProvider.EMAIL }
 						value="Setup password"
 						onClick={ handleOpenDialog }
 					>

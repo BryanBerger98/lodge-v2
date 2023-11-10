@@ -91,6 +91,10 @@ export enum FontMimeType {
 	WOFF2 = 'font/woff2',
 };
 
+export enum UnknwonMimeType {
+	UNKNOWN = 'unknown',
+};
+
 export const MimeType = {
 	...ImageMimeType,
 	...TextMimeType,
@@ -98,6 +102,7 @@ export const MimeType = {
 	...AudioMimeType,
 	...VideoMimeType,
 	...FontMimeType,
+	...UnknwonMimeType,
 };
 
 export const MimeTypeSchema = z.nativeEnum(MimeType);

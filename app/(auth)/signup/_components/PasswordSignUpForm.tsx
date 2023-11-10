@@ -14,7 +14,10 @@ import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import useCsrf from '@/context/csrf/useCsrf';
+import useErrorToast from '@/hooks/error/useErrorToast';
 import { UnregisteredSettingBooleanPopulated } from '@/schemas/setting';
+import { signUpUser } from '@/services/auth.service';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules } from '@/utils/password.util';
 
 import { SignUpStep } from '../_context';
@@ -36,6 +39,8 @@ type PasswordSignUpFormProps = {
 const PasswordSignUpForm = ({ userVerifyEmailSetting, magicLinkSignUpSetting, passwordRules }: PasswordSignUpFormProps) => {
 
 	const { isLoading, step, setStep, email, setIsLoading, setError } = useSignUp();
+	const { csrfToken } = useCsrf();
+	const { triggerErrorToast } = useErrorToast();
 
 	const PasswordSignUpFormSchema = z.object({
 		password: z.string().min(passwordRules.min_length, `At least ${ passwordRules.min_length } characters.`).regex(getValidationRegexFromPasswordRules(passwordRules), { message: getErrorMessageFromPasswordRules(passwordRules) }),
@@ -60,9 +65,20 @@ const PasswordSignUpForm = ({ userVerifyEmailSetting, magicLinkSignUpSetting, pa
 
 	const handleGoBack = () => setStep(SignUpStep.EMAIL);
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
+		if (!csrfToken) {
+			triggerErrorToast({
+				title: 'Error',
+				message: 'Invalid CSRF token.',
+			});
+			return;
+		};
 		setIsLoading(true);
 		setError(null);
+		await signUpUser({
+			email,
+			password: form.getValues('password'),
+		}, { csrfToken });
 		signIn('credentials', {
 			redirect: false,
 			email,

@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { object, string } from 'zod';
 
-import { deleteFileById, findFileByKey } from '@/database/file/file.repository';
+import { deleteFileById, findFileById } from '@/database/file/file.repository';
 import { findSettingByName } from '@/database/setting/setting.repository';
-import { deleteUserById, findUserWithPasswordById } from '@/database/user/user.repository';
+import { deleteUserAccountById, deleteUserById, findUserWithPasswordById } from '@/database/user/user.repository';
 import { deleteFileFromKey } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
+import { AuthenticationProvider } from '@/schemas/authentication-provider';
 import { Role } from '@/schemas/role.schema';
 import { SettingName } from '@/schemas/setting';
 import { routeHandler } from '@/utils/api';
@@ -56,7 +57,7 @@ export const POST = routeHandler(async (request) => {
 		});
 	}
 
-	const photoFileObject = userData.photo ? await findFileByKey(userData.photo) : null;
+	const photoFileObject = userData.photo ? await findFileById(userData.photo) : null;
 
 	if (photoFileObject) {
 		await deleteFileFromKey(photoFileObject.key);
@@ -64,6 +65,10 @@ export const POST = routeHandler(async (request) => {
 	}
 
 	await deleteUserById(currentUser.id);
+
+	if (userData.provider_data !== AuthenticationProvider.EMAIL) {
+		await deleteUserAccountById(currentUser.id);
+	}
 
 	return NextResponse.json({ message: 'Account deleted.' });
 });

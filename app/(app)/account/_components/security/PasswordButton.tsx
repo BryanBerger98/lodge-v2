@@ -14,7 +14,6 @@ import { Input } from '@/components/ui/input';
 import useAuth from '@/context/auth/useAuth';
 import useCsrf from '@/context/csrf/useCsrf';
 import useErrorToast from '@/hooks/error/useErrorToast';
-import { AuthenticationProvider } from '@/schemas/authentication-provider';
 import { updateUserPassword } from '@/services/auth.service';
 import { ApiError } from '@/utils/api/error';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules } from '@/utils/password.util';
@@ -35,7 +34,7 @@ export const PasswordButton = ({ passwordRules }: PasswordButtonProps) => {
 	const [ isLoading, setIsLoading ] = useState(false);
 	const [ isDialogOpen, setIsDialogOpen ] = useState(false);
 
-	const { currentUser, updateCurrentUser } = useAuth();
+	const { updateCurrentUser } = useAuth();
 	const { csrfToken } = useCsrf();
 	const { triggerErrorToast } = useErrorToast();
 
@@ -98,7 +97,6 @@ export const PasswordButton = ({ passwordRules }: PasswordButtonProps) => {
 			>
 				<DialogTrigger asChild>
 					<ButtonItem
-						disabled={ currentUser?.provider_data !== AuthenticationProvider.EMAIL }
 						value="Change your password"
 						onClick={ handleOpenDialog }
 					>

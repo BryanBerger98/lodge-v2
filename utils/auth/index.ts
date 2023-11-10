@@ -18,6 +18,19 @@ export interface ProtectionOptions {
 	redirect?: boolean | string;
 }
 
+export const getServerCurrentUser = async (): Promise<UserPopulated | null> => {
+	const session = await getServerSession(authOptions);
+	const currentUser = session?.user;
+
+	await connectToDatabase();
+
+	if (!currentUser) return null;
+
+	const currentUserData = await findUserById(currentUser.id);
+
+	return currentUserData;
+};
+
 export const setServerAuthGuard = async (options?: ProtectionOptions) => {
 	const session = await getServerSession(authOptions);
 	const currentUser = session?.user;

@@ -43,7 +43,10 @@ export const GET = routeHandler(async () => {
 		});
 	}
 
-	const tokenData = await getTokenFromTargetId(userData.id, { action: TokenAction.EMAIL_VERIFICATION });
+	const tokenData = await getTokenFromTargetId(userData.id, {
+		action: TokenAction.EMAIL_VERIFICATION,
+		created_by: userData.id, 
+	});
 
 	if (!tokenData) {
 		throw buildApiError({
@@ -85,7 +88,10 @@ export const POST = routeHandler(async () => {
 		});
 	}
 
-	const oldToken = await getTokenFromTargetId(userData.id, { action: TokenAction.EMAIL_VERIFICATION });
+	const oldToken = await getTokenFromTargetId(userData.id, {
+		action: TokenAction.EMAIL_VERIFICATION,
+		created_by: userData.id, 
+	});
 
 	if (oldToken) {
 		const tokenCreationTimestamp = oldToken.created_at.getTime();

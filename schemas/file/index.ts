@@ -4,10 +4,10 @@ import { MimeTypeSchema } from './mime-type.schema';
 
 export const FileSchema = z.object({
 	id: z.coerce.string().min(1, 'Cannot be empty.'),
-	original_name: z.coerce.string().min(1, 'Cannot be empty.'),
+	original_name: z.coerce.string(),
 	custom_name: z.coerce.string().optional(),
 	mime_type: MimeTypeSchema,
-	size: z.coerce.number().min(1, 'Cannot be empty.'),
+	size: z.coerce.number(),
 	extension: z.coerce.string().optional(),
 	key: z.coerce.string().min(1, 'Cannot be empty.'),
 	url: z.coerce.string().min(1, 'Cannot be empty.'),

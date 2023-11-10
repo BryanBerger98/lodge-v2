@@ -13,7 +13,7 @@ DatabaseAdapter.createUser = async (user) => {
 		...user,
 		has_password: false,
 		created_by: null,
-		photo: null,
+		photo: user.photo?.id || null,
 	});
 	return {
 		...createdUser,

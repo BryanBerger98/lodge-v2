@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import AuthProviderIcon from '@/components/icons/AuthProviderIcon';
 import { Button } from '@/components/ui/button';
 import ButtonItem from '@/components/ui/Button/ButtonList/ButtonItem';
 import { Dialog, DialogFooter, DialogHeader, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -95,6 +96,12 @@ export const EmailButton = () => {
 				<DialogTrigger asChild>
 					<ButtonItem
 						disabled={ currentUser?.provider_data !== AuthenticationProvider.EMAIL }
+						rightIcon={
+							<AuthProviderIcon
+								authProvider={ currentUser?.provider_data || AuthenticationProvider.EMAIL }
+								size="16"
+							/>
+						}
 						value={ currentUser?.email }
 						onClick={ handleOpenDialog }
 					>

@@ -7,6 +7,7 @@ import { findSettingByName } from '@/database/setting/setting.repository';
 import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
 import { SettingName, UnregisteredSettingBooleanPopulatedSchema, UnregisteredSettingNumberPopulatedSchema } from '@/schemas/setting';
+import { getServerCurrentUser } from '@/utils/auth';
 
 import SignUpProvider from './_context/provider';
 
@@ -16,9 +17,16 @@ const SignUpForm = dynamic(() => import('./_components/SignUpForm'));
 const MagicEmailSent = dynamic(() => import('./_components/MagicLinkEmailSent'));
 
 const SignUpPage = async () => {
+
 	const csrfToken = await getCsrfToken(headers());
 
 	await connectToDatabase();
+
+	const currentUser = await getServerCurrentUser();
+
+	if (currentUser) {
+		redirect('/');
+	}
 
 	const newUserSignUpSettingData = await findSettingByName(SettingName.NEW_USERS_SIGNUP);
 	const newUserSignUpSetting = UnregisteredSettingBooleanPopulatedSchema.parse(newUserSignUpSettingData);

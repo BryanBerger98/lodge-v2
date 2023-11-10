@@ -50,6 +50,10 @@ export const errorMessages: Partial<Record<(ApiErrorCode | StatusCode), { en: st
 		en: 'Invalid token.',
 		fr: 'Jeton invalide.',
 	},
+	[ ApiErrorCode.INVALID_CSRF_TOKEN ]: {
+		en: 'Invalid CSRF token.',
+		fr: 'Jeton CSRF invalide.',
+	},
 	[ StatusCode.UNAUTHORIZED ]: {
 		en: 'Unauthorized.',
 		fr: 'Non autorisé.',

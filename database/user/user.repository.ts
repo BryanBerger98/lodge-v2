@@ -1,9 +1,11 @@
 import { FilterQuery } from 'mongoose';
 
 import { newId, UpdateQueryOptions, QueryOptions } from '@/lib/database';
+import clientPromise from '@/lib/mongodb';
 import { User, UserWithPassword } from '@/schemas/user';
 import { UserPopulated, UserPopulatedWithPassword } from '@/schemas/user/populated.schema';
 import { Optional } from '@/types/utils';
+import { Env } from '@/utils/env.util';
 
 import { CreateUserDTO, UpdateUserDTO } from './user.dto';
 import UserModel from './user.model';
@@ -46,6 +48,16 @@ export const findUserByEmail = async (email: string): Promise<User | null> => {
 	try {
 		const serializedEmail = email.toLowerCase().trim();
 		const document = await UserModel.findOne({ email: serializedEmail }, { password: 0 });
+		return document?.toJSON() || null;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const findPopulatedUserByEmail = async (email: string): Promise<UserPopulated | null> => {
+	try {
+		const serializedEmail = email.toLowerCase().trim();
+		const document = await UserModel.findOne({ email: serializedEmail }).populate(populateUser);
 		return document?.toJSON() || null;
 	} catch (error) {
 		throw error;
@@ -132,6 +144,16 @@ export const deleteUserById = async (user_id: string): Promise<User | null> => {
 			delete deletedUser.password;
 		}
 		return deletedUser;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const deleteUserAccountById = async (user_id: string): Promise<void> => {
+	try {
+		const connection = await clientPromise;
+		await connection.db(Env.DB_NAME).collection('accounts').deleteOne({ userId: newId(user_id) });
+		return;
 	} catch (error) {
 		throw error;
 	}
