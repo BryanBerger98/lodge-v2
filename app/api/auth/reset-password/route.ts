@@ -34,7 +34,10 @@ export const POST = routeHandler(async (request) => {
 		});
 	}
 
-	const oldToken = await getTokenFromTargetId(userData.id, { action: TokenAction.RESET_PASSWORD });
+	const oldToken = await getTokenFromTargetId(userData.id, {
+		action: TokenAction.RESET_PASSWORD,
+		created_by: userData.id, 
+	});
 
 	if (oldToken) {
 		const tokenCreationTimestamp = oldToken.created_at.getTime();
