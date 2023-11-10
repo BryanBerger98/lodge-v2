@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Save } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -11,6 +12,7 @@ import ButtonItem from '@/components/ui/Button/ButtonList/ButtonItem';
 import { Dialog, DialogFooter, DialogHeader, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Paragraph } from '@/components/ui/Typography/text';
 import useAuth from '@/context/auth/useAuth';
 import useCsrf from '@/context/csrf/useCsrf';
 import useErrorToast from '@/hooks/error/useErrorToast';
@@ -114,6 +116,7 @@ export const EmailButton = () => {
 											<FormLabel>Email</FormLabel>
 											<FormControl>
 												<Input
+													disabled={ !currentUser?.has_password }
 													placeholder="example@example.com"
 													type="email"
 													{ ...field }
@@ -123,26 +126,40 @@ export const EmailButton = () => {
 										</FormItem>
 									) }
 								/>
-								<FormField
-									control={ form.control }
-									name="password"
-									render={ ({ field }) => (
-										<FormItem>
-											<FormLabel>Password</FormLabel>
-											<FormControl>
-												<Input
-													placeholder="********"
-													type="password"
-													{ ...field }
-												/>
-											</FormControl>
-											<FormDescription>
-												To update your email, you need to enter your password.
-											</FormDescription>
-											<FormMessage />
-										</FormItem>
-									) }
-								/>
+								{
+									currentUser?.has_password ? (
+										<FormField
+											control={ form.control }
+											name="password"
+											render={ ({ field }) => (
+												<FormItem>
+													<FormLabel>Password</FormLabel>
+													<FormControl>
+														<Input
+															placeholder="********"
+															type="password"
+															{ ...field }
+														/>
+													</FormControl>
+													<FormDescription>
+														To update your email, you need to enter your password.
+													</FormDescription>
+													<FormMessage />
+												</FormItem>
+											) }
+										/>
+									) : (
+										<Paragraph variant="small">
+											<span>Please </span>
+											<Link
+												className="font-bold underline"
+												href="/account/security?setup_password=open"
+											>setup a password
+											</Link>
+											<span> before changing your email address.</span>
+										</Paragraph>
+									)
+								}
 							</div>
 							<DialogFooter>
 								<Button

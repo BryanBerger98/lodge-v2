@@ -1,7 +1,8 @@
 'use client';
 
 import { AlertCircle, Loader2, Send } from 'lucide-react';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -23,9 +24,21 @@ const SetupPasswordButton = () => {
 	const [ error, setError ] = useState<string | null>(null);
 	const [ isDialogOpen, setIsDialogOpen ] = useState(false);
 
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const setupPasswordOpen = searchParams.get('setup_password');
+
 	const { currentUser } = useAuth();
 	const { csrfToken } = useCsrf();
 	const { triggerErrorToast } = useErrorToast();
+
+	useEffect(() => {
+		if (setupPasswordOpen === 'open') {
+			if (!isDialogOpen) {
+				setIsDialogOpen(true);
+			}
+		}
+	}, [ setupPasswordOpen, isDialogOpen ]);
 
 	const handleOpenDialog = () => setIsDialogOpen(true);
 
@@ -57,6 +70,7 @@ const SetupPasswordButton = () => {
 	const handleDialogOpenChange = (open: boolean) => {
 		if (!isLoading) {
 			setIsDialogOpen(open);
+			router.push(`/account/security?setup_password=${ open ? 'open' : 'close' }`);
 		}
 	};
 
