@@ -11,6 +11,7 @@ DatabaseAdapter.createUser = async (user) => {
 	await connectToDatabase();
 	const createdUser = await createUser({
 		...user,
+		has_password: false,
 		created_by: null,
 		photo: null,
 	});

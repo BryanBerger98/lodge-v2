@@ -31,7 +31,7 @@ export const sendEmail = async (to: string, cc: string[], bcc: string[], subject
 	}
 };
 
-export const sendMagicLinkSignInEmail = (user: User, url: string) => {
+export const sendMagicLinkSignInEmail = (user: User | UserPopulated, url: string) => {
 	return new Promise((resolve, reject) => {
 		const htmlBody = render(MagicLinkSignIn({
 			url,

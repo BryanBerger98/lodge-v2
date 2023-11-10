@@ -8,19 +8,17 @@ const SignUpUserWithPasswordDTOSchema = z.object({
 	password: z.string().min(1, 'Cannot be empty.'),
 });
 
-export const CreateUserDTOSchema = z.union([
-	SignUpUserWithPasswordDTOSchema,
-	z.object({
-		username: z.string().optional().nullable(),
-		email: z.string().email().min(1, 'Cannot be empty.'),
-		phone_number: z.string().optional(),
-		role: z.nativeEnum(Role),
-		is_disabled: z.boolean(),
-		provider_data: z.nativeEnum(AuthenticationProvider),
-		photo: z.string().nullable(),
-		created_by: z.string().min(1, 'Cannot be empty.').nullable(),
-	}),
-]);
+export const CreateUserDTOSchema = SignUpUserWithPasswordDTOSchema.or(z.object({
+	username: z.string().optional().nullable(),
+	email: z.string().email().min(1, 'Cannot be empty.'),
+	phone_number: z.string().optional(),
+	role: z.nativeEnum(Role),
+	is_disabled: z.boolean(),
+	provider_data: z.nativeEnum(AuthenticationProvider),
+	photo: z.string().nullable(),
+	has_password: z.boolean(),
+	created_by: z.string().min(1, 'Cannot be empty.').nullable(),
+}));
 
 export type CreateUserDTO = z.infer<typeof CreateUserDTOSchema>;
 

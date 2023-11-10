@@ -12,22 +12,22 @@ import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { SettingPopulatedBoolean, UnregisteredSettingBooleanPopulated } from '@/schemas/setting';
+import { UnregisteredSettingBooleanPopulated } from '@/schemas/setting';
 
 import AppleAuthButton from '../../_components/ProvidersButtons/AppleAuthButton';
 import GoogleAuthButton from '../../_components/ProvidersButtons/GoogleAuthButton';
-
-import { useSignInContext } from './SignInCard';
+import { SignInStep } from '../_context';
+import { useSignIn } from '../_context/useSignIn';
 
 type EmailSignInFormProps = {
-	newUserSignUpSetting: SettingPopulatedBoolean | UnregisteredSettingBooleanPopulated | null;
-	googleAuthSetting: SettingPopulatedBoolean | UnregisteredSettingBooleanPopulated | null;
-	appleAuthSetting: SettingPopulatedBoolean | UnregisteredSettingBooleanPopulated | null;
+	newUserSignUpSetting: UnregisteredSettingBooleanPopulated | null;
+	googleAuthSetting: UnregisteredSettingBooleanPopulated | null;
+	appleAuthSetting: UnregisteredSettingBooleanPopulated | null;
 };
 
 const EmailSignInForm = ({ newUserSignUpSetting, googleAuthSetting, appleAuthSetting } :EmailSignInFormProps) => {
 	
-	const { isLoading, step, setStep, setEmail, email } = useSignInContext();
+	const { isLoading, step, setStep, setEmail, email } = useSignIn();
 
 	const emailSignInFormSchema = z.object({ email: z.string().email('Please, provide a valid email address.').min(1, 'Required.') });
 
@@ -39,16 +39,16 @@ const EmailSignInForm = ({ newUserSignUpSetting, googleAuthSetting, appleAuthSet
 
 	const handleSubmitEmailSignInForm = (values: z.infer<typeof emailSignInFormSchema>) => {
 		setEmail(values.email);
-		setStep('password');
+		setStep(SignInStep.PASSWORD);
 	};
 
-	if (step !== 'email') {
+	if (step !== SignInStep.EMAIL) {
 		return null;
 	}
 
 	const areProvidersEnabled =
-		(googleAuthSetting && googleAuthSetting.value)
-		|| (appleAuthSetting && appleAuthSetting.value);
+		(googleAuthSetting && googleAuthSetting.data_type === 'boolean' && googleAuthSetting.value)
+		|| (appleAuthSetting && appleAuthSetting.data_type === 'boolean' && appleAuthSetting.value);
 
 	return (
 		<Form { ...form }>
@@ -64,8 +64,8 @@ const EmailSignInForm = ({ newUserSignUpSetting, googleAuthSetting, appleAuthSet
 						areProvidersEnabled ?
 							<>
 								<div className="flex flex-col gap-4 mb-4">
-									{ googleAuthSetting && googleAuthSetting.value ? <GoogleAuthButton /> : null }
-									{ appleAuthSetting && appleAuthSetting.value ? <AppleAuthButton /> : null }
+									{ googleAuthSetting && googleAuthSetting.data_type === 'boolean' && googleAuthSetting.value ? <GoogleAuthButton /> : null }
+									{ appleAuthSetting && appleAuthSetting.data_type === 'boolean' && appleAuthSetting.value ? <AppleAuthButton /> : null }
 								</div>
 								<div className="flex gap-4 items-center justify-center w-full mb-2">
 									<Separator

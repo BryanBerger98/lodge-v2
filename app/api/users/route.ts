@@ -51,6 +51,7 @@ export const POST = routeHandler(async (request) => {
 		email,
 		password: hashedPassword,
 		username,
+		has_password: true,
 		role,
 		phone_number,
 		provider_data: AuthenticationProvider.EMAIL,

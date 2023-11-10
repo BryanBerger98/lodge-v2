@@ -6,25 +6,25 @@ import { Button } from '@/components/ui/button';
 import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
-import { SignInStep } from '../_context';
-import { useSignIn } from '../_context/useSignIn';
+import { SignUpStep } from '../_context';
+import { useSignUp } from '../_context/useSignUp';
 
 const MagicEmailSent = () => {
 
-	const { step, setStep, email } = useSignIn();
+	const { step, setStep, email } = useSignUp();
 
-	const handleGoBack = () => setStep(SignInStep.PASSWORD);
+	const handleGoBack = () => setStep(SignUpStep.PASSWORD);
 
-	if (step !== SignInStep.MAGIC_EMAIL_SENT) {
+	if (step !== SignUpStep.MAGIC_EMAIL_SENT) {
 		return null;
-	}	
+	}
 
 	return (
 		<>
 			<CardHeader>
-				<CardTitle>Sign In</CardTitle>
+				<CardTitle>Sign Up</CardTitle>
 				<CardDescription>
-					Sign in with <span className="font-bold">{ email }</span>.
+					Sign up with <span className="font-bold">{ email }</span>.
 				</CardDescription>
 			</CardHeader>
 			<CardContent>

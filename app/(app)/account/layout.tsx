@@ -27,7 +27,7 @@ const AccountLayout = async ({ children }: AccountLayoutProps) => {
 			<PageTitle><User /> Account</PageTitle>
 			<div className="flex flex-col lg:flex-row gap-4">
 				<Tabs
-					className="h-full"
+					className="h-full p-0"
 					defaultValue={ subpath || 'profile' }
 					orientation="vertical"
 				>
