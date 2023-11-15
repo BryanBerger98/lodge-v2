@@ -3,12 +3,12 @@ import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
+import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
 import PageTitle from '@/components/layout/Header/PageTitle';
 import BackButton from '@/components/ui/Button/BackButton';
 import { findUserById } from '@/database/user/user.repository';
 import { getCsrfToken } from '@/lib/csrf';
 import { UserPopulatedSchema } from '@/schemas/user/populated.schema';
-import { renewFileExpiration } from '@/utils/file.util';
 
 import UsersProvider from '../_context/users/users.provider';
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
 import { findUserById, updateUser } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
 import { routeHandler } from '@/utils/api';
@@ -7,7 +8,6 @@ import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
 import { StatusCode } from '@/utils/api/http-status';
 import { setServerAuthGuard } from '@/utils/auth';
-import { renewFileExpiration } from '@/utils/file.util';
 
 import { UpdateUserAccountSchema } from './_schemas/update-user-account.schema';
 

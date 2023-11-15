@@ -14,7 +14,7 @@ export type BreakPoint = {
 	screen: ScreenType;
 };
 
-export const BREAKPOINTS: BreakPoint[] = [
+export const BREAKPOINTS = [
 	{
 		size: 'xs',
 		min: 0,
@@ -50,16 +50,16 @@ export const BREAKPOINTS: BreakPoint[] = [
 		min: 1536,
 		screen: 'desktop', 
 	},
-];
+] as const;
 
 
 export const getBreakPoint = (windowWidth: number) => {
 	const [ xsBreakPoint ] = BREAKPOINTS;
 	return BREAKPOINTS.find(breakpoint => {
-		if (breakpoint.max && windowWidth <= breakpoint.max && breakpoint.min && windowWidth >= breakpoint.min) {
+		if ('max' in breakpoint && windowWidth <= breakpoint.max && breakpoint.min && windowWidth >= breakpoint.min) {
 			return true;
 		}
-		if (!breakpoint.max && breakpoint.min && windowWidth >= breakpoint.min) {
+		if (!('max' in breakpoint) && breakpoint.min && windowWidth >= breakpoint.min) {
 			return true;
 		}
 		return false;
