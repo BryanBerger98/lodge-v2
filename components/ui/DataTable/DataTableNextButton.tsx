@@ -10,7 +10,7 @@ const DataTableNextButton = forwardRef<HTMLButtonElement, DataTableNextButtonPro
 	const { table } = useDataTable();
     
 	const handleNextPage: MouseEventHandler<HTMLButtonElement> = (event) => {
-		table.previousPage();
+		table.nextPage();
 		if (onClick) {
 			onClick(event);
 		}

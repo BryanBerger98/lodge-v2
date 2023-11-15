@@ -17,8 +17,6 @@ const UsersDataTableActions = () => {
 	const { table } = useDataTable<UserPopulated, unknown>();
 	const selectedUsers = table.getSelectedRowModel().rows.map(row => row.original);
 
-	console.log('SELECTED', selectedUsers);
-
 	const { updateUsers, refetchUsers } = useUsers();
 	const [ confirmModalOpenState, setConfirmModalOpenState ] = useState<'suspend' | 'activate' | 'reset-password' | 'verify-email' | 'delete' | null>(null);
 
@@ -60,18 +58,17 @@ const UsersDataTableActions = () => {
 					<DropdownMenuItem
 						className="gap-2 hover:cursor-pointer"
 						onClick={ handleTriggerAction('activate') }
-					><Unlock size="16" /> Activate account
+					><Unlock size="16" /> Activate accounts
 					</DropdownMenuItem>
-					:
 					<DropdownMenuItem
 						className="gap-2 text-red-500 hover:cursor-pointer"
 						onClick={ handleTriggerAction('suspend') }
-					><Lock size="16" /> Suspend account
+					><Lock size="16" /> Suspend accounts
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						className="gap-2 text-red-500 hover:cursor-pointer"
 						onClick={ handleTriggerAction('delete') }
-					><Trash size="16" /> Delete
+					><Trash size="16" /> Delete accounts
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>

@@ -36,11 +36,14 @@ const DataTable = <TData extends DataTableRowData, TValue = unknown>({ data, col
 			...options.state,
 			rowSelection,
 		},
-		onRowSelectionChange: setRowSelection,
+		onRowSelectionChange: (updater) => {
+			if (typeof updater === 'function') {
+				setRowSelection(updater(rowSelection));
+			}
+		},
 		getCoreRowModel: getCoreRowModel<TData>(),
 		getSortedRowModel: getSortedRowModel<TData>(),
 		getPaginationRowModel: getPaginationRowModel<TData>(),
-		
 	  });
 
 	  useEffect(() => {

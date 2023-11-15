@@ -8,7 +8,7 @@ import { Gender } from '@/schemas/user/gender.schema';
 
 import FileModel from '../file/file.model';
 
-interface IUserWithPasswordDocument extends Omit<UserWithPassword, 'created_by' | 'updated_by' | 'photo'> {
+export interface IUserWithPasswordDocument extends Omit<UserWithPassword, 'created_by' | 'updated_by' | 'photo'> {
 	created_by: Types.ObjectId | null;
 	updated_by: Types.ObjectId | null;
 	photo: Types.ObjectId | null;

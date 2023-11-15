@@ -1,3 +1,4 @@
+import { AnyBulkWriteOperation } from 'mongodb';
 import { FilterQuery } from 'mongoose';
 
 import { newId, UpdateQueryOptions, QueryOptions } from '@/lib/database';
@@ -8,7 +9,7 @@ import { Optional } from '@/types/utils';
 import { Env } from '@/utils/env.util';
 
 import { CreateUserDTO, UpdateUserDTO } from './user.dto';
-import UserModel from './user.model';
+import UserModel, { IUserWithPasswordDocument } from './user.model';
 import { populateUser } from './utils/populate-user';
 
 export interface UserDocument extends User, Document {}
@@ -163,6 +164,31 @@ export const deleteMultipleUsersById = async (user_ids: string[]): Promise<numbe
 	try {
 		const { deletedCount } = await UserModel.deleteMany({ _id: { $in: user_ids.map(id => newId(id)) } });
 		return deletedCount;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const updateMultipleUsers = async (usersToUpdate: UpdateUserDTO[]): Promise<number> => {
+	try {
+
+		const updateOperations: AnyBulkWriteOperation<IUserWithPasswordDocument>[] = usersToUpdate.map(user => ({
+			updateOne: {
+				filter: { _id: newId(user.id) },
+				update: {
+					$set: {
+						...user,
+						updated_by: user.updated_by ? newId(user.updated_by) : null,
+						photo: user.photo ? newId(user.photo) : null,
+					}, 
+				},
+				upsert: false,
+			},
+		}));
+
+		const { modifiedCount } = await UserModel.bulkWrite(updateOperations);
+
+		return modifiedCount;
 	} catch (error) {
 		throw error;
 	}
