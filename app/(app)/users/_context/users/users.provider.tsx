@@ -3,7 +3,7 @@
 import { ReactNode, useCallback, useEffect, useMemo, useReducer } from 'react';
 
 import useFetchUsers from '@/hooks/users/useFetchUsers';
-import { UserPopulated } from '@/schemas/user';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 import { LoadingState, LoadingStateError } from '@/types/utils/loading.type';
 
 import { SetUsersStatePayload, USERS_ERROR_ACTION, USERS_IDLE_ACTION, USERS_PENDING_ACTION, USERS_SET_STATE_ACTION, USERS_UPDATE_ACTION } from './users.actions';
