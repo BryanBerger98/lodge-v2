@@ -4,6 +4,20 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { IFile } from '@/schemas/file';
 import { generateUniqueNameFromFileName } from '@/utils/file.util';
 
+export enum DEFAULT_URL_EXPIRATION {
+	PROFILE_PICTURE = 7 * 24 * 60 * 60,
+};
+
+/**
+ * Generate an expiration date from a number of seconds
+ * @param expiration 
+ * @returns 
+ */
+export const generateExpirationDate = (expiration: number) => {
+	const MILLISECONDS = 1000;
+	return new Date(new Date().getTime() + (expiration + MILLISECONDS));
+};
+
 const config = {
 	credentials: {
 		accessKeyId: process.env.BUCKET_ACCESS_KEY_ID as string,
@@ -86,7 +100,7 @@ export const uploadImageToS3 = async (file: Blob, folderPath = ''): Promise<stri
 	return `${ folderPath }${ generatedFileName }`;
 };
 
-export const getFieldSignedURL = async (key: string, expires = 60 * 60 * 24 * 7) => {
+export const gitFileSignedURL = async (key: string, expires?: number) => {
 	const command = new GetObjectCommand({
 		Bucket: process.env.BUCKET_NAME as string,
 		Key: key, 

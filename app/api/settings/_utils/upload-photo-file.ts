@@ -1,5 +1,5 @@
 import { createFile, deleteFileById, findFileById } from '@/database/file/file.repository';
-import { deleteFileFromKey, getFieldSignedURL, uploadImageToS3 } from '@/lib/bucket';
+import { DEFAULT_URL_EXPIRATION, deleteFileFromKey, gitFileSignedURL, uploadImageToS3 } from '@/lib/bucket';
 import { ImageMimeTypeSchema } from '@/schemas/file/mime-type.schema';
 import { Setting, SettingDataType, SettingPopulated, UnregisteredSetting, UnregisteredSettingPopulated } from '@/schemas/setting';
 import { UserPopulated } from '@/schemas/user/populated.schema';
@@ -41,12 +41,13 @@ export const uploadPhotoFile = async (currentUser: UserPopulated, photoFile?: Bl
 			}
 
 			const photoKey = await uploadImageToS3(photoFile, 'branding/');
-			const photoUrl = await getFieldSignedURL(photoKey);
+			const photoUrl = await gitFileSignedURL(photoKey, DEFAULT_URL_EXPIRATION.PROFILE_PICTURE);
 
 			const parsedFile = {
 				...convertFileRequestObjetToModel(photoFile, {
 					url: photoUrl,
 					key: photoKey,
+					expiration_date: new Date(new Date().getTime() + 3000),
 				}),
 				created_by: currentUser.id,
 			};

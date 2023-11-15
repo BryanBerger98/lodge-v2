@@ -1,6 +1,7 @@
 import { Schema, model, models, Model, Types } from 'mongoose';
 
 import { IFile } from '@/schemas/file';
+import { MimeType } from '@/schemas/file/mime-type.schema';
 
 interface IFileDocument extends Omit<IFile, 'created_by' | 'updated_by'> {
 	created_by: Types.ObjectId | null;
@@ -18,7 +19,8 @@ const fileSchema = new Schema<IFileDocument>({
 	},
 	mime_type: {
 		type: String,
-		default: '',
+		enum: MimeType,
+		default: MimeType.UNKNOWN,
 	},
 	extension: {
 		type: String,

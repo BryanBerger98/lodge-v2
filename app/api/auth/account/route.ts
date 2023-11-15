@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 
-import { updateFileURL } from '@/database/file/file.repository';
+import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
 import { findUserById, updateUser } from '@/database/user/user.repository';
-import { getFieldSignedURL } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
 import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
@@ -27,14 +26,7 @@ export const GET = routeHandler(async () => {
 		});
 	}
 
-	if (userData.photo && userData.photo.url_expiration_date && userData.photo.url_expiration_date < new Date()) {
-		const photoUrl = await getFieldSignedURL(userData.photo.key, 24 * 60 * 60);
-		const updatedFile = await updateFileURL({
-			id: userData.photo.id,
-			url: photoUrl,
-		});
-		userData.photo = updatedFile;
-	}
+	userData.photo = await renewFileExpiration(userData.photo);
 
 	return NextResponse.json(userData);
 });

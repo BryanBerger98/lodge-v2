@@ -161,15 +161,6 @@ export const updateUserAvatar = async (file: File, options: FetcherOptionsWithCs
 	}
 };
 
-export const getAvatar = async (): Promise<{ photoUrl: string }> => {
-	try {
-		const data = await fetcher('/api/auth/account/avatar');
-		return z.object({ photoUrl: z.string() }).parse(data);
-	} catch (error) {
-		throw error;
-	}
-};
-
 export const deleteUserAccount = async (password: string, options: FetcherOptionsWithCsrf): Promise<{ message: string }> => {
 	try {
 		const data = await fetcher('/api/auth/account/delete', {
