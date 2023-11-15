@@ -170,7 +170,7 @@ const EditUserForm = ({ user, csrfToken }: EditUserFormProps) => {
 									<FormLabel>Email address</FormLabel>
 									<FormControl>
 										<Input
-											disabled={ user?.role === 'owner' || user?.provider_data !== 'email' }
+											disabled={ user ? user.role === 'owner' || user.provider_data !== 'email' : false }
 											placeholder="john@doe.com"
 											{ ...field }
 										/>

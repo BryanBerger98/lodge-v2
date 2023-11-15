@@ -8,6 +8,7 @@ import { FetchUsersSchema } from '@/app/api/users/_schemas/fetch-users.schema';
 import PageTitle from '@/components/layout/Header/PageTitle';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import CsrfProvider from '@/context/csrf/csrf.provider';
 import { findUsers, findUsersCount } from '@/database/user/user.repository';
 import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
@@ -16,7 +17,7 @@ import { isFileURLExpired, renewFileExpiration } from '@/utils/file.util';
 
 import UsersProvider from './_context/users/users.provider';
 
-const DynamicUsersDataTable = dynamic(() => import('./_components/UsersDataTable'));
+const UsersDataTable = dynamic(() => import('./_components/data-table'));
 
 type UsersPageProps = {
 	searchParams?: { [key: string]: string | string[] | undefined };
@@ -67,69 +68,69 @@ const UsersPage = async ({ searchParams }: UsersPageProps) => {
 	const parsedUsers = z.array(UserPopulatedSchema).parse(users);
 
 	return (
-		<UsersProvider
-			total={ totalUsers }
-			users={ parsedUsers }
-		>
-			<PageTitle
-				headerButton={ {
-					asChild: true,
-					variant: 'ghost',
-					children: <Link href="/users/new"><Plus /></Link>,
-				} }
-			><Users /> Users
-			</PageTitle>
-			<div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+		<CsrfProvider csrfToken={ csrfToken }>
+			<UsersProvider
+				total={ totalUsers }
+				users={ parsedUsers }
+			>
+				<PageTitle
+					headerButton={ {
+						asChild: true,
+						variant: 'ghost',
+						children: <Link href="/users/new"><Plus /></Link>,
+					} }
+				><Users /> Users
+				</PageTitle>
+				<div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+					<Card>
+						<CardHeader>
+							<CardTitle>{ totalUsers }</CardTitle>
+							<CardDescription>Registered user{ totalUsers > 1 ? 's' : '' }</CardDescription>
+						</CardHeader>
+					</Card>
+					<Card>
+						<CardHeader>
+							<CardTitle>{ verifiedUsersCount }</CardTitle>
+							<CardDescription>Verified user{ verifiedUsersCount > 1 ? 's' : '' }</CardDescription>
+						</CardHeader>
+					</Card>
+					<Card>
+						<CardHeader>
+							<CardTitle>{ unverifiedUsersCount }</CardTitle>
+							<CardDescription>Unverified user{ unverifiedUsersCount > 1 ? 's' : '' }</CardDescription>
+						</CardHeader>
+					</Card>
+					<Card>
+						<CardHeader>
+							<CardTitle>{ disabledUsersCount }</CardTitle>
+							<CardDescription>Disabled user{ disabledUsersCount > 1 ? 's' : '' }</CardDescription>
+						</CardHeader>
+					</Card>
+				</div>
 				<Card>
-					<CardHeader>
-						<CardTitle>{ totalUsers }</CardTitle>
-						<CardDescription>Registered user{ totalUsers > 1 ? 's' : '' }</CardDescription>
+					<CardHeader className="flex-row justify-between items-start">
+						<div>
+							<CardTitle>Manage users</CardTitle>
+							<CardDescription>
+								Manage users accounts, permissions and roles.
+							</CardDescription>
+						</div>
+						<Button
+							className="hidden md:flex gap-2 items-center"
+							asChild
+						>
+							<Link href="/users/new">
+								<UserPlus size="16" />
+								Create user
+							</Link>
+						</Button>
 					</CardHeader>
+					<CardContent>
+						<UsersDataTable />
+					</CardContent>
 				</Card>
-				<Card>
-					<CardHeader>
-						<CardTitle>{ verifiedUsersCount }</CardTitle>
-						<CardDescription>Verified user{ verifiedUsersCount > 1 ? 's' : '' }</CardDescription>
-					</CardHeader>
-				</Card>
-				<Card>
-					<CardHeader>
-						<CardTitle>{ unverifiedUsersCount }</CardTitle>
-						<CardDescription>Unverified user{ unverifiedUsersCount > 1 ? 's' : '' }</CardDescription>
-					</CardHeader>
-				</Card>
-				<Card>
-					<CardHeader>
-						<CardTitle>{ disabledUsersCount }</CardTitle>
-						<CardDescription>Disabled user{ disabledUsersCount > 1 ? 's' : '' }</CardDescription>
-					</CardHeader>
-				</Card>
-			</div>
-			<Card>
-				<CardHeader className="flex-row justify-between items-start">
-					<div>
-						<CardTitle>Manage users</CardTitle>
-						<CardDescription>
-							Manage users accounts, permissions and roles.
-						</CardDescription>
-					</div>
-					<Button
-						className="hidden md:flex gap-2 items-center"
-						asChild
-					>
-						<Link href="/users/new">
-							<UserPlus size="16" />
-							Create user
-						</Link>
-					</Button>
-				</CardHeader>
-				<CardContent>
-					<DynamicUsersDataTable
-						csrfToken={ csrfToken }
-					/>
-				</CardContent>
-			</Card>
-		</UsersProvider>
+			</UsersProvider>
+		</CsrfProvider>
 	);
 };
 

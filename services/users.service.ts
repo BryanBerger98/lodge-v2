@@ -2,11 +2,11 @@ import { SortingState } from '@tanstack/react-table';
 import { z } from 'zod';
 
 import { CreateUserSchema } from '@/app/api/users/_schemas/create-user.schema';
+import { UpdateMultipleUsersSchema } from '@/app/api/users/_schemas/update-multiple-users.schema';
 import { UpdateUserSchema } from '@/app/api/users/_schemas/update-user.schema';
 import fetcher, { FetcherOptions, FetcherOptionsWithCsrf } from '@/lib/fetcher';
 import { Role } from '@/schemas/role.schema';
 import { SafeToken, SafeTokenSchema } from '@/schemas/token.schema';
-import { User, UserSchema } from '@/schemas/user';
 import { UserPopulated, UserPopulatedSchema } from '@/schemas/user/populated.schema';
 import { objectToFormData } from '@/utils/object.utils';
 import { buildQueryUrl } from '@/utils/url.util';
@@ -47,15 +47,15 @@ export const updateUser = async (userToUpdate: z.infer<typeof UpdateUserSchema> 
 	}
 };
 
-export const updateMultipleUsers = async (usersToUpdate: z.infer<typeof UpdateUserSchema>[], options: FetcherOptionsWithCsrf): Promise<User> => {
+export const updateMultipleUsers = async (usersToUpdate: z.infer<typeof UpdateMultipleUsersSchema>, options: FetcherOptionsWithCsrf): Promise<void> => {
 	try {
-		const data = await fetcher('/api/users/bulk', {
+		await fetcher('/api/users/bulk', {
 			method: 'PUT',
 			body: JSON.stringify(usersToUpdate),
 			headers: { 'Content-Type': 'application/json' },
 			...options,
 		});
-		return UserSchema.parse(data);
+		return;
 	} catch (error) {
 		throw error;
 	}

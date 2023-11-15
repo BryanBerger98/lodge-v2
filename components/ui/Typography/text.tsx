@@ -3,7 +3,7 @@ import { BlockquoteHTMLAttributes, HTMLAttributes, forwardRef } from 'react';
 
 import { cn } from '@/utils/ui.util';
 
-const paragraphVariants = cva(
+export const paragraphVariants = cva(
 	'',
 	{
 		variants: {
