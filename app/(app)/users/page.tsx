@@ -4,13 +4,12 @@ import { headers } from 'next/headers';
 import Link from 'next/link';
 import { z } from 'zod';
 
+import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
 import { FetchUsersSchema } from '@/app/api/users/_schemas/fetch-users.schema';
 import PageTitle from '@/components/layout/Header/PageTitle';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { updateFileURL } from '@/database/file/file.repository';
 import { findUsers, findUsersCount } from '@/database/user/user.repository';
-import { getFieldSignedURL } from '@/lib/bucket';
 import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
 import { UserPopulatedSchema } from '@/schemas/user/populated.schema';
@@ -45,13 +44,7 @@ const UsersPage = async ({ searchParams }: UsersPageProps) => {
 	const expiredFiles = isFileURLExpired(...users.map(user => user.photo));
 
 	if (expiredFiles.length > 0) {
-		await Promise.all(expiredFiles.map(async (file) => {
-			const photoUrl = await getFieldSignedURL(file.key, 24 * 60 * 60);
-			await updateFileURL({
-				id: file.id,
-				url: photoUrl,
-			});
-		}));
+		await Promise.all(expiredFiles.map(async (file) => await renewFileExpiration(file)));
 		users = await findUsers(searchRequest, {
 			sort: Object.fromEntries(sort_fields.map((field, index) => [ field, sort_directions[ index ] as 1 | -1 ])),
 			skip: Math.round(page_index * page_size),

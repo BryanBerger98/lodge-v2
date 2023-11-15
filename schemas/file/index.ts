@@ -11,7 +11,7 @@ export const FileSchema = z.object({
 	extension: z.coerce.string().optional(),
 	key: z.coerce.string().min(1, 'Cannot be empty.'),
 	url: z.coerce.string().min(1, 'Cannot be empty.'),
-	url_expiration_date: z.date().nullable(),
+	url_expiration_date: z.coerce.date().nullable(),
 	created_at: z.coerce.date().nullable(),
 	updated_at: z.coerce.date().nullable(),
 	created_by: z.coerce.string().min(1, 'Cannot be empty.').nullable(),

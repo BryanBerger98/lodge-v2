@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { createFile, deleteFileById, findFileById } from '@/database/file/file.repository';
 import { findUserById, updateUser } from '@/database/user/user.repository';
-import { deleteFileFromKey, getFieldSignedURL, uploadImageToS3 } from '@/lib/bucket';
+import { DEFAULT_URL_EXPIRATION, deleteFileFromKey, gitFileSignedURL, uploadImageToS3 } from '@/lib/bucket';
 import { ImageMimeTypeSchema } from '@/schemas/file/mime-type.schema';
 import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
@@ -10,33 +10,6 @@ import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
 import { StatusCode } from '@/utils/api/http-status';
 import { setServerAuthGuard } from '@/utils/auth';
 import { AUTHORIZED_IMAGE_MIME_TYPES, AUTHORIZED_IMAGE_SIZE, convertFileRequestObjetToModel } from '@/utils/file.util';
-
-export const GET = routeHandler(async () => {
-
-	const { user: currentUser } = await setServerAuthGuard();
-
-	const currentUserData = await findUserById(currentUser.id);
-
-	if (!currentUserData) {
-		throw buildApiError({
-			code: ApiErrorCode.USER_NOT_FOUND,
-			status: StatusCode.NOT_FOUND,
-		});
-	}
-
-	const photoFileObject = currentUserData.photo ? await findFileById(currentUserData.photo.id) : null;
-
-	if (!photoFileObject) {
-		throw buildApiError({
-			code: ApiErrorCode.FILE_NOT_FOUND,
-			status: StatusCode.NOT_FOUND,
-		});
-	}
-
-	const photoUrl = await getFieldSignedURL(photoFileObject.key, 24 * 60 * 60);
-
-	return NextResponse.json({ photo_url: photoUrl });
-});
 
 export const PUT = routeHandler(async (request) => {
 	const formData = await request.formData();
@@ -86,13 +59,13 @@ export const PUT = routeHandler(async (request) => {
 
 	const photoKey = await uploadImageToS3(file, 'avatars/');
 
-	const photoUrl = await getFieldSignedURL(photoKey, 24 * 60 * 60);
-	
+	const photoUrl = await gitFileSignedURL(photoKey, DEFAULT_URL_EXPIRATION.PROFILE_PICTURE);
 
 	const parsedFile = {
 		...convertFileRequestObjetToModel(file, {
 			key: photoKey,
 			url: photoUrl,
+			expiration_date: new Date(new Date().getTime() + 3000),
 		}),
 		created_by: currentUser.id,
 	};

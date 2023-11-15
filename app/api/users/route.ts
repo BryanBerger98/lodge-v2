@@ -2,9 +2,8 @@ import { parse } from 'url';
 
 import { NextResponse } from 'next/server';
 
-import { updateFileURL } from '@/database/file/file.repository';
+import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
 import { createUser, findUserByEmail, findUsers, findUsersCount } from '@/database/user/user.repository';
-import { getFieldSignedURL } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
 import { AuthenticationProvider } from '@/schemas/authentication-provider';
 import { Role } from '@/schemas/role.schema';
@@ -93,13 +92,7 @@ export const GET = routeHandler(async (request) => {
 	const expiredFiles = isFileURLExpired(...users.map(user => user.photo));
 
 	if (expiredFiles.length > 0) {
-		await Promise.all(expiredFiles.map(async (file) => {
-			const photoUrl = await getFieldSignedURL(file.key, 24 * 60 * 60);
-			await updateFileURL({
-				id: file.id,
-				url: photoUrl,
-			});
-		}));
+		await Promise.all(expiredFiles.map(async (file) => await renewFileExpiration(file)));
 		users = await findUsers({
 			...rolesRequest,
 			...searchRequest, 

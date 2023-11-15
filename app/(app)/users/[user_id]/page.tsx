@@ -3,18 +3,17 @@ import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
+import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
 import PageTitle from '@/components/layout/Header/PageTitle';
 import BackButton from '@/components/ui/Button/BackButton';
-import { updateFileURL } from '@/database/file/file.repository';
 import { findUserById } from '@/database/user/user.repository';
-import { getFieldSignedURL } from '@/lib/bucket';
 import { getCsrfToken } from '@/lib/csrf';
 import { UserPopulatedSchema } from '@/schemas/user/populated.schema';
 
 import UsersProvider from '../_context/users/users.provider';
 
 const EditUserForm = dynamic(() => import('../_components/EditUserForm'));
-const DynamicMenu = dynamic(() => import('./_components/Menu'));
+const Menu = dynamic(() => import('./_components/Menu'));
 
 type EditUserPageProps = {
 	params: {
@@ -38,14 +37,7 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
 		redirect('/users');
 	}
 
-	if (userData.photo && userData.photo.url_expiration_date && userData.photo.url_expiration_date < new Date()) {
-		const photoUrl = await getFieldSignedURL(userData.photo.key, 24 * 60 * 60);
-		const updatedFile = await updateFileURL({
-			id: userData.photo.id,
-			url: photoUrl,
-		});
-		userData.photo = updatedFile;
-	}
+	userData.photo = await renewFileExpiration(userData.photo);
 
 	const parsedUserData = UserPopulatedSchema.parse(userData);
 
@@ -59,7 +51,7 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
 							<BackButton className="mb-0">
 								<ChevronLeft /> Back
 							</BackButton>
-							<DynamicMenu
+							<Menu
 								csrfToken={ csrfToken }
 								userData={ userData }
 							/>
