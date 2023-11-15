@@ -4,7 +4,6 @@ import { headers } from 'next/headers';
 import Link from 'next/link';
 import { z } from 'zod';
 
-import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
 import { FetchUsersSchema } from '@/app/api/users/_schemas/fetch-users.schema';
 import PageTitle from '@/components/layout/Header/PageTitle';
 import { Button } from '@/components/ui/button';
@@ -13,7 +12,7 @@ import { findUsers, findUsersCount } from '@/database/user/user.repository';
 import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
 import { UserPopulatedSchema } from '@/schemas/user/populated.schema';
-import { isFileURLExpired } from '@/utils/file.util';
+import { isFileURLExpired, renewFileExpiration } from '@/utils/file.util';
 
 import UsersProvider from './_context/users/users.provider';
 

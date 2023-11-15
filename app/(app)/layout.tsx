@@ -1,15 +1,13 @@
 import dynamic from 'next/dynamic';
 import { redirect } from 'next/navigation';
-import { getServerSession } from 'next-auth';
 import { ReactNode } from 'react';
 
 import HeaderProvider from '@/components/layout/Header';
 import { findSettingByName } from '@/database/setting/setting.repository';
-import { findUserById } from '@/database/user/user.repository';
-import authOptions from '@/lib/auth';
 import { connectToDatabase } from '@/lib/database';
 import { UnregisteredSettingBooleanPopulatedSchema, UnregisteredSettingImagePopulatedSchema, UnregisteredSettingStringPopulatedSchema } from '@/schemas/setting';
 import { SettingName } from '@/schemas/setting/name.shema';
+import { getServerCurrentUser } from '@/utils/auth';
 
 const Sidebar = dynamic(() => import('@/components/layout/Sidebar'));
 
@@ -21,13 +19,7 @@ const AppLayout = async ({ children }: AppLayoutProps) => {
 
 	await connectToDatabase();
 
-	const session = await getServerSession(authOptions);
-
-	if (!session) {
-		redirect('/signin');
-	}
-
-	const currentUser = await findUserById(session?.user.id);
+	const currentUser = await getServerCurrentUser();
 
 	if (!currentUser) {
 		redirect('/signin');

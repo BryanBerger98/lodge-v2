@@ -1,6 +1,7 @@
 import './globals.css';
 
 import { Metadata } from 'next';
+import { ReactNode } from 'react';
 
 import PageProgressBar from '@/components/layout/PageProgressBar';
 import { Toaster } from '@/components/ui/toaster';
@@ -8,6 +9,7 @@ import { findSettingByName } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
 import { ImageMimeType } from '@/schemas/file/mime-type.schema';
 import { SettingName } from '@/schemas/setting/name.shema';
+import { getServerCurrentUser } from '@/utils/auth';
 
 import Providers from './_components/Providers';
 
@@ -33,14 +35,15 @@ export const generateMetadata = async (): Promise<Metadata> => {
 	};
 };
 
-const RootLayout = ({ children }: {
-  children: React.ReactNode
-}) => {
+const RootLayout = async ({ children }: { children: ReactNode }) => {
+
+	const currentUser = await getServerCurrentUser();
+
 	return (
 		<html lang="en">
 			<body className="min-h-screen">
 				<PageProgressBar />
-				<Providers>
+				<Providers values={ { currentUser } }>
 					{ children }
 				</Providers>
 				<Toaster />
