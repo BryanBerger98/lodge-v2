@@ -22,11 +22,12 @@ const UNAUTH_WHITELIST_PATHNAMES = [
 
 type AuthProviderProps = {
 	children: ReactNode;
+	currentUser?: UserPopulated | null;
 };
 
-const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
+const AuthProvider: FC<AuthProviderProps> = ({ children, currentUser: initialCurrentUser = null }) => {
 
-	const [ currentUser, setCurrentUser ] = useState<UserPopulated | null>(null);
+	const [ currentUser, setCurrentUser ] = useState<UserPopulated | null>(initialCurrentUser);
 	const [ loading, setLoading ] = useState<LoadingState>('idle');
 	const [ error, setError ] = useState<string | null>(null);
 
