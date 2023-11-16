@@ -11,11 +11,10 @@ import DataTableCustomColumns from '@/components/ui/DataTable/DataTableCustomCol
 import DataTableNextButton from '@/components/ui/DataTable/DataTableNextButton';
 import DataTablePreviousButton from '@/components/ui/DataTable/DataTablePreviousButton';
 import DataTableSearch from '@/components/ui/DataTable/DataTableSearch';
+import useUsers from '@/context/users/useUsers';
 import useUpdateEffect from '@/hooks/utils/useUpdateEffect';
 import { UserPopulated } from '@/schemas/user/populated.schema';
 import { getSortingFromURLParams } from '@/utils/table.utils';
-
-import useUsers from '../../_context/users/useUsers';
 
 import { COLUMN_NAMES, columns } from './columns';
 import UsersDataTableActions from './UsersDataTableActions';

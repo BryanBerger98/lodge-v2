@@ -4,13 +4,12 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import useDataTable from '@/components/ui/DataTable/useDataTable';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import useUsers from '@/context/users/useUsers';
 import { UserPopulated } from '@/schemas/user/populated.schema';
 
-import useUsers from '../../_context/users/useUsers';
 import ActivateMultipleUserAccountsConfirmModal from '../confirm-modals/ActivateMultipleUserAccountsConfirmModal';
 import DeleteMultipleUserAccountsConfirmModal from '../confirm-modals/DeleteMultipleUserAccountsConfirmModal';
 import SuspendMultipleUserAccountsConfirmModal from '../confirm-modals/SuspendMultipleUserAccounts';
-
 
 const UsersDataTableActions = () => {
 

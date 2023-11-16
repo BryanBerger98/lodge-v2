@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server';
 
 import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
 import { createUser, findUserByEmail, findUsers, findUsersCount } from '@/database/user/user.repository';
-import { connectToDatabase } from '@/lib/database';
 import { AuthenticationProvider } from '@/schemas/authentication-provider';
 import { Role } from '@/schemas/role.schema';
 import { routeHandler } from '@/utils/api';
@@ -20,17 +19,14 @@ import { FetchUsersSchema } from './_schemas/fetch-users.schema';
 import { uploadProfilePhotoFile } from './_utils/upload-profile-photo';
 
 export const POST = routeHandler(async (request) => {
-	await connectToDatabase();
 
 	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
 
 	const formData = await request.formData();
 
-	const file = formData.get('avatar') as Blob | null;
-	formData.delete('avatar');
 	const body = Object.fromEntries(formData.entries());
 
-	const { email, username, phone_number, is_disabled, role } = CreateUserSchema.parse(body);
+	const { avatar, email, ...values } = CreateUserSchema.parse(body);
 
 	const password = generatePassword(12);
 	const existingUser = await findUserByEmail(email);
@@ -44,19 +40,16 @@ export const POST = routeHandler(async (request) => {
 
 	const hashedPassword = await hashPassword(password);
 
-	const photoFileData = await uploadProfilePhotoFile(currentUser, file);
+	const photoFileData = avatar instanceof File ? await uploadProfilePhotoFile(currentUser, avatar) : null;
 	
 	const createdUser = await createUser({
+		...values,
 		email,
 		password: hashedPassword,
-		username,
 		has_password: true,
-		role,
-		phone_number,
 		provider_data: AuthenticationProvider.EMAIL,
 		created_by: currentUser.id,
 		photo: photoFileData?.id || null,
-		is_disabled,
 	});
 		
 	return NextResponse.json(createdUser, {
@@ -66,8 +59,6 @@ export const POST = routeHandler(async (request) => {
 });
 
 export const GET = routeHandler(async (request) => {
-	await connectToDatabase();
-
 	await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
 
 	const queryParams = parse(request.url, true).query;

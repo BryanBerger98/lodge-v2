@@ -6,14 +6,14 @@ import { redirect } from 'next/navigation';
 import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
 import PageTitle from '@/components/layout/Header/PageTitle';
 import BackButton from '@/components/ui/Button/BackButton';
+import CsrfProvider from '@/context/csrf/csrf.provider';
+import UserProvider from '@/context/users/user/user.provider';
 import { findUserById } from '@/database/user/user.repository';
 import { getCsrfToken } from '@/lib/csrf';
 import { UserPopulatedSchema } from '@/schemas/user/populated.schema';
 
-import UsersProvider from '../_context/users/users.provider';
-
-const EditUserForm = dynamic(() => import('../_components/EditUserForm'));
-const Menu = dynamic(() => import('./_components/Menu'));
+const UserHeader = dynamic(() => import('./_components/UserHeader'));
+const UserForm = dynamic(() => import('../_components/UserForm'));
 
 type EditUserPageProps = {
 	params: {
@@ -44,25 +44,19 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
 	return (
 		<>
 			<PageTitle><User /> Edit user</PageTitle>
-			<UsersProvider>
-				<div className="grid gird-cols-1 lg:grid-cols-3">
-					<div className="col-span-2 flex flex-col gap-8">
-						<div className="flex justify-between items-center">
+			<CsrfProvider csrfToken={ csrfToken }>
+				<UserProvider user={ parsedUserData }>
+					<div className="grid gird-cols-1 lg:grid-cols-3">
+						<div className="col-span-2 space-y-8">
 							<BackButton className="mb-0">
 								<ChevronLeft /> Back
 							</BackButton>
-							<Menu
-								csrfToken={ csrfToken }
-								userData={ userData }
-							/>
+							<UserHeader />
+							<UserForm />
 						</div>
-						<EditUserForm
-							csrfToken={ csrfToken }
-							user={ parsedUserData }
-						/>
 					</div>
-				</div>
-			</UsersProvider>
+				</UserProvider>
+			</CsrfProvider>
 		</>
 	);
 };

@@ -3,7 +3,7 @@ import { Reducer } from 'react';
 import { UserPopulated } from '@/schemas/user/populated.schema';
 import { LoadingState } from '@/types/utils/loading.type';
 
-import { USERS_ERROR_ACTION, USERS_IDLE_ACTION, USERS_PENDING_ACTION, USERS_SET_STATE_ACTION, USERS_UPDATE_ACTION, UsersReducerAction } from './users.actions';
+import { USERS_ACTION, UsersReducerAction } from './users.actions';
 
 export type UsersState = {
 	users: UserPopulated[];
@@ -14,28 +14,28 @@ export type UsersState = {
 
 const usersReducer: Reducer<UsersState, UsersReducerAction> = (state, action) => {
 	switch (action.type) {
-		case USERS_SET_STATE_ACTION:
+		case USERS_ACTION.SET_STATE:
 			return {
 				...state,
 				...action.payload, 
 			};
-		case USERS_IDLE_ACTION:
+		case USERS_ACTION.IDLE:
 			return {
 				...state,
 				loading: 'idle',
 			};
-		case USERS_PENDING_ACTION:
+		case USERS_ACTION.PENDING:
 			return {
 				...state,
 				loading: 'pending',
 			};
-		case USERS_ERROR_ACTION:
+		case USERS_ACTION.ERROR:
 			return {
 				...state,
 				loading: 'error',
 				error: action.payload,
 			};
-		case USERS_UPDATE_ACTION:
+		case USERS_ACTION.UPDATE:
 			return {
 				...state,
 				users: state.users.map(user => {

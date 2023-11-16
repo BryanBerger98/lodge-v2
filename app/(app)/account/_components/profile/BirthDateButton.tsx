@@ -102,6 +102,7 @@ export const BirthDateButton = () => {
 										<FormItem>
 											<FormLabel>Date de naissance</FormLabel>
 											<DatePickerInput
+												placeholder="DD/MM/YYYY"
 												selected={ value }
 												initialFocus
 												onSelect={ handleChange }

@@ -6,7 +6,7 @@ import useFetchUsers from '@/hooks/users/useFetchUsers';
 import { UserPopulated } from '@/schemas/user/populated.schema';
 import { LoadingState, LoadingStateError } from '@/types/utils/loading.type';
 
-import { SetUsersStatePayload, USERS_ERROR_ACTION, USERS_IDLE_ACTION, USERS_PENDING_ACTION, USERS_SET_STATE_ACTION, USERS_UPDATE_ACTION } from './users.actions';
+import { SetUsersStatePayload, USERS_ACTION } from './users.actions';
 import usersReducer, { UsersState } from './users.reducer';
 
 import UsersContext from '.';
@@ -16,7 +16,6 @@ const INITIAL_STATE: UsersState = {
 	total: 0,
 	loading: 'idle',
 };
-
 
 type UsersProviderProps = {
 	children: ReactNode;
@@ -36,14 +35,14 @@ const UsersProvider = ({ users: initialUsersState = [], total = 0, children }: U
 
 	const updateUsers = useCallback((...usersToUpdate: (Partial<UserPopulated> & { id: string })[]) => {
 		dispatch({
-			type: USERS_UPDATE_ACTION,
+			type: USERS_ACTION.UPDATE,
 			payload: usersToUpdate,
 		});
 	}, []);
 
 	const setUsersState = useCallback((newState: SetUsersStatePayload) => {
 		dispatch({
-			type: USERS_SET_STATE_ACTION,
+			type: USERS_ACTION.SET_STATE,
 			payload: newState,
 		});
 	}, []);
@@ -51,16 +50,16 @@ const UsersProvider = ({ users: initialUsersState = [], total = 0, children }: U
 	const setLoadingState = useCallback(<T extends LoadingState>(loading: T, ...error: LoadingStateError<T>) => {
 		switch (loading) {
 			case 'pending':
-				dispatch({ type: USERS_PENDING_ACTION });
+				dispatch({ type: USERS_ACTION.PENDING });
 				break;
 			case 'error':
 				dispatch({
-					type: USERS_ERROR_ACTION,
+					type: USERS_ACTION.ERROR,
 					payload: error[ 0 ] as string,
 				});
 				break;
 			default:
-				dispatch({ type: USERS_IDLE_ACTION });
+				dispatch({ type: USERS_ACTION.IDLE });
 				break;
 		}
 	}, []);

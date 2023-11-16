@@ -4,9 +4,9 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import useUsers from '@/context/users/useUsers';
 import { UserPopulated } from '@/schemas/user/populated.schema';
 
-import useUsers from '../../../_context/users/useUsers';
 import ActivateUserAccountConfirmModal from '../../confirm-modals/ActivateUserAccountConfirmModal';
 import DeleteUserAccountConfirmModal from '../../confirm-modals/DeleteUserAccountConfirmModal';
 import SendUserEmailVerificationConfirmModal from '../../confirm-modals/SendUserEmailVerificationConfirmModal';

@@ -8,7 +8,8 @@ import { routeHandler } from '@/utils/api';
 import { setServerAuthGuard } from '@/utils/auth';
 
 import { UpdateImageSettingSchema } from '../_schemas/update-image.setting.schema';
-import { uploadPhotoFile } from '../_utils/upload-photo-file';
+
+import { uploadPhotoFile } from './_utils/upload-photo-file';
 
 export const PUT = routeHandler(async (request) => {
 	await connectToDatabase();
