@@ -12,8 +12,6 @@ import { findUserById } from '@/database/user/user.repository';
 import { getCsrfToken } from '@/lib/csrf';
 import { UserPopulatedSchema } from '@/schemas/user/populated.schema';
 
-import UsersProvider from '../_context/users/users.provider';
-
 const UserHeader = dynamic(() => import('./_components/UserHeader'));
 const UserForm = dynamic(() => import('../_components/UserForm'));
 
@@ -47,19 +45,17 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
 		<>
 			<PageTitle><User /> Edit user</PageTitle>
 			<CsrfProvider csrfToken={ csrfToken }>
-				<UsersProvider>
-					<UserProvider user={ parsedUserData }>
-						<div className="grid gird-cols-1 lg:grid-cols-3">
-							<div className="col-span-2 space-y-8">
-								<BackButton className="mb-0">
-									<ChevronLeft /> Back
-								</BackButton>
-								<UserHeader />
-								<UserForm />
-							</div>
+				<UserProvider user={ parsedUserData }>
+					<div className="grid gird-cols-1 lg:grid-cols-3">
+						<div className="col-span-2 space-y-8">
+							<BackButton className="mb-0">
+								<ChevronLeft /> Back
+							</BackButton>
+							<UserHeader />
+							<UserForm />
 						</div>
-					</UserProvider>
-				</UsersProvider>
+					</div>
+				</UserProvider>
 			</CsrfProvider>
 		</>
 	);

@@ -2,6 +2,7 @@
 
 import { ArrowRightLeft, BadgeCheck, KeyRound, MoreHorizontal, Trash } from 'lucide-react';
 import { signOut } from 'next-auth/react';
+import { useRouter } from 'next-nprogress-bar';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -17,8 +18,6 @@ import { UserPopulated } from '@/schemas/user/populated.schema';
 import { deleteUser, sendResetPasswordTokenToUser, sendVerificationTokenToUser } from '@/services/users.service';
 import { ApiError } from '@/utils/api/error';
 import { getErrorMessage } from '@/utils/api/error/error-messages.util';
-
-import useUsers from '../../_context/users/useUsers';
 
 type ModalState<T extends ('form' | 'simple')> = T extends 'form' ? {
 	isOpen: boolean;
@@ -52,8 +51,7 @@ const Menu = () => {
 
 	const { csrfToken } = useCsrf();
 	const { user } = useUser();
-
-	const { refetchUsers } = useUsers();
+	const router = useRouter();
 
 	const [ confirmationModalState, setConfirmationModalState ] = useState<ModalState<'form' | 'simple'>>({
 		isOpen: false,
@@ -111,7 +109,7 @@ const Menu = () => {
 			setIsLoading(true);
 			if (confirmationModalState.action === 'delete') {
 				await deleteUser(user.id, { csrfToken });
-				refetchUsers();
+				router.push('/users');
 			}
 			if (confirmationModalState.action === 'reset-password') {
 				await sendResetPasswordTokenToUser(user.id, { csrfToken });
@@ -142,7 +140,7 @@ const Menu = () => {
 
 	return (
 		<>
-			<DropdownMenu>
+			<DropdownMenu modal={ false }>
 				<DropdownMenuTrigger asChild>
 					<Button
 						className="gap-2 items-center"

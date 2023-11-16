@@ -10,13 +10,12 @@ import PageTitle from '@/components/layout/Header/PageTitle';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import CsrfProvider from '@/context/csrf/csrf.provider';
+import UsersProvider from '@/context/users/users.provider';
 import { findUsers, findUsersCount } from '@/database/user/user.repository';
 import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
 import { UserPopulatedSchema } from '@/schemas/user/populated.schema';
 import { isFileURLExpired } from '@/utils/file.util';
-
-import UsersProvider from './_context/users/users.provider';
 
 const UsersDataTable = dynamic(() => import('./_components/data-table'));
 
