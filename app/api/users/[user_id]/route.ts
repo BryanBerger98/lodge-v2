@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
 import { deleteFileById, findFileById } from '@/database/file/file.repository';
 import { deleteUserById, findUserByEmail, findUserById, updateUser } from '@/database/user/user.repository';
 import { deleteFileFromKey } from '@/lib/bucket';
@@ -13,6 +14,34 @@ import { setServerAuthGuard } from '@/utils/auth';
 
 import { UpdateUserSchema } from '../_schemas/update-user.schema';
 import { uploadProfilePhotoFile } from '../_utils/upload-profile-photo';
+
+export const GET = routeHandler(async (_, { params }) => {
+
+	const { user_id } = params;
+
+	if (!user_id) {
+		throw buildApiError({
+			code: ApiErrorCode.INVALID_INPUT,
+			message: 'User id is missing.',
+			status: StatusCode.UNPROCESSABLE_ENTITY,
+		});
+	}
+
+	await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
+
+	const userData = await findUserById(user_id);
+
+	if (!userData) {
+		throw buildApiError({
+			code: ApiErrorCode.USER_NOT_FOUND,
+			status: StatusCode.NOT_FOUND,
+		});
+	}
+
+	userData.photo = await renewFileExpiration(userData.photo);
+
+	return NextResponse.json(userData);
+});
 
 export const DELETE = routeHandler(async (_, { params }) => {
 	const { user_id } = params;

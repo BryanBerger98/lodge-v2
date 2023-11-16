@@ -11,20 +11,11 @@ import { UserPopulated, UserPopulatedSchema } from '@/schemas/user/populated.sch
 import { objectToFormData } from '@/utils/object.utils';
 import { buildQueryUrl } from '@/utils/url.util';
 
-export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema> & { avatar?: File | Blob | null }, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
+export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema>, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
 	try {
-		const formData = new FormData();
-		formData.append('username', userToCreate.username);
-		formData.append('email', userToCreate.email);
-		formData.append('phone_number', userToCreate.phone_number);
-		formData.append('role', userToCreate.role);
-		formData.append('is_disabled', userToCreate.is_disabled.toString());
-		if (userToCreate.avatar) {
-			formData.append('avatar', userToCreate.avatar);
-		}
 		const data = await fetcher('/api/users', {
 			method: 'POST',
-			body: formData,
+			body: objectToFormData({ ...userToCreate }),
 			...options,
 		});
 		return UserPopulatedSchema.parse(data);
@@ -94,6 +85,15 @@ export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: 
 			total: z.number(),
 			count: z.number(),
 		}).parse(data);
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const fetchUserById = async (user_id: string, options?: FetcherOptions): Promise<UserPopulated> => {
+	try {
+		const data = await fetcher(`/api/users/${ user_id }`, options);
+		return UserPopulatedSchema.parse(data);
 	} catch (error) {
 		throw error;
 	}
