@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server';
 
 import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
 import { createUser, findUserByEmail, findUsers, findUsersCount } from '@/database/user/user.repository';
-import { connectToDatabase } from '@/lib/database';
 import { AuthenticationProvider } from '@/schemas/authentication-provider';
 import { Role } from '@/schemas/role.schema';
 import { routeHandler } from '@/utils/api';
@@ -60,8 +59,6 @@ export const POST = routeHandler(async (request) => {
 });
 
 export const GET = routeHandler(async (request) => {
-	await connectToDatabase();
-
 	await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
 
 	const queryParams = parse(request.url, true).query;

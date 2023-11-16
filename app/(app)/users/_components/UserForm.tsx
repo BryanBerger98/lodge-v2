@@ -12,8 +12,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
 import useCsrf from '@/context/csrf/useCsrf';
+import useUser from '@/context/users/user/useUser';
 import useErrorToast from '@/hooks/error/useErrorToast';
-import { createUser } from '@/services/users.service';
+import { Role } from '@/schemas/role.schema';
+import { createUser, updateUser } from '@/services/users.service';
 import { ApiError } from '@/utils/api/error';
 
 import UserAccessRightsFormBlock, { UserAccessRightsFormBlockSchema } from './form-blocks/UserAccessRightsFormBlock';
@@ -27,6 +29,8 @@ type UserFormValues = z.infer<typeof UserFormSchema>;
 const UserForm = () => {
 
 	const [ isLoading, setIsLoading ] = useState(false);
+
+	const { user, setUser } = useUser();
 	
 	const router = useRouter();
 	const { csrfToken } = useCsrf();
@@ -35,6 +39,18 @@ const UserForm = () => {
 	const form = useForm<UserFormValues>({
 		resolver: zodResolver(UserFormSchema),
 		mode: 'onSubmit',
+		defaultValues: {
+			email: user?.email,
+			first_name: user?.first_name || undefined,
+			last_name: user?.last_name || undefined,
+			phone_number: user?.phone_number,
+			role: user?.role || Role.USER,
+			is_disabled: user?.is_disabled || false,
+			username: user?.username || undefined,
+			birth_date: user?.birth_date || undefined,
+			avatar: user?.photo?.url,
+			gender: user?.gender,
+		},
 	});
 
 	const handleSubmit = async (values: UserFormValues) => {
@@ -47,8 +63,16 @@ const UserForm = () => {
 				return;
 			}
 			setIsLoading(true);
-			await createUser(values, { csrfToken });
-			router.push('/users');
+			if (user) {
+				const updatedUser = await updateUser({
+					id: user.id,
+					...values,
+				}, { csrfToken });
+				setUser(updatedUser);
+			} else {
+				await createUser(values, { csrfToken });
+				router.push('/users');
+			}
 		} catch (error) {
 			triggerErrorToast(error as ApiError<unknown>, form);
 		} finally {

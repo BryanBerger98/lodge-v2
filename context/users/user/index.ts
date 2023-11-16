@@ -1,3 +1,5 @@
+'use client';
+
 import { Dispatch, SetStateAction, createContext } from 'react';
 
 import { UserPopulated } from '@/schemas/user/populated.schema';

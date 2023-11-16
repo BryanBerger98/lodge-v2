@@ -24,12 +24,11 @@ export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema>,
 	}
 };
 
-export const updateUser = async (userToUpdate: z.infer<typeof UpdateUserSchema> & { avatar?: File | Blob | null, id: string }, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
+export const updateUser = async (userToUpdate: z.infer<typeof UpdateUserSchema> & { id: string }, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
 	try {
-		const formData = objectToFormData({ ...userToUpdate });
 		const data = await fetcher(`/api/users/${ userToUpdate.id }`, {
 			method: 'PUT',
-			body: formData,
+			body: objectToFormData({ ...userToUpdate }),
 			...options,
 		});
 		return UserPopulatedSchema.parse(data);
