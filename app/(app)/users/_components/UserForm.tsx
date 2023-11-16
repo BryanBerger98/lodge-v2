@@ -30,7 +30,7 @@ const UserForm = () => {
 
 	const [ isLoading, setIsLoading ] = useState(false);
 
-	const { user, setUser } = useUser();
+	const { user, refetchUser } = useUser();
 	
 	const router = useRouter();
 	const { csrfToken } = useCsrf();
@@ -64,11 +64,11 @@ const UserForm = () => {
 			}
 			setIsLoading(true);
 			if (user) {
-				const updatedUser = await updateUser({
+				await updateUser({
 					id: user.id,
 					...values,
 				}, { csrfToken });
-				setUser(updatedUser);
+				await refetchUser();
 			} else {
 				await createUser(values, { csrfToken });
 				router.push('/users');
