@@ -1,3 +1,4 @@
+import { Role } from '@/schemas/role.schema';
 import { SettingDataType, SettingName, UnregisteredSettingPopulated } from '@/schemas/setting';
 
 export const DEFAULT_SETTINGS: UnregisteredSettingPopulated[] = [
@@ -20,6 +21,11 @@ export const DEFAULT_SETTINGS: UnregisteredSettingPopulated[] = [
 		name: SettingName.NEW_USERS_SIGNUP,
 		value: true,
 		data_type: SettingDataType.BOOLEAN,
+	},
+	{
+		name: SettingName.DEFAULT_USER_ROLE,
+		value: Role.USER,
+		data_type: SettingDataType.STRING,
 	},
 	{
 		name: SettingName.USER_VERIFY_EMAIL,

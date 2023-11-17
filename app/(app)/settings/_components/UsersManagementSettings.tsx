@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
+import useCsrf from '@/context/csrf/useCsrf';
 import useSettings from '@/context/settings/useSettings';
 import { SettingName, SettingDataType, UnregisteredSetting } from '@/schemas/setting';
 import { updateSettings } from '@/services/settings.service';
@@ -24,11 +25,7 @@ const usersSettingsFormSchema = z.object({
 	can_user_delete_account: z.boolean().default(true),
 });
 
-type UsersManagementSettingsProps = {
-	csrfToken: string;
-};
-
-const UsersManagementSettings = ({ csrfToken }: UsersManagementSettingsProps) => {
+const UsersManagementSettings = () => {
 
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 
@@ -37,6 +34,8 @@ const UsersManagementSettings = ({ csrfToken }: UsersManagementSettingsProps) =>
 	const newUserSignupSetting = getSetting(SettingName.NEW_USERS_SIGNUP);
 	const userVerifyEmailSetting = getSetting(SettingName.USER_VERIFY_EMAIL);
 	const userAccountDeletionSetting = getSetting(SettingName.USER_ACCOUNT_DELETION);
+
+	const { csrfToken } = useCsrf();
 
 	const { toast } = useToast();
 
@@ -67,6 +66,7 @@ const UsersManagementSettings = ({ csrfToken }: UsersManagementSettingsProps) =>
 
 	const handleSubmitUsersSettingsForm = async ({ can_new_user_signup, should_verify_email, can_user_delete_account }: z.infer<typeof usersSettingsFormSchema>) => {
 		try {
+			if (!csrfToken) return;
 			setIsLoading(true);
 			const settingsValues: (UnregisteredSetting & { settingName: string, settingValue: boolean | string | number | undefined })[] = [
 				{
