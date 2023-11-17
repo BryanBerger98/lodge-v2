@@ -97,10 +97,7 @@ export const PUT = routeHandler(async (request) => {
 		});
 	}
 
-	console.log('settingsToUpdate');
-
 	for (const setting of settingsToUpdate) {
-		console.log('SETTING TO UPDATE', setting);
 		await updateSetting({
 			...setting,
 			data_type: setting.data_type,
