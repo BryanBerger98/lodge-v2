@@ -3,8 +3,13 @@ import { SettingDataType, SettingName, UnregisteredSettingPopulated } from '@/sc
 export const DEFAULT_SETTINGS: UnregisteredSettingPopulated[] = [
 	{
 		name: SettingName.SHARE_WITH_ADMIN,
-		value: false,
-		data_type: SettingDataType.BOOLEAN,
+		value: 'dont_share', // dont_share, share_all_admin, share_admin_selection
+		data_type: SettingDataType.STRING,
+	},
+	{
+		name: SettingName.SHARE_WITH_ADMIN_USERS_LIST,
+		value: [],
+		data_type: SettingDataType.ARRAY_OF_OBJECT_IDS,
 	},
 	{
 		name: SettingName.OWNER,

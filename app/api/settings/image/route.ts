@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 
+import { hasSettingsAccess } from '@/app/_utils/settings/has-settings-access';
 import { findSettingByName, updateSetting } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
 import { Role } from '@/schemas/role.schema';
-import { SettingDataType, SettingName } from '@/schemas/setting';
+import { SettingDataType } from '@/schemas/setting';
 import { routeHandler } from '@/utils/api';
+import { buildApiError } from '@/utils/api/error';
+import { StatusCode } from '@/utils/api/http-status';
 import { setServerAuthGuard } from '@/utils/auth';
 
 import { UpdateImageSettingSchema } from '../_schemas/update-image.setting.schema';
@@ -14,11 +17,13 @@ import { uploadPhotoFile } from './_utils/upload-photo-file';
 export const PUT = routeHandler(async (request) => {
 	await connectToDatabase();
 
-	const shareWithAdminSetting = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
+	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
 
-	const rolesWhiteList: Role[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ Role.OWNER, Role.ADMIN ] : [ Role.OWNER ];
+	const hasUserSettingsAccess = hasSettingsAccess(currentUser);
 
-	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList });
+	if (!hasUserSettingsAccess) {
+		throw buildApiError({ status: StatusCode.FORBIDDEN });
+	}
 
 	const formData = await request.formData();
 

@@ -3,8 +3,9 @@ import { z } from 'zod';
 import { UpdateImageSettingSchema } from '@/app/api/settings/_schemas/update-image.setting.schema';
 import fetcher, { FetcherOptions, FetcherOptionsWithCsrf } from '@/lib/fetcher';
 import { SettingName, SettingPopulated, SettingPopulatedSchema } from '@/schemas/setting';
-import { UnregisteredSetting, UnregisteredSettingBooleanPopulatedSchema, UnregisteredSettingObjectIdPopulatedSchema } from '@/schemas/setting/unregistered-setting.schema';
+import { UnregisteredSetting, UnregisteredSettingArrayOfObjectIdsPopulatedSchema, UnregisteredSettingBooleanPopulatedSchema, UnregisteredSettingObjectIdPopulatedSchema } from '@/schemas/setting/unregistered-setting.schema';
 import { UserSchema } from '@/schemas/user';
+import { UserPopulatedSchema } from '@/schemas/user/populated.schema';
 import { objectToFormData } from '@/utils/object.utils';
 import { buildQueryUrl } from '@/utils/url.util';
 
@@ -12,13 +13,15 @@ const ShareSettingsSchema = z.object({
 	settings: z.object({
 		shareWithAdmin: UnregisteredSettingBooleanPopulatedSchema,
 		owner: UnregisteredSettingObjectIdPopulatedSchema,
+		shareWithAdminUsersListSetting: UnregisteredSettingArrayOfObjectIdsPopulatedSchema,
 	}),
 	ownerUser: UserSchema,
+	selectedAdminUsers: UserPopulatedSchema.array(),
 });
 
 export type ShareSettings = z.infer<typeof ShareSettingsSchema>;
 
-export const getShareSettings = async (): Promise<ShareSettings> => {
+export const fetchShareSettings = async (): Promise<ShareSettings> => {
 	try {
 		const data = await fetcher('/api/settings/share');
 		return ShareSettingsSchema.parse(data);

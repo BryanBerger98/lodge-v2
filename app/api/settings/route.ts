@@ -2,11 +2,14 @@ import { parse } from 'url';
 
 import { NextRequest, NextResponse } from 'next/server';
 
-import { findSettingByName, findSettings, updateSetting } from '@/database/setting/setting.repository';
+import { hasSettingsAccess } from '@/app/_utils/settings/has-settings-access';
+import { findSettings, updateSetting } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
 import { Role } from '@/schemas/role.schema';
 import { SettingName } from '@/schemas/setting';
 import { routeHandler } from '@/utils/api';
+import { buildApiError } from '@/utils/api/error';
+import { StatusCode } from '@/utils/api/http-status';
 import { setServerAuthGuard } from '@/utils/auth';
 
 import { FetchSettingsSchema } from './_schemas/fetch-settings.schema';
@@ -15,11 +18,13 @@ import { UpdateSettingsSchema } from './_schemas/update-settings.schema';
 export const PUT = routeHandler(async (request: NextRequest) => {
 	await connectToDatabase();
 
-	const shareWithAdminSetting = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
+	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
 
-	const rolesWhiteList: Role[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ Role.OWNER, Role.ADMIN ] : [ Role.OWNER ];
+	const hasUserSettingsAccess = hasSettingsAccess(currentUser);
 
-	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList });
+	if (!hasUserSettingsAccess) {
+		throw buildApiError({ status: StatusCode.FORBIDDEN });
+	}
 
 	const body = await request.json();
 
