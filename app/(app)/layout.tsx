@@ -5,10 +5,11 @@ import { ReactNode } from 'react';
 import HeaderProvider from '@/components/layout/Header';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
-import { Role } from '@/schemas/role.schema';
 import { UnregisteredSettingBooleanPopulatedSchema, UnregisteredSettingImagePopulatedSchema, UnregisteredSettingStringPopulatedSchema } from '@/schemas/setting';
 import { SettingName } from '@/schemas/setting/name.shema';
 import { getServerCurrentUser } from '@/utils/auth';
+
+import { hasSettingsAccess } from '../_utils/settings/has-settings-access';
 
 const Sidebar = dynamic(() => import('@/components/layout/Sidebar'));
 
@@ -33,11 +34,6 @@ const AppLayout = async ({ children }: AppLayoutProps) => {
 		redirect('/verify-email');
 	}
 
-	const shareWithAdminSettingData = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
-	const shareWithAdminSetting = UnregisteredSettingStringPopulatedSchema.parse(shareWithAdminSettingData);
-
-	const hasSettingsAccess = currentUser?.role === Role.OWNER || currentUser.role === Role.ADMIN && shareWithAdminSetting?.value === 'share_all_admin';
-
 	const brandNameSettingData = await findSettingByName(SettingName.BRAND_NAME);
 	const brandNameSetting = UnregisteredSettingStringPopulatedSchema.parse(brandNameSettingData);
 	const bandName: string = brandNameSetting.value;
@@ -46,11 +42,13 @@ const AppLayout = async ({ children }: AppLayoutProps) => {
 	const brandLogoSetting = UnregisteredSettingImagePopulatedSchema.parse(brandLogoSettingData);
 	const brandLogo: string = brandLogoSetting?.value?.url || '';
 
+	const hasUserSettingsAccess = await hasSettingsAccess(currentUser);
+
 	return (
 		<HeaderProvider>
 			<Sidebar
 				brandName={ bandName }
-				hasSettingsAccess={ hasSettingsAccess }
+				hasSettingsAccess={ hasUserSettingsAccess }
 				logoUrl={ brandLogo }
 			/>
 			<div className="ml-0 md:ml-[200px] container !w-auto p-4 lg:p-8">

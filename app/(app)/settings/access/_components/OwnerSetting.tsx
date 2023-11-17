@@ -6,8 +6,6 @@ import { useEffect, useState } from 'react';
 import PasswordModal from '@/components/features/auth/PasswordModal';
 import SearchSelect, { SelectOption } from '@/components/forms/Select/SearchSelect';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Paragraph } from '@/components/ui/Typography/text';
 import useAuth from '@/context/auth/useAuth';
 import useCsrf from '@/context/csrf/useCsrf';
 import useSettings from '@/context/settings/useSettings';
@@ -116,7 +114,6 @@ const OwnerSetting = ({ ownerUser }: OwnerSettingProps) => {
 	return (
 		<>
 			<div className="space-y-2">
-				<Label>Owner</Label>
 				<SearchSelect
 					isLoading={ isSearchLoading }
 					options={ searchedOptions }
@@ -142,9 +139,6 @@ const OwnerSetting = ({ ownerUser }: OwnerSettingProps) => {
 						<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 					</Button>
 				</SearchSelect>
-				<Paragraph variant="muted">
-					Select user to tranfer ownership.
-				</Paragraph>
 			</div>
 			<PasswordModal
 				isLoading={ isLoading }

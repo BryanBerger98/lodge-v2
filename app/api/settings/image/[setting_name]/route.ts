@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 
+import { hasSettingsAccess } from '@/app/_utils/settings/has-settings-access';
 import { deleteFileById, findFileById } from '@/database/file/file.repository';
 import { findSettingByName, updateSetting } from '@/database/setting/setting.repository';
 import { deleteFileFromKey } from '@/lib/bucket';
 import { connectToDatabase } from '@/lib/database';
 import { Role } from '@/schemas/role.schema';
-import { SettingDataType, SettingName } from '@/schemas/setting';
+import { SettingDataType } from '@/schemas/setting';
 import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
@@ -20,11 +21,13 @@ export const DELETE = routeHandler(async (_, { params }) => {
 
 	await connectToDatabase();
 
-	const shareWithAdminSetting = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
+	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
 
-	const rolesWhiteList: Role[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ Role.OWNER, Role.ADMIN ] : [ Role.OWNER ];
+	const hasUserSettingsAccess = hasSettingsAccess(currentUser);
 
-	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList });
+	if (!hasUserSettingsAccess) {
+		throw buildApiError({ status: StatusCode.FORBIDDEN });
+	}
 
 	const settingData = await findSettingByName(name);
 

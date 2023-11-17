@@ -1,18 +1,17 @@
 import { Database, Globe, KeyRound, Mail, Settings, Star, Unlock, Unplug, Users } from 'lucide-react';
 import { headers } from 'next/headers';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { ReactNode } from 'react';
 
+import { hasSettingsAccess } from '@/app/_utils/settings/has-settings-access';
 import PageTitle from '@/components/layout/Header/PageTitle';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import CsrfProvider from '@/context/csrf/csrf.provider';
 import SettingsProvider from '@/context/settings/settings.provider';
-import { findSettingByName } from '@/database/setting/setting.repository';
 import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
-import { Role } from '@/schemas/role.schema';
-import { SettingName } from '@/schemas/setting/name.shema';
-import { setServerAuthGuard } from '@/utils/auth';
+import { getServerCurrentUser } from '@/utils/auth';
 
 type SettingsLayoutProps = {
 	children: ReactNode;
@@ -25,15 +24,18 @@ const SettingsLayout = async ({ children }: SettingsLayoutProps) => {
 	const csrfToken = await getCsrfToken(headers());
 
 	await connectToDatabase();
+	
+	const currentUser = await getServerCurrentUser();
 
-	const shareWithAdminSetting = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
+	if (!currentUser) {
+		redirect('/signin');
+	}
 
-	const rolesWhiteList: Role[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ Role.OWNER, Role.ADMIN ] : [ Role.OWNER ];
+	const hasUserSettingsAccess = await hasSettingsAccess(currentUser);
 
-	await setServerAuthGuard({
-		rolesWhiteList,
-		redirect: '/', 
-	});
+	if (!hasUserSettingsAccess) {
+		redirect('/');
+	}
 
 	return (
 		<>

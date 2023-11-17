@@ -47,7 +47,16 @@ const AccessSettingsPage = async () => {
 						</div>
 						<ShareWithAdminSetting selectedAdminUsers={ selectedAdminUsers } />
 					</div>
-					<OwnerSetting ownerUser={ parsedOwnerUser } />
+				</div>
+				<div className="space-y-4">
+					<Paragraph variant="lead">Transfer ownership</Paragraph>
+					<div className="rounded-lg border p-4 mb-4 space-y-4">
+						<div className="flex flex-col">
+							<Paragraph variant="medium">Owner</Paragraph>
+							<Paragraph variant="muted">Select user to tranfer ownership.</Paragraph>
+						</div>
+						<OwnerSetting ownerUser={ parsedOwnerUser } />
+					</div>
 				</div>
 			</div>
 		</CsrfProvider>

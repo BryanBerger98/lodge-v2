@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus, Trash } from 'lucide-react';
+import { Loader2, Plus, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import SearchSelectUsersModal from '@/app/_components/modals/users/SearchSelectUsersModal';
@@ -46,7 +46,7 @@ const ShareWithAdminSetting = ({ selectedAdminUsers: initialSelectedAdminUsers }
 	const [ isPasswordModalOpen, setIsPasswordModalOpen ] = useState<boolean>(false);
 
 	const { getSetting, loading, refetchSettings } = useSettings();
-	const { currentUser, fetchCurrentUser } = useAuth();
+	const { currentUser } = useAuth();
 	const { csrfToken } = useCsrf();
 	const { triggerErrorToast } = useErrorToast();
 
@@ -94,9 +94,6 @@ const ShareWithAdminSetting = ({ selectedAdminUsers: initialSelectedAdminUsers }
 			});
 			return;
 		}
-
-		console.log(userToRevoke);
-		console.log('USERS', alreadySelectedAdminUsers.concat(selectedAdminUsers).filter(user => userToRevoke && user.id !== userToRevoke.id ? true : !userToRevoke));
 		
 		try {
 			setIsLoading(true);
@@ -141,9 +138,12 @@ const ShareWithAdminSetting = ({ selectedAdminUsers: initialSelectedAdminUsers }
 		setIsPasswordModalOpen(true);
 	};
 
+	if (loading === 'pending') return <Loader2 className="w-4 h-4 animate-spin" />;
+
 	return (
 		<>
 			<Select
+				disabled={ currentUser?.role !== Role.OWNER }
 				value={ shareSettingSelection }
 				onValueChange={ handleChangeShareSettingSelection }
 			>
@@ -172,17 +172,20 @@ const ShareWithAdminSetting = ({ selectedAdminUsers: initialSelectedAdminUsers }
 										alreadySelectedAdminUsers.map(user => (
 											<ButtonItem
 												key={ user.id }
+												disabled={ currentUser?.role !== Role.OWNER }
 												rightIcon={
-													<TooltipProvider delayDuration={ 100 }>
-														<Tooltip>
-															<TooltipTrigger>
-																<Trash className="w-4 h-4 group-hover:text-destructive" />
-															</TooltipTrigger>
-															<TooltipContent>
-																Revoke access
-															</TooltipContent>
-														</Tooltip>
-													</TooltipProvider>
+													currentUser?.role === Role.OWNER ? ( 
+														<TooltipProvider delayDuration={ 100 }>
+															<Tooltip>
+																<TooltipTrigger asChild>
+																	<Trash className="w-4 h-4 group-hover:text-destructive" />
+																</TooltipTrigger>
+																<TooltipContent>
+																	Revoke access
+																</TooltipContent>
+															</Tooltip>
+														</TooltipProvider>
+													) : null
 												}
 												value={ (user.first_name && user.last_name) || user.username ? user.email : null }
 												valueAsDescription
@@ -195,14 +198,18 @@ const ShareWithAdminSetting = ({ selectedAdminUsers: initialSelectedAdminUsers }
 								</ButtonList>
 							) : null
 						}
-						<ButtonList>
-							<ButtonItem
-								rightIcon={ <Plus className="w-4 h-4" /> }
-								onClick={ handleOpenSearchAdminUsersModal }
-							>
-								Add admin users
-							</ButtonItem>
-						</ButtonList>
+						{
+							currentUser?.role === Role.OWNER ? (
+								<ButtonList>
+									<ButtonItem
+										rightIcon={ <Plus className="w-4 h-4" /> }
+										onClick={ handleOpenSearchAdminUsersModal }
+									>
+										Add admin users
+									</ButtonItem>
+								</ButtonList>
+							) : null
+						}
 					</>
 				) : null
 			}
