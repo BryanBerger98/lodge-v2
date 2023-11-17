@@ -18,7 +18,7 @@ const ButtonItem = forwardRef<HTMLButtonElement, ButtonProps>(({ onClick: handle
 
 	return (
 		<button
-			className={ cn('flex justify-between items-center border border-slate-200 first:rounded-t-md last:rounded-b-md text-sm py-2 px-4 hover:cursor-default [&:not(:first-child)]:-mt-[1px] disabled:pointer-event-none disabled:cursor-default disabled:hover:!bg-transparent', { 'hover:bg-secondary hover:cursor-pointer': handleClick }, className) }
+			className={ cn('group flex justify-between items-center border border-slate-200 first:rounded-t-md last:rounded-b-md text-sm py-2 px-4 hover:cursor-default [&:not(:first-child)]:-mt-[1px] disabled:pointer-event-none disabled:cursor-default disabled:hover:!bg-transparent', { 'hover:bg-secondary hover:cursor-pointer': handleClick }, className) }
 			type="button"
 			{ ...rest }
 			disabled={ disabled || isLoading }

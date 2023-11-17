@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { findSettingByName, updateSetting } from '@/database/setting/setting.repository';
-import { findOwnerUser, findUserById, updateUser } from '@/database/user/user.repository';
+import { findOwnerUser, findUserById, findUsers, updateUser } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
 import { Role } from '@/schemas/role.schema';
 import { SettingDataType, SettingName } from '@/schemas/setting';
@@ -20,6 +20,11 @@ export const GET = routeHandler(async () => {
 
 	const shareWithAdminSetting = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
 	const ownerSetting = await findSettingByName(SettingName.OWNER);
+	const shareWithAdminUsersListSetting = shareWithAdminSetting && shareWithAdminSetting.value === 'share_admin_selection' ? await findSettingByName(SettingName.SHARE_WITH_ADMIN_USERS_LIST) : null;
+	const adminUsers = shareWithAdminUsersListSetting ? await findUsers({
+		role: Role.ADMIN,
+		_id: { $in: shareWithAdminUsersListSetting.value }, 
+	}) : [];
 
 	const ownerUser = await findOwnerUser();
 
@@ -42,8 +47,14 @@ export const GET = routeHandler(async () => {
 				value: ownerUser.id,
 				data_type: SettingDataType.OBJECT_ID,
 			},
+			shareWithAdminUsersListSetting: shareWithAdminUsersListSetting ?? {
+				name: SettingName.SHARE_WITH_ADMIN_USERS_LIST,
+				value: [],
+				data_type: SettingDataType.ARRAY_OF_OBJECT_IDS,
+			},
 		},
 		ownerUser,
+		selectedAdminUsers: adminUsers,
 	});
 });
 
@@ -86,9 +97,13 @@ export const PUT = routeHandler(async (request) => {
 		});
 	}
 
+	console.log('settingsToUpdate');
+
 	for (const setting of settingsToUpdate) {
+		console.log('SETTING TO UPDATE', setting);
 		await updateSetting({
 			...setting,
+			data_type: setting.data_type,
 			updated_by: currentUser.id,
 		}, {
 			upsert: true,

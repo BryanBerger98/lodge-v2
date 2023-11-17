@@ -4,7 +4,8 @@ import { UnregisteredSettingPopulated } from '@/schemas/setting/unregistered-set
 import { DEFAULT_SETTINGS } from './default-settings.util';
 
 export const SETTING_NAME_TYPE = {
-	[ SettingName.SHARE_WITH_ADMIN ]: SettingDataType.BOOLEAN,
+	[ SettingName.SHARE_WITH_ADMIN ]: SettingDataType.STRING,
+	[ SettingName.SHARE_WITH_ADMIN_USERS_LIST ]: SettingDataType.ARRAY_OF_OBJECT_IDS,
 	[ SettingName.OWNER ]: SettingDataType.OBJECT_ID,
 	[ SettingName.NEW_USERS_SIGNUP ]: SettingDataType.BOOLEAN,
 	[ SettingName.USER_VERIFY_EMAIL ]: SettingDataType.BOOLEAN,

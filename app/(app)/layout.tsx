@@ -5,6 +5,7 @@ import { ReactNode } from 'react';
 import HeaderProvider from '@/components/layout/Header';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
+import { Role } from '@/schemas/role.schema';
 import { UnregisteredSettingBooleanPopulatedSchema, UnregisteredSettingImagePopulatedSchema, UnregisteredSettingStringPopulatedSchema } from '@/schemas/setting';
 import { SettingName } from '@/schemas/setting/name.shema';
 import { getServerCurrentUser } from '@/utils/auth';
@@ -33,9 +34,9 @@ const AppLayout = async ({ children }: AppLayoutProps) => {
 	}
 
 	const shareWithAdminSettingData = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
-	const shareWithAdminSetting = UnregisteredSettingBooleanPopulatedSchema.parse(shareWithAdminSettingData);
+	const shareWithAdminSetting = UnregisteredSettingStringPopulatedSchema.parse(shareWithAdminSettingData);
 
-	const hasSettingsAccess = currentUser?.role === 'owner' || shareWithAdminSetting?.value;
+	const hasSettingsAccess = currentUser?.role === Role.OWNER || currentUser.role === Role.ADMIN && shareWithAdminSetting?.value === 'share_all_admin';
 
 	const brandNameSettingData = await findSettingByName(SettingName.BRAND_NAME);
 	const brandNameSetting = UnregisteredSettingStringPopulatedSchema.parse(brandNameSettingData);

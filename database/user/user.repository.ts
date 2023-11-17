@@ -14,7 +14,7 @@ import { populateUser } from './utils/populate-user';
 
 export interface UserDocument extends User, Document {}
 
-export const findUsers = async (searchRequest: FilterQuery<User>, options?: QueryOptions<User>): Promise<UserPopulated[]> => {
+export const findUsers = async (searchRequest: FilterQuery<IUserWithPasswordDocument>, options?: QueryOptions<User>): Promise<UserPopulated[]> => {
 	try {
 		const users = await UserModel.find(searchRequest, { password: 0 })
 			.populate(populateUser)

@@ -1,7 +1,7 @@
 import { Schema, model, Types, Model, models } from 'mongoose';
 import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 
-import { SettingBase, SettingBoolean, SettingDataType, SettingDate, SettingImage, SettingNumber, SettingObjectId, SettingString } from '@/schemas/setting';
+import { SettingArrayOfObjectIds, SettingArrayOfStrings, SettingBase, SettingBoolean, SettingDataType, SettingDate, SettingImage, SettingNumber, SettingObjectId, SettingString } from '@/schemas/setting';
 
 import FileModel from '../file/file.model';
 import UserModel from '../user/user.model';
@@ -40,6 +40,17 @@ interface ISettingNumberDocument extends Omit<SettingNumber, 'created_by' | 'upd
 
 interface ISettingObjectIdDocument extends Omit<SettingObjectId, 'created_by' | 'updated_by' | 'value'> {
 	value: Types.ObjectId | null;
+	created_by: Types.ObjectId | null;
+	updated_by: Types.ObjectId | null;
+};
+
+interface ISettingArrayOfStringsDocument extends Omit<SettingArrayOfStrings, 'created_by' | 'updated_by'> {
+	created_by: Types.ObjectId | null;
+	updated_by: Types.ObjectId | null;
+};
+
+interface ISettingArrayOfObjectIdsDocument extends Omit<SettingArrayOfObjectIds, 'created_by' | 'updated_by' | 'value'> {
+	value: Types.ObjectId[] | null;
 	created_by: Types.ObjectId | null;
 	updated_by: Types.ObjectId | null;
 };
@@ -83,6 +94,20 @@ const numberSettingSchema = new Schema<ISettingNumberDocument>({
 const objectIdSettingSchema = new Schema<ISettingObjectIdDocument>({
 	value: {
 		type: Schema.Types.ObjectId,
+		required: true,
+	},
+}, { discriminatorKey: 'data_type' });
+
+const arrayOfStringsSettingSchema = new Schema<ISettingArrayOfStringsDocument>({
+	value: {
+		type: [ String ],
+		required: true,
+	},
+}, { discriminatorKey: 'data_type' });
+
+const arrayOfObjectIdsSettingSchema = new Schema<ISettingArrayOfObjectIdsDocument>({
+	value: {
+		type: [ Schema.Types.ObjectId ],
 		required: true,
 	},
 }, { discriminatorKey: 'data_type' });
@@ -137,6 +162,8 @@ export const DateSettingModel: Model<ISettingDateDocument> = SettingModel.discri
 export const ImageSettingModel: Model<ISettingImageDocument> = SettingModel.discriminators?.image || SettingModel.discriminator('image', imageSettingSchema);
 export const NumberSettingModel: Model<ISettingNumberDocument> = SettingModel.discriminators?.number || SettingModel.discriminator('number', numberSettingSchema);
 export const ObjectIdSettingModel: Model<ISettingObjectIdDocument> = SettingModel.discriminators?.object_id || SettingModel.discriminator('object_id', objectIdSettingSchema);
+export const ArrayOfStringsSettingModel: Model<ISettingArrayOfStringsDocument> = SettingModel.discriminators?.array_of_strings || SettingModel.discriminator('array_of_strings', arrayOfStringsSettingSchema);
+export const ArrayOfObjectIdsSettingModel: Model<ISettingArrayOfObjectIdsDocument> = SettingModel.discriminators?.array_of_object_ids || SettingModel.discriminator('array_of_object_ids', arrayOfObjectIdsSettingSchema);
 
 const SettingModels = {
 	[ SettingDataType.STRING ]: StringSettingModel,
@@ -145,6 +172,8 @@ const SettingModels = {
 	[ SettingDataType.IMAGE ]: ImageSettingModel,
 	[ SettingDataType.NUMBER ]: NumberSettingModel,
 	[ SettingDataType.OBJECT_ID ]: ObjectIdSettingModel,
+	[ SettingDataType.ARRAY_OF_STRINGS ]: ArrayOfStringsSettingModel,
+	[ SettingDataType.ARRAY_OF_OBJECT_IDS ]: ArrayOfObjectIdsSettingModel,
 	default: SettingModel,
 } as const;
 
@@ -163,6 +192,10 @@ export const getSettingModel = (dataType: SettingDataType) => {
 			return NumberSettingModel;
 		case SettingDataType.OBJECT_ID:
 			return ObjectIdSettingModel;
+		case SettingDataType.ARRAY_OF_STRINGS:
+			return ArrayOfStringsSettingModel;
+		case SettingDataType.ARRAY_OF_OBJECT_IDS:
+			return ArrayOfObjectIdsSettingModel;
 		default:
 			return SettingModel;
 	}

@@ -1,7 +1,7 @@
 import { FilterQuery } from 'mongoose';
 
 import { UpdateQueryOptions, newId } from '@/lib/database';
-import { Setting, SettingPopulated, SettingName } from '@/schemas/setting';
+import { Setting, SettingPopulated, SettingName, SettingDataType } from '@/schemas/setting';
 import { UnregisteredSettingPopulated } from '@/schemas/setting/unregistered-setting.schema';
 import { SettingNameType, findDefaultSettingByName } from '@/utils/settings';
 
@@ -285,18 +285,66 @@ export const createSetting = async (settingToCreate: CreateSettingDTO): Promise<
 	}
 };
 
+const updateSettingDocument = (settingToUpdate: UpdateSettingDTO, options?: UpdateQueryOptions) => {
+	const updateOperation = {
+		$set: {
+			value: settingToUpdate.value,
+			data_type: settingToUpdate.data_type,
+			updated_by: settingToUpdate.updated_by ? newId(settingToUpdate.updated_by) : settingToUpdate.updated_by, 
+		}, 
+	};
+	switch (settingToUpdate.data_type) {
+		case SettingDataType.STRING:
+			return SettingModels.string.findOneAndUpdate({ name: settingToUpdate.name }, updateOperation, {
+				new: options?.newDocument || false,
+				upsert: options?.upsert || false, 
+			});
+		case SettingDataType.ARRAY_OF_OBJECT_IDS:
+			return SettingModels.array_of_object_ids.findOneAndUpdate({ name: settingToUpdate.name }, updateOperation, {
+				new: options?.newDocument || false,
+				upsert: options?.upsert || false, 
+			});
+		case SettingDataType.ARRAY_OF_STRINGS:
+			return SettingModels.array_of_strings.findOneAndUpdate({ name: settingToUpdate.name }, updateOperation, {
+				new: options?.newDocument || false,
+				upsert: options?.upsert || false, 
+			});
+		case SettingDataType.BOOLEAN:
+			return SettingModels.boolean.findOneAndUpdate({ name: settingToUpdate.name }, updateOperation, {
+				new: options?.newDocument || false,
+				upsert: options?.upsert || false, 
+			});
+		case SettingDataType.DATE:
+			return SettingModels.date.findOneAndUpdate({ name: settingToUpdate.name }, updateOperation, {
+				new: options?.newDocument || false,
+				upsert: options?.upsert || false, 
+			});
+		case SettingDataType.IMAGE:
+			return SettingModels.image.findOneAndUpdate({ name: settingToUpdate.name }, updateOperation, {
+				new: options?.newDocument || false,
+				upsert: options?.upsert || false, 
+			});
+		case SettingDataType.NUMBER:
+			return SettingModels.number.findOneAndUpdate({ name: settingToUpdate.name }, updateOperation, {
+				new: options?.newDocument || false,
+				upsert: options?.upsert || false, 
+			});
+		case SettingDataType.OBJECT_ID:
+			return SettingModels.object_id.findOneAndUpdate({ name: settingToUpdate.name }, updateOperation, {
+				new: options?.newDocument || false,
+				upsert: options?.upsert || false, 
+			});
+		default:
+			return SettingModels.default.findOneAndUpdate({ name: settingToUpdate.name }, updateOperation, {
+				new: options?.newDocument || false,
+				upsert: options?.upsert || false, 
+			});
+	}
+};
+
 export const updateSetting = async (settingToUpdate: UpdateSettingDTO, options?: UpdateQueryOptions): Promise<SettingPopulated | null> => {
 	try {
-		const document = await SettingModels.default.findOneAndUpdate({ name: settingToUpdate.name }, {
-			$set: {
-				value: settingToUpdate.value,
-				data_type: settingToUpdate.data_type,
-				updated_by: settingToUpdate.updated_by ? newId(settingToUpdate.updated_by) : settingToUpdate.updated_by, 
-			}, 
-		}, {
-			new: options?.newDocument || false,
-			upsert: options?.upsert || false, 
-		});
+		const document = await updateSettingDocument(settingToUpdate, options);
 		if (!document) return null;
 		const populatedDocument = await document.populate(populateSetting(settingToUpdate.data_type));
 		return populatedDocument.toJSON();

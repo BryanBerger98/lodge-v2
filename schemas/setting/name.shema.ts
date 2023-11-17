@@ -3,6 +3,7 @@ import { z } from 'zod';
 export enum SettingName {
 	// -- SHARE SETTINGS --
 	SHARE_WITH_ADMIN = 'share_with_admin',
+	SHARE_WITH_ADMIN_USERS_LIST = 'share_with_admin_users_list',
 	OWNER = 'owner',
 
 	// -- USER SETTINGS --

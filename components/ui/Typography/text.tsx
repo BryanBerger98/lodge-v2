@@ -12,6 +12,7 @@ export const paragraphVariants = cva(
 				bold: 'leading-7 [&:not(:first-child)]:mt-6 font-semibold',
 				lead: 'text-xl text-muted-foreground',
 				large: 'text-lg font-semibold',
+				medium: 'text-base font-medium',
 				small: 'text-sm font-medium leading-none',
 				muted: 'text-sm text-muted-foreground',
 			},

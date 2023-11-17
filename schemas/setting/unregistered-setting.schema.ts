@@ -52,6 +52,18 @@ export const UnregisteredSettingDateSchema = UnregisteredSettingBaseSchema.exten
 });
 export type UnregisteredSettingDate = z.infer<typeof UnregisteredSettingDateSchema>;
 
+export const UnregisteredSettingArrayOfStringsSchema = UnregisteredSettingBaseSchema.extend({
+	value: z.array(z.string()),
+	data_type: z.literal(SettingDataType.ARRAY_OF_STRINGS),
+});
+export type UnregisteredSettingArrayOfStrings = z.infer<typeof UnregisteredSettingArrayOfStringsSchema>;
+
+export const UnregisteredSettingArrayOfObjectIdsSchema = UnregisteredSettingBaseSchema.extend({
+	value: z.array(z.string()),
+	data_type: z.literal(SettingDataType.ARRAY_OF_OBJECT_IDS),
+});
+export type UnregisteredSettingArrayOfObjectIds = z.infer<typeof UnregisteredSettingArrayOfObjectIdsSchema>;
+
 export const UnregisteredSettingSchema = z.discriminatedUnion('data_type', [
 	UnregisteredSettingImageSchema,
 	UnregisteredSettingBooleanSchema,
@@ -59,6 +71,8 @@ export const UnregisteredSettingSchema = z.discriminatedUnion('data_type', [
 	UnregisteredSettingNumberSchema,
 	UnregisteredSettingObjectIdSchema,
 	UnregisteredSettingDateSchema,
+	UnregisteredSettingArrayOfStringsSchema,
+	UnregisteredSettingArrayOfObjectIdsSchema,
 ]);
 
 export type UnregisteredSetting<T = SettingDataType> = 
@@ -68,6 +82,8 @@ export type UnregisteredSetting<T = SettingDataType> =
 	: T extends SettingDataType.OBJECT_ID ? UnregisteredSettingObjectId
 	: T extends SettingDataType.DATE ? UnregisteredSettingDate
 	: T extends SettingDataType.IMAGE ? UnregisteredSettingImage
+	: T extends SettingDataType.ARRAY_OF_STRINGS ? UnregisteredSettingArrayOfStrings
+	: T extends SettingDataType.ARRAY_OF_OBJECT_IDS ? UnregisteredSettingArrayOfObjectIds
 	: z.infer<typeof UnregisteredSettingSchema>;
 
 export const UnregisteredSettingBasePopulatedSchema = UnregisteredSettingBaseSchema.extend({
@@ -111,6 +127,18 @@ export const UnregisteredSettingDatePopulatedSchema = UnregisteredSettingBasePop
 });
 export type UnregisteredSettingDatePopulated = z.infer<typeof UnregisteredSettingDatePopulatedSchema>;
 
+export const UnregisteredSettingArrayOfStringsPopulatedSchema = UnregisteredSettingBasePopulatedSchema.extend({
+	value: z.array(z.string()),
+	data_type: z.literal(SettingDataType.ARRAY_OF_STRINGS),
+});
+export type UnregisteredSettingArrayOfStringsPopulated = z.infer<typeof UnregisteredSettingArrayOfStringsPopulatedSchema>;
+
+export const UnregisteredSettingArrayOfObjectIdsPopulatedSchema = UnregisteredSettingBasePopulatedSchema.extend({
+	value: z.array(z.string()),
+	data_type: z.literal(SettingDataType.ARRAY_OF_OBJECT_IDS),
+});
+export type UnregisteredSettingArrayOfObjectIdsPopulated = z.infer<typeof UnregisteredSettingArrayOfObjectIdsPopulatedSchema>;
+
 export const UnregisteredSettingPopulatedSchema = z.discriminatedUnion('data_type', [
 	UnregisteredSettingImagePopulatedSchema,
 	UnregisteredSettingBooleanPopulatedSchema,
@@ -118,6 +146,8 @@ export const UnregisteredSettingPopulatedSchema = z.discriminatedUnion('data_typ
 	UnregisteredSettingNumberPopulatedSchema,
 	UnregisteredSettingObjectIdPopulatedSchema,
 	UnregisteredSettingDatePopulatedSchema,
+	UnregisteredSettingArrayOfStringsPopulatedSchema,
+	UnregisteredSettingArrayOfObjectIdsPopulatedSchema,
 ]);
 
 export type UnregisteredSettingPopulated<T = SettingDataType> = 
@@ -127,6 +157,8 @@ export type UnregisteredSettingPopulated<T = SettingDataType> =
 	: T extends SettingDataType.OBJECT_ID ? UnregisteredSettingObjectIdPopulated
 	: T extends SettingDataType.DATE ? UnregisteredSettingDatePopulated
 	: T extends SettingDataType.IMAGE ? UnregisteredSettingImagePopulated
+	: T extends SettingDataType.ARRAY_OF_STRINGS ? UnregisteredSettingArrayOfStringsPopulated
+	: T extends SettingDataType.ARRAY_OF_OBJECT_IDS ? UnregisteredSettingArrayOfObjectIdsPopulated
 	: z.infer<typeof UnregisteredSettingPopulatedSchema>;
 
 export type UpdateUnregisteredSettingPopulated<T = SettingDataType> =
@@ -136,4 +168,6 @@ export type UpdateUnregisteredSettingPopulated<T = SettingDataType> =
 	: T extends SettingDataType.OBJECT_ID ? UnregisteredSettingObjectIdPopulated
 	: T extends SettingDataType.DATE ? UnregisteredSettingDatePopulated
 	: T extends SettingDataType.IMAGE ? UnregisteredSettingImagePopulated
+	: T extends SettingDataType.ARRAY_OF_STRINGS ? UnregisteredSettingArrayOfStringsPopulated
+	: T extends SettingDataType.ARRAY_OF_OBJECT_IDS ? UnregisteredSettingArrayOfObjectIdsPopulated
 	: z.infer<typeof UnregisteredSettingPopulatedSchema>;
