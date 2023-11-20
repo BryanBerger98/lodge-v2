@@ -8,6 +8,7 @@ export const SETTING_NAME_TYPE = {
 	[ SettingName.SHARE_WITH_ADMIN_USERS_LIST ]: SettingDataType.ARRAY_OF_OBJECT_IDS,
 	[ SettingName.OWNER ]: SettingDataType.OBJECT_ID,
 	[ SettingName.NEW_USERS_SIGNUP ]: SettingDataType.BOOLEAN,
+	[ SettingName.DEFAULT_USER_ROLE ]: SettingDataType.STRING,
 	[ SettingName.USER_VERIFY_EMAIL ]: SettingDataType.BOOLEAN,
 	[ SettingName.USER_ACCOUNT_DELETION ]: SettingDataType.BOOLEAN,
 	[ SettingName.PASSWORD_UPPERCASE_MIN ]: SettingDataType.NUMBER,

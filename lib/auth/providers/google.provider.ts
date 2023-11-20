@@ -1,11 +1,15 @@
 import Google, { GoogleProfile } from 'next-auth/providers/google';
 
 import { createFile } from '@/database/file/file.repository';
+import { findSettingByName } from '@/database/setting/setting.repository';
 import { findPopulatedUserByEmail } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
 import { AuthenticationProvider } from '@/schemas/authentication-provider';
 import { MimeType } from '@/schemas/file/mime-type.schema';
 import { Role } from '@/schemas/role.schema';
+import { SettingName } from '@/schemas/setting';
+import { buildApiError } from '@/utils/api/error';
+import { StatusCode } from '@/utils/api/http-status';
 
 const GoogleProvider = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET ?
 	Google({
@@ -19,6 +23,13 @@ const GoogleProvider = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT
 
 			if (existingUser) {
 				return existingUser;
+			}
+
+			const newUserSignUpSetting = await findSettingByName(SettingName.NEW_USERS_SIGNUP);
+			const defaultUserRoleSetting = await findSettingByName(SettingName.DEFAULT_USER_ROLE);
+		
+			if ((newUserSignUpSetting && !newUserSignUpSetting.value) || (defaultUserRoleSetting && !defaultUserRoleSetting.value)) {
+				throw buildApiError({ status: StatusCode.FORBIDDEN });
 			}
 
 			const file = await createFile({
@@ -40,7 +51,7 @@ const GoogleProvider = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT
 				first_name: profile.given_name,
 				last_name: profile.family_name,
 				photo: file,
-				role: Role.USER,
+				role: defaultUserRoleSetting?.value ? (defaultUserRoleSetting.value as Role) : Role.USER,
 				provider_data: AuthenticationProvider.GOOGLE,
 				is_disabled: false,
 				has_email_verified: profile.email_verified,

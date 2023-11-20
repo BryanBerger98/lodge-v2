@@ -23,8 +23,9 @@ export const POST = routeHandler(async (request) => {
 	await connectToDatabase();
 
 	const newUserSignUpSetting = await findSettingByName(SettingName.NEW_USERS_SIGNUP);
+	const defaultUserRoleSetting = await findSettingByName(SettingName.DEFAULT_USER_ROLE);
 
-	if (newUserSignUpSetting && newUserSignUpSetting.data_type === 'boolean' && !newUserSignUpSetting.value) {
+	if ((newUserSignUpSetting && !newUserSignUpSetting.value) || (defaultUserRoleSetting && !defaultUserRoleSetting.value)) {
 		throw buildApiError({ status: StatusCode.FORBIDDEN });
 	}
 
@@ -64,7 +65,7 @@ export const POST = routeHandler(async (request) => {
 		password: hashedPassword,
 		has_password: true,
 		provider_data: AuthenticationProvider.EMAIL,
-		role: Role.USER,
+		role: defaultUserRoleSetting?.value ? (defaultUserRoleSetting.value as Role) : Role.USER,
 	});
 
 	if (createdUser.has_email_verified) {

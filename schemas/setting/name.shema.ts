@@ -8,6 +8,7 @@ export enum SettingName {
 
 	// -- USER SETTINGS --
 	NEW_USERS_SIGNUP = 'new_users_signup',
+	DEFAULT_USER_ROLE = 'default_user_role',
 	USER_VERIFY_EMAIL = 'user_verify_email',
 	USER_ACCOUNT_DELETION = 'user_account_deletion',
 
