@@ -1,15 +1,18 @@
 import { Loader2, Save, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import ButtonItem from '@/components/ui/Button/ButtonList/ButtonItem';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/components/ui/use-toast';
 import useCsrf from '@/context/csrf/useCsrf';
+import useSettings from '@/context/settings/useSettings';
 import useErrorToast from '@/hooks/error/useErrorToast';
 import { Role } from '@/schemas/role.schema';
 import { UnregisteredSettingStringPopulated } from '@/schemas/setting';
+import { updateSettings } from '@/services/settings.service';
 import { ApiError } from '@/utils/api/error';
 
 type DefaultAssignedRoleSettingButtonProps = {
@@ -22,8 +25,17 @@ const DefaultAssignedRoleSettingButton = ({ initialValue }: DefaultAssignedRoleS
 	const [ isDialogOpen, setIsDialogOpen ] = useState(false);
 	const [ setting, setSetting ] = useState<UnregisteredSettingStringPopulated | null>(initialValue);
 
+	const { refetchSettings } = useSettings();
 	const { csrfToken } = useCsrf();
 	const { triggerErrorToast } = useErrorToast();
+	const { toast } = useToast();
+
+	useEffect(() => {
+		if (initialValue) {
+			setSetting(initialValue);
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ initialValue ]);
 
 	const handleOpenDialog = () => setIsDialogOpen(true);
 	const handleCancel = () => {
@@ -31,7 +43,7 @@ const DefaultAssignedRoleSettingButton = ({ initialValue }: DefaultAssignedRoleS
 		setSetting(initialValue);
 	};
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (!csrfToken) {
 			triggerErrorToast({
 				title: 'Error',
@@ -39,12 +51,24 @@ const DefaultAssignedRoleSettingButton = ({ initialValue }: DefaultAssignedRoleS
 			});
 			return;
 		}
+		if (!setting) {
+			return;
+		}
 		try {
 			setIsLoading(true);
-			// const updatedUser = await updateAccount({ gender }, { csrfToken });
-			// await updateCurrentUser(updatedUser);
-			// form.reset({ gender: updatedUser.gender || Gender.UNSPECIFIED });
+			await updateSettings([
+				{
+					name: setting.name,
+					data_type: setting.data_type,
+					value: setting.value,
+				},
+			], { csrfToken });
+			await refetchSettings();
 			setIsDialogOpen(false);
+			toast({
+				title: 'Success',
+				description: 'Settings updated.',
+			});
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
 			triggerErrorToast(apiError);
@@ -73,8 +97,7 @@ const DefaultAssignedRoleSettingButton = ({ initialValue }: DefaultAssignedRoleS
 		>
 			<DialogTrigger asChild>
 				<ButtonItem
-					className="capitalize"
-					value="User"
+					value={ <span className="capitalize">{ initialValue?.value }</span> }
 					onClick={ handleOpenDialog }
 				>
 					Default assigned role
@@ -113,6 +136,7 @@ const DefaultAssignedRoleSettingButton = ({ initialValue }: DefaultAssignedRoleS
 					<Button
 						disabled={ isLoading }
 						type="button"
+						onClick={ handleSubmit }
 					>
 						{ isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="w-4 h-4" /> }
 						Save

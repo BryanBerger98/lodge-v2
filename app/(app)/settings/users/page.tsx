@@ -15,12 +15,12 @@ export const dynamic = 'force-dynamic';
 const UsersSettingsPage = async () => {
 
 	const newUserSignUpSettingData = await findSettingByName(SettingName.NEW_USERS_SIGNUP);
-	// const userVerifyEmailSettingData = await findSettingByName(SettingName.USER_VERIFY_EMAIL);
-	// const userAccountDeletionSettingData = await findSettingByName(SettingName.USER_ACCOUNT_DELETION);
+	const userVerifyEmailSettingData = await findSettingByName(SettingName.USER_VERIFY_EMAIL);
+	const userAccountDeletionSettingData = await findSettingByName(SettingName.USER_ACCOUNT_DELETION);
 
 	const newUserSignUpSetting = UnregisteredSettingBooleanPopulatedSchema.parse(newUserSignUpSettingData);
-	// const userVerifyEmailSetting = UnregisteredSettingBooleanPopulatedSchema.parse(userVerifyEmailSettingData);
-	// const userAccountDeletionSetting = UnregisteredSettingBooleanPopulatedSchema.parse(userAccountDeletionSettingData);
+	const userVerifyEmailSetting = UnregisteredSettingBooleanPopulatedSchema.parse(userVerifyEmailSettingData);
+	const userAccountDeletionSetting = UnregisteredSettingBooleanPopulatedSchema.parse(userAccountDeletionSettingData);
 
 	return (
 		<div className="w-1/2 flex flex-col gap-8 mt-0">
@@ -28,11 +28,10 @@ const UsersSettingsPage = async () => {
 			<div className="space-y-4">
 				<Paragraph variant="lead">Accounts settings</Paragraph>
 				<AllowNewUsersToSignUpSetting initialValue={ newUserSignUpSetting } />
-				<EmailVerificationSetting />
-				<AllowUsersToDeleteTheirAccountSetting />
+				<EmailVerificationSetting initialValue={ userVerifyEmailSetting } />
+				<AllowUsersToDeleteTheirAccountSetting initialValue={ userAccountDeletionSetting } />
 				<AllowUsersMultipleAccountsSetting />
 			</div>
-			{ /* <UsersSettings /> */ }
 		</div>
 	);
 };

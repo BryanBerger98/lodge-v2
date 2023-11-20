@@ -5,7 +5,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import ButtonList from '@/components/ui/Button/ButtonList';
 import ButtonItem from '@/components/ui/Button/ButtonList/ButtonItem';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import useSettings from '@/context/settings/useSettings';
 import { SettingName } from '@/schemas/setting';
 
@@ -37,63 +36,55 @@ const BrandSettingsForm = () => {
 
 	return (
 		<>
-			<Card className="w-full">
-				<CardHeader>
-					<CardTitle>Brand</CardTitle>
-					<CardDescription>Add the name and the logo of your business.</CardDescription>
-				</CardHeader>
-				<CardContent className="flex flex-col gap-4">
-					<ButtonList>
-						<ButtonItem
-							isLoading={ loading === 'pending' }
-							value={ loading === 'pending' ? '' : brandLogoSetting && brandLogoSetting.value && brandLogoSetting.value.url ? 'Update the logo' : 'Upload a logo' } 
-							onClick={ handleClickSettingButton('brand-logo') }
-						>
-							{
-								brandLogoSetting && brandLogoSetting.value?.url ?
-									<div className="w-32 h-10 relative">
-										<Image
-											alt="Brand logo"
-											className="object-contain"
-											src={ brandLogoSetting.value.url }
-											fill
-										/>
-									</div>
-									: 'Logo'
-							}
-						</ButtonItem>
-					</ButtonList>
-					<ButtonList>
-						<ButtonItem
-							isLoading={ loading === 'pending' }
-							value={ brandNameSetting?.data_type === 'string' ? brandNameSetting.value : '' }
-							onClick={ handleClickSettingButton('brand-name') }
-						>
-							Brand name
-						</ButtonItem>
-						<ButtonItem
-							isLoading={ loading === 'pending' }
-							value={
-								loading === 'pending' ? '' : brandFaviconSetting && brandFaviconSetting.value && brandFaviconSetting.value.url ?
-									(
-										<div className="w-4 h-4 relative">
-											<Image
-												alt="Brand logo"
-												className="object-contain"
-												src={ brandFaviconSetting.value.url }
-												fill
-											/>
-										</div>
-									)
-									: 'Upload a favicon'
-							}
-							onClick={ handleClickSettingButton('brand-favicon') }
-						>
-							Favicon
-						</ButtonItem>
-					</ButtonList>
-				</CardContent>
-			</Card>
+			<ButtonList>
+				<ButtonItem
+					isLoading={ loading === 'pending' }
+					value={ loading === 'pending' ? '' : brandLogoSetting && brandLogoSetting.value && brandLogoSetting.value.url ? 'Update the logo' : 'Upload a logo' } 
+					onClick={ handleClickSettingButton('brand-logo') }
+				>
+					{
+						brandLogoSetting && brandLogoSetting.value?.url ?
+							<div className="w-32 h-10 relative">
+								<Image
+									alt="Brand logo"
+									className="object-contain"
+									src={ brandLogoSetting.value.url }
+									fill
+								/>
+							</div>
+							: 'Logo'
+					}
+				</ButtonItem>
+			</ButtonList>
+			<ButtonList>
+				<ButtonItem
+					isLoading={ loading === 'pending' }
+					value={ brandNameSetting?.data_type === 'string' ? brandNameSetting.value : '' }
+					onClick={ handleClickSettingButton('brand-name') }
+				>
+					Brand name
+				</ButtonItem>
+				<ButtonItem
+					isLoading={ loading === 'pending' }
+					value={
+						loading === 'pending' ? '' : brandFaviconSetting && brandFaviconSetting.value && brandFaviconSetting.value.url ?
+							(
+								<div className="w-4 h-4 relative">
+									<Image
+										alt="Brand logo"
+										className="object-contain"
+										src={ brandFaviconSetting.value.url }
+										fill
+									/>
+								</div>
+							)
+							: 'Upload a favicon'
+					}
+					onClick={ handleClickSettingButton('brand-favicon') }
+				>
+					Favicon
+				</ButtonItem>
+			</ButtonList>
 			<BrandNameFormDialog isOpen={ isBrandNameDialogOpen } />
 			<BrandLogoFormDialog isOpen={ isBrandLogoDialogOpen } />
 			<BrandFaviconFormDialog isOpen={ isBrandFaviconDialogOpen } />

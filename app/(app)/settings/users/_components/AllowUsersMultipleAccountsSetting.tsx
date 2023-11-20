@@ -14,8 +14,10 @@ const AllowUsersMultipleAccountsSetting = () => {
 				</div>
 				<TooltipProvider delayDuration={ 100 }>
 					<Tooltip>
-						<TooltipTrigger>
-							<Switch disabled />
+						<TooltipTrigger asChild>
+							<span>
+								<Switch disabled />
+							</span>
 						</TooltipTrigger>
 						<TooltipContent>
 							Coming soon
