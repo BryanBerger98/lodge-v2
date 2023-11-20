@@ -21,6 +21,7 @@ export enum SettingName {
 	PASSWORD_UNIQUE_CHARS = 'password_unique_chars',
 
 	// SIGN UP / SIGN IN SETTINGS
+	CREDENTIALS_SIGNIN = 'credentials_signin',
 	MAGIC_LINK_SIGNIN = 'magic_link_signin',
 	GOOGLE_AUTH = 'google_auth',
 	APPLE_AUTH = 'apple_auth',

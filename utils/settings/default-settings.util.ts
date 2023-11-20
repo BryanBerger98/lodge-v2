@@ -38,6 +38,11 @@ export const DEFAULT_SETTINGS: UnregisteredSettingPopulated[] = [
 		data_type: SettingDataType.BOOLEAN,
 	},
 	{
+		name: SettingName.CREDENTIALS_SIGNIN,
+		value: true,
+		data_type: SettingDataType.BOOLEAN,
+	},
+	{
 		name: SettingName.MAGIC_LINK_SIGNIN,
 		value: true,
 		data_type: SettingDataType.BOOLEAN,

@@ -1,5 +1,5 @@
 import { SettingName, SettingDataType } from '@/schemas/setting';
-import { UnregisteredSettingPopulated } from '@/schemas/setting/unregistered-setting.schema';
+import { UnregisteredSettingBooleanPopulated, UnregisteredSettingPopulated } from '@/schemas/setting/unregistered-setting.schema';
 
 import { DEFAULT_SETTINGS } from './default-settings.util';
 
@@ -17,6 +17,7 @@ export const SETTING_NAME_TYPE = {
 	[ SettingName.PASSWORD_SYMBOLS_MIN ]: SettingDataType.NUMBER,
 	[ SettingName.PASSWORD_MIN_LENGTH ]: SettingDataType.NUMBER,
 	[ SettingName.PASSWORD_UNIQUE_CHARS ]: SettingDataType.BOOLEAN,
+	[ SettingName.CREDENTIALS_SIGNIN ]: SettingDataType.BOOLEAN,
 	[ SettingName.MAGIC_LINK_SIGNIN ]: SettingDataType.BOOLEAN,
 	[ SettingName.GOOGLE_AUTH ]: SettingDataType.BOOLEAN,
 	[ SettingName.APPLE_AUTH ]: SettingDataType.BOOLEAN,
@@ -35,6 +36,24 @@ export const SETTING_NAME_TYPE = {
 export type SettingNameTypes = typeof SETTING_NAME_TYPE;
 export type SettingNameType<T = SettingName> = T extends keyof SettingNameTypes ? SettingNameTypes[ T ] : never;
 
+export type InferUnregisteredSettingPopulatedArray<T extends ReadonlyArray<SettingName>> = {
+	[K in keyof T]: UnregisteredSettingPopulated<SettingNameType<T[K]>> | undefined;
+};
+
 export const findDefaultSettingByName = <T extends SettingName>(settingName: T): UnregisteredSettingPopulated<SettingNameType<T>> | undefined => {
 	return DEFAULT_SETTINGS.find(({ name }) => name === settingName) as UnregisteredSettingPopulated<SettingNameType<T>> | undefined;
+};
+
+export const SIGN_IN_SETTINGS_NAMES = [
+	SettingName.CREDENTIALS_SIGNIN,
+	SettingName.MAGIC_LINK_SIGNIN,
+	SettingName.GOOGLE_AUTH,
+	SettingName.APPLE_AUTH,
+];
+
+export const getListOfEnabledBooleanSettings = (...settings: (UnregisteredSettingBooleanPopulated | undefined)[]): (UnregisteredSettingBooleanPopulated | undefined)[] => settings.filter((setting) => setting?.value);
+
+export const checkIfAtLeastOneBooleanSettingIsEnabled = (...settings: (UnregisteredSettingBooleanPopulated | undefined)[]): boolean => {
+	const enabledSignInProviders = getListOfEnabledBooleanSettings(...settings).filter(setting => setting) as UnregisteredSettingBooleanPopulated[];
+	return enabledSignInProviders.length > 0;
 };
