@@ -26,6 +26,7 @@ import { useSignUp } from '../_context/useSignUp';
 type PasswordSignUpFormProps = {
 	userVerifyEmailSetting: UnregisteredSettingBooleanPopulated | null;
 	magicLinkSignUpSetting: UnregisteredSettingBooleanPopulated | null;
+	credentialsSignInSetting: UnregisteredSettingBooleanPopulated | null;
 	passwordRules: {
 		uppercase_min: number;
 		lowercase_min: number;
@@ -36,7 +37,7 @@ type PasswordSignUpFormProps = {
 	};
 };
 
-const PasswordSignUpForm = ({ userVerifyEmailSetting, magicLinkSignUpSetting, passwordRules }: PasswordSignUpFormProps) => {
+const PasswordSignUpForm = ({ userVerifyEmailSetting, magicLinkSignUpSetting, credentialsSignInSetting, passwordRules }: PasswordSignUpFormProps) => {
 
 	const { isLoading, step, setStep, email, setIsLoading, setError } = useSignUp();
 	const { csrfToken } = useCsrf();
@@ -75,6 +76,10 @@ const PasswordSignUpForm = ({ userVerifyEmailSetting, magicLinkSignUpSetting, pa
 		};
 		setIsLoading(true);
 		setError(null);
+		if (credentialsSignInSetting && !credentialsSignInSetting.value) {
+			setError('Wrong authentication method.');
+			return;
+		}
 		await signUpUser({
 			email,
 			password: form.getValues('password'),
@@ -151,7 +156,7 @@ const PasswordSignUpForm = ({ userVerifyEmailSetting, magicLinkSignUpSetting, pa
 				</CardHeader>
 				<CardContent>
 					{
-						magicLinkSignUpSetting && magicLinkSignUpSetting.data_type === 'boolean' && magicLinkSignUpSetting.value ?
+						magicLinkSignUpSetting && magicLinkSignUpSetting.value ?
 							<div className="flex flex-col gap-4">
 								<Button
 									className="gap-2 w-full"
@@ -162,62 +167,76 @@ const PasswordSignUpForm = ({ userVerifyEmailSetting, magicLinkSignUpSetting, pa
 									{ isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 size="16" /> }
 									Sign up with magic link
 								</Button>
-								<div className="flex gap-4 items-center justify-center w-full mb-2">
-									<Separator
-										className="flex-1"
-										orientation="horizontal"
-									/>
-									<p className="text-sm text-slate-500 m-0">OR</p>
-									<Separator
-										className="flex-1"
-										orientation="horizontal"
-									/>
-								</div>
+								{
+									credentialsSignInSetting && credentialsSignInSetting.value ? 
+										<div className="flex gap-4 items-center justify-center w-full mb-2">
+											<Separator
+												className="flex-1"
+												orientation="horizontal"
+											/>
+											<p className="text-sm text-slate-500 m-0">OR</p>
+											<Separator
+												className="flex-1"
+												orientation="horizontal"
+											/>
+										</div>
+										: null
+								}
 							</div>
 							: null
 					}
-					<FormField
-						control={ form.control }
-						name="password"
-						render={ ({ field }) => (
-							<FormItem className="mb-4">
-								<FormLabel>Password</FormLabel>
-								<FormControl>
-									<Input
-										type="password"
-										{ ...field }
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						) }
-					/>
-					<FormField
-						control={ form.control }
-						name="passwordConfirm"
-						render={ ({ field }) => (
-							<FormItem>
-								<FormLabel>Confirm password</FormLabel>
-								<FormControl>
-									<Input
-										type="password"
-										{ ...field }
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						) }
-					/>
+					{
+						credentialsSignInSetting && credentialsSignInSetting.value ?
+							<>
+								<FormField
+									control={ form.control }
+									name="password"
+									render={ ({ field }) => (
+										<FormItem className="mb-4">
+											<FormLabel>Password</FormLabel>
+											<FormControl>
+												<Input
+													type="password"
+													{ ...field }
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									) }
+								/>
+								<FormField
+									control={ form.control }
+									name="passwordConfirm"
+									render={ ({ field }) => (
+										<FormItem>
+											<FormLabel>Confirm password</FormLabel>
+											<FormControl>
+												<Input
+													type="password"
+													{ ...field }
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									) }
+								/>
+							</>
+							: null
+					}
 				</CardContent>
 				<CardFooter className="flex-col gap-4">
-					<Button
-						className="gap-2"
-						disabled={ isLoading }
-						type="submit"
-					>
-						{ isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn size="16" /> }
-						Sign up
-					</Button>
+					{
+						credentialsSignInSetting && credentialsSignInSetting.value ?
+							<Button
+								className="gap-2"
+								disabled={ isLoading }
+								type="submit"
+							>
+								{ isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn size="16" /> }
+								Sign up
+							</Button>
+							: null
+					}
 					<Separator orientation="horizontal" />
 					<div className="flex w-full justify-between">
 						<Button

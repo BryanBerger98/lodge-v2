@@ -40,6 +40,8 @@ const SignUpPage = async () => {
 
 	const magicLinkSignInSettingData = await findSettingByName(SettingName.MAGIC_LINK_SIGNIN);
 	const magicLinkSignInSetting = UnregisteredSettingBooleanPopulatedSchema.parse(magicLinkSignInSettingData);
+	const credentialsSignInSettingData = await findSettingByName(SettingName.CREDENTIALS_SIGNIN);
+	const credentialsSignInSetting = UnregisteredSettingBooleanPopulatedSchema.parse(credentialsSignInSettingData);
 
 	const passwordLowercaseMinSettingData = await findSettingByName(SettingName.PASSWORD_LOWERCASE_MIN);
 	const passwordLowercaseMinSetting = UnregisteredSettingNumberPopulatedSchema.parse(passwordLowercaseMinSettingData);
@@ -69,6 +71,7 @@ const SignUpPage = async () => {
 							googleAuthSetting={ googleAuthSetting }
 						/>
 						<PasswordSignUpForm
+							credentialsSignInSetting={ credentialsSignInSetting }
 							magicLinkSignUpSetting={ magicLinkSignInSetting }
 							passwordRules={ {
 								uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,
