@@ -2,6 +2,7 @@ import { parse } from 'url';
 
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getEnabledSignInProvidersSettings } from '@/app/_utils/settings/get-enabled-sign-in-providers-settings';
 import { hasSettingsAccess } from '@/app/_utils/settings/has-settings-access';
 import { findSettings, updateSetting } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
@@ -11,6 +12,7 @@ import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
 import { StatusCode } from '@/utils/api/http-status';
 import { setServerAuthGuard } from '@/utils/auth';
+import { SIGN_IN_SETTINGS_NAMES } from '@/utils/settings';
 
 import { FetchSettingsSchema } from './_schemas/fetch-settings.schema';
 import { UpdateSettingsSchema } from './_schemas/update-settings.schema';
@@ -35,7 +37,18 @@ export const PUT = routeHandler(async (request: NextRequest) => {
 	}
 
 	const settingsToUpdate = settings.filter(setting => setting.name !== SettingName.OWNER && setting.name !== SettingName.SHARE_WITH_ADMIN);
-		
+
+	const enabledSignInProvidersSettings = await getEnabledSignInProvidersSettings();
+
+	const falsySignInProvidersSettingsToUpdate = settingsToUpdate.filter(setting => SIGN_IN_SETTINGS_NAMES.includes(setting.name) && setting.value === false);
+
+	if (enabledSignInProvidersSettings.length <= 1 && falsySignInProvidersSettingsToUpdate.length >= 1) {
+		throw buildApiError({
+			status: StatusCode.UNPROCESSABLE_ENTITY,
+			message: 'At least one sign in provider must be enabled.', 
+		});
+	}
+	
 	for (const setting of settingsToUpdate) {
 		await updateSetting({
 			...setting,

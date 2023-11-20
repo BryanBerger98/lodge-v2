@@ -29,6 +29,8 @@ const SignInPage = async () => {
 	const userVerifyEmailSetting = UnregisteredSettingBooleanPopulatedSchema.parse(userVerifyEmailSettingData);
 	const magicLinkSignInSettingData = await findSettingByName(SettingName.MAGIC_LINK_SIGNIN);
 	const magicLinkSignInSetting = UnregisteredSettingBooleanPopulatedSchema.parse(magicLinkSignInSettingData);
+	const credentialsSignInSettingData = await findSettingByName(SettingName.CREDENTIALS_SIGNIN);
+	const credentialsSignInSetting = UnregisteredSettingBooleanPopulatedSchema.parse(credentialsSignInSettingData);
 
 	const googleAuthSettingData = await findSettingByName(SettingName.GOOGLE_AUTH);
 	const googleAuthSetting = UnregisteredSettingBooleanPopulatedSchema.parse(googleAuthSettingData);
@@ -45,6 +47,7 @@ const SignInPage = async () => {
 						newUserSignUpSetting={ newUserSignUpSetting }
 					/>
 					<PasswordSignInForm
+						credentialsSignInSetting={ credentialsSignInSetting }
 						magicLinkSignInSetting={ magicLinkSignInSetting }
 						userVerifyEmailSetting={ userVerifyEmailSetting }
 					/>

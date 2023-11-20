@@ -19,13 +19,13 @@ import { UnregisteredSettingBooleanPopulated } from '@/schemas/setting';
 import { SignInStep } from '../_context';
 import { useSignIn } from '../_context/useSignIn';
 
-
 type PasswordSignInFormProps = {
 	userVerifyEmailSetting: UnregisteredSettingBooleanPopulated | null;
 	magicLinkSignInSetting: UnregisteredSettingBooleanPopulated | null;
+	credentialsSignInSetting: UnregisteredSettingBooleanPopulated | null;
 };
 
-const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: PasswordSignInFormProps) => {
+const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting, credentialsSignInSetting }: PasswordSignInFormProps) => {
 
 	const { isLoading, step, setStep, email, setIsLoading, setError } = useSignIn();
 
@@ -46,6 +46,10 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 	const handleSubmitEmailSignInForm = () => {
 		setIsLoading(true);
 		setError(null);
+		if (credentialsSignInSetting && !credentialsSignInSetting.value) {
+			setError('Wrong authentication method.');
+			return;
+		}
 		signIn('credentials', {
 			redirect: false,
 			email,
@@ -55,7 +59,7 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 				if (data?.error) {
 					setError('Incorrect credentials.');
 				} else {
-					if (!userVerifyEmailSetting || (userVerifyEmailSetting && userVerifyEmailSetting.data_type === 'boolean' && userVerifyEmailSetting.value)) {
+					if (!userVerifyEmailSetting || (userVerifyEmailSetting && userVerifyEmailSetting.value)) {
 						if (verificationToken) {
 							router.replace(`/verify-email/${ verificationToken }`);
 						} else {
@@ -76,7 +80,7 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 	};
 
 	const handleSendSignInMagicLink = () => {
-		if (!magicLinkSignInSetting || magicLinkSignInSetting.data_type !== 'boolean' || !magicLinkSignInSetting.value) {
+		if (!magicLinkSignInSetting || !magicLinkSignInSetting.value) {
 			return;
 		}
 		setIsLoading(true);
@@ -118,7 +122,7 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 				</CardHeader>
 				<CardContent>
 					{
-						magicLinkSignInSetting && magicLinkSignInSetting.data_type === 'boolean' && magicLinkSignInSetting.value ?
+						magicLinkSignInSetting && magicLinkSignInSetting.value ?
 							<div className="flex flex-col gap-4">
 								<Button
 									className="gap-2 w-full"
@@ -129,46 +133,58 @@ const PasswordSignInForm = ({ userVerifyEmailSetting, magicLinkSignInSetting }: 
 									{ isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 size="16" /> }
 									Sign in with magic link
 								</Button>
-								<div className="flex gap-4 items-center justify-center w-full mb-2">
-									<Separator
-										className="flex-1"
-										orientation="horizontal"
-									/>
-									<p className="text-sm text-slate-500 m-0">OR</p>
-									<Separator
-										className="flex-1"
-										orientation="horizontal"
-									/>
-								</div>
+								{
+									credentialsSignInSetting && credentialsSignInSetting.value ?
+										<div className="flex gap-4 items-center justify-center w-full mb-2">
+											<Separator
+												className="flex-1"
+												orientation="horizontal"
+											/>
+											<p className="text-sm text-slate-500 m-0">OR</p>
+											<Separator
+												className="flex-1"
+												orientation="horizontal"
+											/>
+										</div>
+										: null
+								}
 							</div>
 							: null
 					}
-					<FormField
-						control={ form.control }
-						name="password"
-						render={ ({ field }) => (
-							<FormItem>
-								<FormLabel>Password</FormLabel>
-								<FormControl>
-									<Input
-										type="password"
-										{ ...field }
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						) }
-					/>
+					{
+						credentialsSignInSetting && credentialsSignInSetting.value ?
+							<FormField
+								control={ form.control }
+								name="password"
+								render={ ({ field }) => (
+									<FormItem>
+										<FormLabel>Password</FormLabel>
+										<FormControl>
+											<Input
+												type="password"
+												{ ...field }
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								) }
+							/>
+							: null
+					}
 				</CardContent>
 				<CardFooter className="flex-col gap-4">
-					<Button
-						className="gap-2"
-						disabled={ isLoading }
-						type="submit"
-					>
-						{ isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn size="16" /> }
-						Sign in
-					</Button>
+					{
+						!credentialsSignInSetting || credentialsSignInSetting.value ?
+							<Button
+								className="gap-2"
+								disabled={ isLoading }
+								type="submit"
+							>
+								{ isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn size="16" /> }
+								Sign in
+							</Button>
+							: null
+					}
 					<Separator orientation="horizontal" />
 					<div className="flex w-full justify-between">
 						<Button

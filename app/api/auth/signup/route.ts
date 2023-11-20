@@ -24,8 +24,9 @@ export const POST = routeHandler(async (request) => {
 
 	const newUserSignUpSetting = await findSettingByName(SettingName.NEW_USERS_SIGNUP);
 	const defaultUserRoleSetting = await findSettingByName(SettingName.DEFAULT_USER_ROLE);
+	const credentialsSignInSetting = await findSettingByName(SettingName.CREDENTIALS_SIGNIN);
 
-	if ((newUserSignUpSetting && !newUserSignUpSetting.value) || (defaultUserRoleSetting && !defaultUserRoleSetting.value)) {
+	if ((newUserSignUpSetting && !newUserSignUpSetting.value) || (defaultUserRoleSetting && !defaultUserRoleSetting.value) || (credentialsSignInSetting && !credentialsSignInSetting.value)) {
 		throw buildApiError({ status: StatusCode.FORBIDDEN });
 	}
 

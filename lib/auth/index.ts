@@ -71,7 +71,10 @@ const authOptions: NextAuthOptions = {
 				const userExists = await findUserByEmail(user.email);
 
 				if (account?.provider === 'credentials' && userExists) {
-					return true;
+					const credentialsSignInSetting = await findSettingByName(SettingName.CREDENTIALS_SIGNIN);
+					if (credentialsSignInSetting && !credentialsSignInSetting.value) {
+						throw buildApiError({ status: StatusCode.FORBIDDEN });
+					}
 				}
 
 				if (account?.provider === 'email') {
@@ -103,6 +106,10 @@ const authOptions: NextAuthOptions = {
 				}
 
 				if (account?.provider === 'google' && profile?.email) {
+					const googleAuthSetting = await findSettingByName(SettingName.GOOGLE_AUTH);
+					if (googleAuthSetting && !googleAuthSetting.value) {
+						throw buildApiError({ status: StatusCode.FORBIDDEN });
+					}
 					const googleUserExists = await findUserByEmail(profile.email);
 					if (googleUserExists?.provider_data === 'google') {
 						return true;
