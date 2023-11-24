@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
@@ -5,8 +6,7 @@ import { getServerSession } from 'next-auth';
 import authOptions from '@/lib/auth';
 import { getCsrfToken } from '@/lib/csrf';
 
-import ConfirmEmailCard from '../_components/ConfirmEmailCard';
-
+const ConfirmEmailCard = dynamic(() => import('../_components/ConfirmEmailCard'));
 
 type ConfirmEmailPageProps = {
 	params: {

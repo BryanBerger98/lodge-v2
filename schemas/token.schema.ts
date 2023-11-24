@@ -3,6 +3,7 @@ import { z } from 'zod';
 export enum TokenAction {
 	RESET_PASSWORD = 'reset_password',
 	EMAIL_VERIFICATION = 'email_verification',
+	NEW_EMAIL_CONFIRMATION = 'new_email_confirmation',
 };
 
 export const TokenSchema = z.object({

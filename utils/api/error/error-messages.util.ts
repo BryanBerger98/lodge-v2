@@ -22,6 +22,10 @@ export const errorMessages: Partial<Record<(ApiErrorCode | StatusCode), { en: st
 		en: 'This user already exists.',
 		fr: 'Cet utilisateur est déjà enregistré.',
 	},
+	[ ApiErrorCode.EMAIL_ALREADY_EXISTS ]: {
+		en: 'This email address is already registered.',
+		fr: 'Cette adresse email est déjà enregistrée.',
+	},
 	[ ApiErrorCode.MISSING_CREDENTIALS ]: {
 		en: 'Credentials are missing.',
 		fr: 'Identifiants manquants.',

@@ -7,15 +7,19 @@ import { IconProps } from './icons.type';
 const AuthProviderIcon = ({ size, authProvider, ...rest }: IconProps & { authProvider: AuthenticationProvider }) => {
 	switch (authProvider) {
 		case AuthenticationProvider.GOOGLE:
-			return (<GoogleIcon
-				size={ size }
-				{ ...rest }
-			        />);
+			return (
+				<GoogleIcon
+					size={ size }
+					{ ...rest }
+				/>
+			);
 		case AuthenticationProvider.APPLE:
-			return (<AppleIcon
-				size={ size }
-				{ ...rest }
-			        />);
+			return (
+				<AppleIcon
+					size={ size }
+					{ ...rest }
+				/>)
+			;
 		default:
 			return null;
 	};

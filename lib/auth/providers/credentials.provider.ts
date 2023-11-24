@@ -68,7 +68,7 @@ const CredentialsProvider = Credentials({
 				id: user.id,
 				updated_by: user.id,
 				last_login_date: new Date(), 
-			}, { newDocument: true });
+			});
 
 			const sanitizedUser: Optional<UserPopulatedWithPassword, 'password'> = updatedUser ? updatedUser : user;
 

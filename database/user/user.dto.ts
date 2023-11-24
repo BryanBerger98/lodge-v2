@@ -26,6 +26,7 @@ const UpdateUserDTOSchema = z.object({
 	id: z.string().min(1, 'Cannot be empty.'),
 	username: z.string().optional().nullable(),
 	email: z.string().email().min(1, 'Cannot be empty.').optional(),
+	new_email: z.string().email().nullable().optional(),
 	phone_number: z.string().optional(),
 	role: z.nativeEnum(Role).optional(),
 	is_disabled: z.boolean().optional(),

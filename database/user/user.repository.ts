@@ -1,7 +1,7 @@
 import { AnyBulkWriteOperation } from 'mongodb';
 import { FilterQuery } from 'mongoose';
 
-import { newId, UpdateQueryOptions, QueryOptions } from '@/lib/database';
+import { newId, QueryOptions } from '@/lib/database';
 import clientPromise from '@/lib/mongodb';
 import { User, UserWithPassword } from '@/schemas/user';
 import { UserPopulated, UserPopulatedWithPassword } from '@/schemas/user/populated.schema';
@@ -106,14 +106,14 @@ export const createUser = async (userData: CreateUserDTO): Promise<UserPopulated
 	}
 };
 
-export const updateUser = async (userToUpdate: UpdateUserDTO, options?: UpdateQueryOptions): Promise<UserPopulated | null> => {
+export const updateUser = async (userToUpdate: UpdateUserDTO): Promise<UserPopulated | null> => {
 	try {
 		await UserModel.findByIdAndUpdate(newId(userToUpdate.id), {
 			$set: {
 				...userToUpdate,
 				photo: userToUpdate.photo ? newId(userToUpdate.photo) : undefined, 
 			}, 
-		}, { new: options?.newDocument || false });
+		}, { new: true });
 		const document = await UserModel.findById(newId(userToUpdate.id), { password: 0 }).populate(populateUser);
 		if (!document) return null;
 		return document.toJSON();

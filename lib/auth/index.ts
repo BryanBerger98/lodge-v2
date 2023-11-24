@@ -75,6 +75,7 @@ const authOptions: NextAuthOptions = {
 					if (credentialsSignInSetting && !credentialsSignInSetting.value) {
 						throw buildApiError({ status: StatusCode.FORBIDDEN });
 					}
+					return true;
 				}
 
 				if (account?.provider === 'email') {

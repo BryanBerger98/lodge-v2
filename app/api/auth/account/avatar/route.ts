@@ -76,7 +76,7 @@ export const PUT = routeHandler(async (request) => {
 		id: currentUser.id,
 		photo: savedFile?.id,
 		updated_by: currentUser.id,
-	}, { newDocument: true });
+	});
 
 	return NextResponse.json(updatedCurrentUser);
 });
