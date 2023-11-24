@@ -46,7 +46,7 @@ export const PUT = routeHandler(async (request) => {
 		id: currentUser.id,
 		updated_by: currentUser.id,
 		...values,
-	}, { newDocument: true });
+	});
 
 	return NextResponse.json(updatedUser);
 });

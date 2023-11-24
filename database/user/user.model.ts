@@ -27,6 +27,12 @@ const userSchema = new Schema<IUserWithPasswordDocument>({
 		type: Boolean,
 		default: false,
 	},
+	new_email: {
+		type: String,
+		default: null,
+		trim: true,
+		lowercase: true,
+	},
 	role: {
 		type: String,
 		enum: Role,

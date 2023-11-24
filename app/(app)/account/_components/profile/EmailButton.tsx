@@ -21,6 +21,8 @@ import { AuthenticationProvider } from '@/schemas/authentication-provider';
 import { updateUserEmail } from '@/services/auth.service';
 import { ApiError } from '@/utils/api/error';
 
+import AskForEmailUpdateConfirmationModal from './AskForEmailUpdateConfirmationModal';
+
 const EmailFormSchema = z.object({
 	email: z.string().email().min(1, 'Required.'),
 	password: z.string().min(1, 'Required.'),
@@ -32,6 +34,7 @@ export const EmailButton = () => {
 
 	const [ isLoading, setIsLoading ] = useState(false);
 	const [ isDialogOpen, setIsDialogOpen ] = useState(false);
+	const [ isAskFormEmailConfirmationModalOpen, setIsAskFormEmailConfirmationModalOpen ] = useState(false);
 
 	const { currentUser, updateCurrentUser } = useAuth();
 	const { csrfToken } = useCsrf();
@@ -73,6 +76,7 @@ export const EmailButton = () => {
 				password: '', 
 			});
 			setIsDialogOpen(false);
+			setIsAskFormEmailConfirmationModalOpen(true);
 		} catch (error) {
 			const apiError = error as ApiError<unknown>;
 			triggerErrorToast(apiError, form);
@@ -97,10 +101,12 @@ export const EmailButton = () => {
 					<ButtonItem
 						disabled={ currentUser?.provider_data !== AuthenticationProvider.EMAIL }
 						rightIcon={
-							<AuthProviderIcon
-								authProvider={ currentUser?.provider_data || AuthenticationProvider.EMAIL }
-								size="16"
-							/>
+							currentUser?.provider_data !== AuthenticationProvider.EMAIL ?
+								<AuthProviderIcon
+									authProvider={ currentUser?.provider_data || AuthenticationProvider.EMAIL }
+									size="16"
+								/>
+								: undefined
 						}
 						value={ currentUser?.email }
 						onClick={ handleOpenDialog }
@@ -182,6 +188,10 @@ export const EmailButton = () => {
 					</Form>
 				</DialogContent>
 			</Dialog>
+			<AskForEmailUpdateConfirmationModal
+				isOpen={ isAskFormEmailConfirmationModalOpen }
+				onOpenChange={ setIsAskFormEmailConfirmationModalOpen }
+			/>
 		</>
 	);
 };

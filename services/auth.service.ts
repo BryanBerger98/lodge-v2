@@ -53,13 +53,13 @@ export const sendEmailVerificationToken = async (options: FetcherOptionsWithCsrf
 	}
 };
 
-export const verifyUserEmail = async (token: string, csrfToken: string): Promise<UserPopulated> => {
+export const verifyUserEmail = async (token: string, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/verify-email', {
 			method: 'PUT',
 			body: JSON.stringify({ token }), 
 			headers: { 'Content-Type': 'application/json' },
-			csrfToken,
+			...options,
 		});
 		return UserPopulatedSchema.parse(data);
 	} catch (error) {
@@ -132,11 +132,25 @@ export const updateUserPassword = async ({ password, newPassword }: { password: 
 export const updateUserEmail = async ({ email, password }: { email: string, password: string }, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account/email', {
-			method: 'PUT',
+			method: 'POST',
 			body: JSON.stringify({
 				email,
 				password, 
 			}),
+			headers: { 'Content-Type': 'application/json' },
+			...options,
+		});
+		return UserPopulatedSchema.parse(data);
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const confirmNewUserEmail = async (token: string, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
+	try {
+		const data = await fetcher('/api/auth/account/email', {
+			method: 'PUT',
+			body: JSON.stringify({ token }), 
 			headers: { 'Content-Type': 'application/json' },
 			...options,
 		});

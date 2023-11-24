@@ -7,6 +7,7 @@ import { UserPopulated } from '@/schemas/user/populated.schema';
 
 import EmailVerification from './templates/EmailVerification';
 import MagicLinkSignIn from './templates/MagicLinkSignIn';
+import NewEmailConfirmation from './templates/NewEmailConfirmation';
 import ResetPassword from './templates/ResetPassword';
 
 const appName = process.env.NEXT_PUBLIC_APP_NAME;
@@ -70,6 +71,25 @@ export const sendResetPasswordEmail = (user: User | UserPopulated, token: Token)
 		const emailSubject = `${ appName } - Reset your password`;
 		const emailPlainText = `${ appName } - Reset your password`;
 		sendEmail(user.email, [], [], emailSubject, emailPlainText, htmlBody)
+			.then(resolve).catch(reject);
+	});
+};
+
+export const sendNewEmailConfirmationEmail = (user: User | UserPopulated, token: Token) => {
+	return new Promise((resolve, reject) => {
+		if (!user.new_email) {
+			reject(new Error('User does not have a new email address.'));
+			return;
+		}
+		const tokenLink = `${ process.env.FRONT_URL }/confirm-new-email/${ token.token }`;
+		const htmlBody = render(NewEmailConfirmation({
+			user,
+			tokenLink,
+			appName,
+		}));
+		const emailSubject = `${ appName } - Confirm your new email address`;
+		const emailPlainText = `${ appName } - Confirm your new email address`;
+		sendEmail(user.new_email, [], [], emailSubject, emailPlainText, htmlBody)
 			.then(resolve).catch(reject);
 	});
 };

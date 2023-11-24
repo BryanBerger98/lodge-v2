@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, CheckCircle2, Loader2, XCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Loader2, RefreshCcw, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import useAuth from '@/context/auth/useAuth';
-import { verifyUserEmail } from '@/services/auth.service';
+import { confirmNewUserEmail } from '@/services/auth.service';
 import { ApiError } from '@/utils/api/error';
 import { getErrorMessage } from '@/utils/api/error/error-messages.util';
 
@@ -17,7 +17,7 @@ type ConfirmEmailCardProps = {
 	verificationToken: string;
 }
 
-const ConfirmEmailCard = ({ csrfToken, verificationToken }: ConfirmEmailCardProps) => {
+const ConfirmNewEmailCard = ({ csrfToken, verificationToken }: ConfirmEmailCardProps) => {
 
 	const [ isLoading, setIsLoading ] = useState(true);
 	const [ error, setError ] = useState('');
@@ -29,14 +29,15 @@ const ConfirmEmailCard = ({ csrfToken, verificationToken }: ConfirmEmailCardProp
 	useEffect(() => {
 		if (currentUser) {
 			setIsLoading(true);
-			verifyUserEmail(verificationToken, { csrfToken })
-				.then(({ has_email_verified }) => {
+			confirmNewUserEmail(verificationToken, { csrfToken })
+				.then(({ email, new_email }) => {
 					updateCurrentUser({
 						...currentUser,
-						has_email_verified,
+						email,
+						new_email: new_email || null,
 					})
 						.catch(console.error)
-						.finally(() => {
+						.then(() => {
 							router.replace('/');
 						});
 				})
@@ -53,9 +54,9 @@ const ConfirmEmailCard = ({ csrfToken, verificationToken }: ConfirmEmailCardProp
 	return (
 		<Card className="lg:min-w-[420px]">
 			<CardHeader>
-				<CardTitle>Email verification</CardTitle>
+				<CardTitle>New email confirmation</CardTitle>
 				<CardDescription>
-					Check your inbox to confirm your email address.
+					Your new email address is being confirmed.
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
@@ -67,7 +68,7 @@ const ConfirmEmailCard = ({ csrfToken, verificationToken }: ConfirmEmailCardProp
 								className="animate-spin"
 								size="32"
 							/>
-							<p>We are verifying your email...</p>
+							<p>We are updating your email...</p>
 						</div> : null
 				}
 
@@ -89,7 +90,7 @@ const ConfirmEmailCard = ({ csrfToken, verificationToken }: ConfirmEmailCardProp
 								className="text-green-500"
 								size="32"
 							/>
-							<p className="text-green-500">Your email was successfully verified.</p>
+							<p className="text-green-500">Your email has been successfully updated.</p>
 						</div> : null
 				}
 			</CardContent>
@@ -102,7 +103,7 @@ const ConfirmEmailCard = ({ csrfToken, verificationToken }: ConfirmEmailCardProp
 									className="gap-2"
 									type="button"
 								>
-									Go back to the app <ArrowRight />
+									Go back to the app <ArrowRight className="h-4 w-4" />
 								</Button> : null
 						}
 						{
@@ -113,7 +114,7 @@ const ConfirmEmailCard = ({ csrfToken, verificationToken }: ConfirmEmailCardProp
 									asChild
 								>
 									<Link href="/verify-email">
-										Try verifying my email again <ArrowRight />
+										<RefreshCcw className="h-4 w-4"/> Try confirming my new email again
 									</Link>
 								</Button> : null
 						}
@@ -123,4 +124,4 @@ const ConfirmEmailCard = ({ csrfToken, verificationToken }: ConfirmEmailCardProp
 	);
 };
 
-export default ConfirmEmailCard;
+export default ConfirmNewEmailCard;

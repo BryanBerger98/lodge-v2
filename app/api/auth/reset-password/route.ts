@@ -4,7 +4,6 @@ import { object, string } from 'zod';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { createToken, deleteTokenById, getTokenFromTargetId, getTokenFromTokenString } from '@/database/token/token.repository';
 import { findUserByEmail, findUserById, updateUserPassword } from '@/database/user/user.repository';
-import { connectToDatabase } from '@/lib/database';
 import { generateToken, verifyToken } from '@/lib/jwt';
 import { SettingName } from '@/schemas/setting';
 import { Token, TokenAction } from '@/schemas/token.schema';
@@ -17,7 +16,6 @@ import { sendResetPasswordEmail } from '@/utils/email';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules, hashPassword } from '@/utils/password.util';
 
 export const POST = routeHandler(async (request) => {
-	await connectToDatabase();
 
 	const emailSchema = object({ email: string().email('Please, provide a valid email address.').min(1, 'Required.') });
 
@@ -73,8 +71,6 @@ export const POST = routeHandler(async (request) => {
 
 export const PUT = routeHandler(async (request) => {
 
-	await connectToDatabase();
-
 	const passwordLowercaseMinSetting = await findSettingByName(SettingName.PASSWORD_LOWERCASE_MIN);
 	const passwordUppercaseMinSetting = await findSettingByName(SettingName.PASSWORD_UPPERCASE_MIN);
 	const passwordNumbersMinSetting = await findSettingByName(SettingName.PASSWORD_NUMBERS_MIN);
@@ -129,6 +125,6 @@ export const PUT = routeHandler(async (request) => {
 
 	const hashedPassword = await hashPassword(password);
 	await updateUserPassword(userData.id, hashedPassword, userData.id);
-		
+
 	return NextResponse.json({ message: 'Updated.' });
 });

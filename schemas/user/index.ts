@@ -8,6 +8,7 @@ import { GenderSchema } from './gender.schema';
 export const UserSchema = z.object({
 	id: z.coerce.string().min(1, 'Cannot be empty.'),
 	email: z.coerce.string().email().min(1, 'Cannot be empty.'),
+	new_email: z.coerce.string().email().nullable().optional(),
 	has_email_verified: z.coerce.boolean(),
 	first_name: z.coerce.string().nullable().optional(),
 	last_name: z.coerce.string().nullable().optional(),

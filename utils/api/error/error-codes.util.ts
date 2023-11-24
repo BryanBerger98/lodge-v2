@@ -2,6 +2,7 @@ export enum ApiErrorCode {
 	USER_NOT_FOUND = 'user-not-found',
 	USER_UNEDITABLE = 'user-uneditable',
 	USER_ALREADY_EXISTS = 'user-already-exists',
+	EMAIL_ALREADY_EXISTS = 'email-already-exists',
 	MISSING_CREDENTIALS = 'missing-credentials',
 	WRONG_AUTH_METHOD = 'wrong-auth-method',
 	ACCOUNT_DISABLED = 'account-disabled',
