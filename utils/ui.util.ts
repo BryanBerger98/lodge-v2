@@ -1,8 +1,15 @@
 import { type ClassValue, clsx } from 'clsx';
+import { Children, ReactNode, isValidElement } from 'react';
 import { twMerge } from 'tailwind-merge';
  
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
+}
+
+export function getValidChildren(children: ReactNode) {
+	return Children
+		.toArray(children)
+		.filter((child) => isValidElement(child)) as React.ReactElement[];
 }
 
 export type ScreenType = 'mobile' | 'tablet' | 'laptop' | 'desktop';
