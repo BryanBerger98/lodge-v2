@@ -35,7 +35,7 @@ const AuthSettingsPage = async () => {
 	const googleAuthSetting = UnregisteredSettingBooleanPopulatedSchema.parse(googleAuthSettingData);
 
 	return (
-		<div className="flex flex-col gap-8 mt-0 w-1/2">
+		<div className="flex flex-col gap-8 lg:w-1/2">
 			<Heading2 className="flex gap-2 items-center"><KeyRound /> Authentication settings</Heading2>
 			<div className="space-y-4">
 				<Paragraph variant="lead">Providers settings</Paragraph>

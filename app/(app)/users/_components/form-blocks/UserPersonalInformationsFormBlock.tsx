@@ -42,7 +42,7 @@ const UserPersonalInformationsFormBlock = () => {
 					</FormItem>
 				) }
 			/>
-			<div className="grid grid-cols-2 gap-4">
+			<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 				<div className="col-span-1">
 					<FormField
 						control={ form.control }
@@ -80,7 +80,7 @@ const UserPersonalInformationsFormBlock = () => {
 					/>
 				</div>
 			</div>
-			<div className="grid grid-cols-2 gap-4">
+			<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 				<div className="col-span-1">
 					<FormField
 						control={ form.control }
@@ -122,7 +122,7 @@ const UserPersonalInformationsFormBlock = () => {
 					/>
 				</div>
 			</div>
-			<div className="grid grid-cols-2 gap-4">
+			<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 				<div className="col-span-1">
 					<FormField
 						control={ form.control }

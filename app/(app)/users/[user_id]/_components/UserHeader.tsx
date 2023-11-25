@@ -19,7 +19,7 @@ const UserHeader = () => {
 	return (
 		<Card>
 			<CardHeader className="flex-row gap-4 items-center">
-				<Avatar className="w-16 h-16">
+				<Avatar className="hidden w-16 h-16 lg:flex">
 					<AvatarImage
 						alt="Profile"
 						src={ user.photo?.url }
@@ -27,7 +27,16 @@ const UserHeader = () => {
 					<AvatarFallback><User /></AvatarFallback>
 				</Avatar>
 				<div className="flex flex-col space-y-1.5">
-					<CardTitle>{ user.first_name && user.last_name ? user.first_name + ' ' + user.last_name : user.username ? user.username : <span className="italic text-slate-500">No username</span> }</CardTitle>
+					<CardTitle className="flex gap-2 items-center">
+						<Avatar className="fle w-10 h-10 lg:hidden">
+							<AvatarImage
+								alt="Profile"
+								src={ user.photo?.url }
+							/>
+							<AvatarFallback><User /></AvatarFallback>
+						</Avatar>
+						{ user.first_name && user.last_name ? user.first_name + ' ' + user.last_name : user.username ? user.username : <span className="italic text-slate-500">No username</span> }
+					</CardTitle>
 					<div className="flex gap-2">
 						<Badge
 							className="capitalize"

@@ -4,7 +4,7 @@ import { User } from 'lucide-react';
 
 import ButtonList from '@/components/ui/Button/ButtonList';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heading4 } from '@/components/ui/Typography/heading';
+import { Heading2 } from '@/components/ui/Typography/heading';
 import { Paragraph } from '@/components/ui/Typography/text';
 import useAuth from '@/context/auth/useAuth';
 
@@ -22,7 +22,7 @@ const AccountPage = () => {
 
 	return (
 		<>
-			<Heading4 className="gap-2 flex items-center"><User size="16" />Profile</Heading4>
+			<Heading2 className="flex gap-2 items-center"><User /> Profile</Heading2>
 			<Card>
 				<CardHeader>
 					<CardTitle>Personal informations</CardTitle>

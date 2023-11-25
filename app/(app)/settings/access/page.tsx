@@ -31,7 +31,7 @@ const AccessSettingsPage = async () => {
 	}) : [];
 
 	return (
-		<div className="w-1/2 space-y-8 mt-0">
+		<div className="lg:w-1/2 space-y-8">
 			<Heading2 className="flex gap-2 items-center"><Unlock /> Access settings</Heading2>
 			<div className="space-y-4">
 				<Paragraph variant="lead">Share settings</Paragraph>
