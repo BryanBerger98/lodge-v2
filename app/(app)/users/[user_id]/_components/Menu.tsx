@@ -2,6 +2,7 @@
 
 import { ArrowRightLeft, BadgeCheck, KeyRound, MoreHorizontal, Trash } from 'lucide-react';
 import { signOut } from 'next-auth/react';
+import { useRouter } from 'next-nprogress-bar';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -10,16 +11,13 @@ import ConfirmationFormModal, { ConfirmationModalOpenChangeEvent } from '@/compo
 import ConfirmationModal from '@/components/ui/Modal/ConfirmationModal';
 import { useToast } from '@/components/ui/use-toast';
 import useAuth from '@/context/auth/useAuth';
+import useCsrf from '@/context/csrf/useCsrf';
+import useUser from '@/context/users/user/useUser';
+import { Role } from '@/schemas/role.schema';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 import { deleteUser, sendResetPasswordTokenToUser, sendVerificationTokenToUser } from '@/services/users.service';
-import { IUserPopulated } from '@/types/user.type';
-import { ApiError, getErrorMessage } from '@/utils/error';
-
-import useUsers from '../../_context/users/useUsers';
-
-type MenuProps = {
-	userData: IUserPopulated;
-	csrfToken: string;
-}
+import { ApiError } from '@/utils/api/error';
+import { getErrorMessage } from '@/utils/api/error/error-messages.util';
 
 type ModalState<T extends ('form' | 'simple')> = T extends 'form' ? {
 	isOpen: boolean;
@@ -34,10 +32,10 @@ type ModalState<T extends ('form' | 'simple')> = T extends 'form' ? {
 	action: 'reset-password' | 'verify-email';
 };
 
-const getModalContent = (userData: IUserPopulated) => ({
+const getModalContent = (user?: UserPopulated | null) => ({
 	delete: {
 		title: 'Delete user',
-		description: <span>Please enter the email of the user <span className="font-bold text-slate-700 select-none">{ userData.email }</span> to confirm the deletion. This action is irreversible.</span>,
+		description: <span>Please enter the email of the user <span className="font-bold text-slate-700 select-none">{ user?.email }</span> to confirm the deletion. This action is irreversible.</span>,
 	},
 	'reset-password': {
 		title: 'Send reset password email',
@@ -49,15 +47,17 @@ const getModalContent = (userData: IUserPopulated) => ({
 	},
 });
 
-const Menu = ({ userData, csrfToken }: MenuProps) => {
+const Menu = () => {
 
-	const { refetchUsers } = useUsers();
+	const { csrfToken } = useCsrf();
+	const { user } = useUser();
+	const router = useRouter();
 
 	const [ confirmationModalState, setConfirmationModalState ] = useState<ModalState<'form' | 'simple'>>({
 		isOpen: false,
 		modalType: 'form',
 		action: 'delete',
-		valueToValidate: userData.email,
+		valueToValidate: user?.email || '',
 		inputLabel: 'Email',
 		inputType: 'email',
 	});
@@ -71,7 +71,7 @@ const Menu = ({ userData, csrfToken }: MenuProps) => {
 			isOpen: true,
 			modalType: 'form',
 			action: 'delete', 
-			valueToValidate: userData.email,
+			valueToValidate: user?.email || '',
 			inputLabel: 'Email',
 			inputType: 'email',
 		});
@@ -101,27 +101,27 @@ const Menu = ({ userData, csrfToken }: MenuProps) => {
 			});
 		}
 
-		if (!csrfToken) {
+		if (!csrfToken || !user) {
 			return;
 		}
 
 		try {
 			setIsLoading(true);
 			if (confirmationModalState.action === 'delete') {
-				await deleteUser(userData.id, csrfToken);
-				refetchUsers();
+				await deleteUser(user.id, { csrfToken });
+				router.push('/users');
 			}
 			if (confirmationModalState.action === 'reset-password') {
-				await sendResetPasswordTokenToUser(userData.id, csrfToken);
+				await sendResetPasswordTokenToUser(user.id, { csrfToken });
 			}
 			if (confirmationModalState.action === 'verify-email') {
-				await sendVerificationTokenToUser(userData.id, csrfToken);
+				await sendVerificationTokenToUser(user.id, { csrfToken });
 			}
 			setConfirmationModalState({
 				...confirmationModalState,
 				isOpen: openState,
 			});
-			if (currentUser && userData.id.toString() === currentUser.id.toString() && [ 'delete', 'suspend' ].includes(confirmationModalState.action)) {
+			if (currentUser && user.id.toString() === currentUser.id.toString() && [ 'delete', 'suspend' ].includes(confirmationModalState.action)) {
 				await signOut({ redirect: false });
 				return;
 			}
@@ -140,7 +140,7 @@ const Menu = ({ userData, csrfToken }: MenuProps) => {
 
 	return (
 		<>
-			<DropdownMenu>
+			<DropdownMenu modal={ false }>
 				<DropdownMenuTrigger asChild>
 					<Button
 						className="gap-2 items-center"
@@ -148,7 +148,7 @@ const Menu = ({ userData, csrfToken }: MenuProps) => {
 					>
 						<span className="sr-only">Open menu</span>
 						<MoreHorizontal size="16" />
-						Actions
+						<span className="hidden md:inline">Actions</span>
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">
@@ -164,7 +164,7 @@ const Menu = ({ userData, csrfToken }: MenuProps) => {
 					><BadgeCheck size="16" /> Send email verification
 					</DropdownMenuItem>
 					{
-						userData.role !== 'owner' ?
+						user?.role !== Role.OWNER ?
 							<>
 								<DropdownMenuItem
 									className="gap-2 hover:cursor-pointer"
@@ -184,21 +184,21 @@ const Menu = ({ userData, csrfToken }: MenuProps) => {
 				</DropdownMenuContent>
 			</DropdownMenu>
 			<ConfirmationFormModal
-				description={ getModalContent(userData)[ confirmationModalState.action ].description }
+				description={ getModalContent(user)[ confirmationModalState.action ].description }
 				inputLabel={ confirmationModalState.modalType === 'form' ? confirmationModalState.inputLabel : '' }
 				inputType={ confirmationModalState.modalType === 'form' ? confirmationModalState.inputType : 'text' }
 				isLoading={ isLoading }
 				isOpen={ confirmationModalState.modalType === 'form' && confirmationModalState.isOpen }
-				title={ getModalContent(userData)[ confirmationModalState.action ].title }
+				title={ getModalContent(user)[ confirmationModalState.action ].title }
 				valueToValidate={ confirmationModalState.modalType === 'form' ? confirmationModalState.valueToValidate : '' }
 				variant="destructive"
 				onOpenChange={ handleConfirmationModalOpenChange }
 			/>
 			<ConfirmationModal
-				description={ getModalContent(userData)[ confirmationModalState.action ].description }
+				description={ getModalContent(user)[ confirmationModalState.action ].description }
 				isLoading={ isLoading }
 				isOpen={ confirmationModalState.modalType === 'simple' && confirmationModalState.isOpen }
-				title={ getModalContent(userData)[ confirmationModalState.action ].title }
+				title={ getModalContent(user)[ confirmationModalState.action ].title }
 				onOpenChange={ handleConfirmationModalOpenChange }
 			/>
 		</>

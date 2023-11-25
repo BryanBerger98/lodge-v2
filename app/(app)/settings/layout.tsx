@@ -1,15 +1,19 @@
-import { Database, Globe, KeyRound, Mail, Settings, Star, Unlock, Unplug, Users } from 'lucide-react';
+import { Database, Globe, KeyRound, Mail, Star, Unlock, Unplug, Users } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { ReactNode } from 'react';
 
-import PageTitle from '@/components/layout/Header/PageTitle';
+import { hasSettingsAccess } from '@/app/_utils/settings/has-settings-access';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import CsrfProvider from '@/context/csrf/csrf.provider';
 import SettingsProvider from '@/context/settings/settings.provider';
-import { findSettingByName } from '@/database/setting/setting.repository';
+import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
-import { setServerAuthGuard } from '@/utils/auth';
-import { SHARE_WITH_ADMIN_SETTING } from '@/utils/settings';
+import { getServerCurrentUser } from '@/utils/auth';
+
+const SettingsHeader = dynamic(() => import('./_components/SettingsHeader'));
 
 type SettingsLayoutProps = {
 	children: ReactNode;
@@ -19,29 +23,32 @@ const SettingsLayout = async ({ children }: SettingsLayoutProps) => {
 
 	const [ , subpath ] = headers().get('x-pathname')?.split('/').filter(el => el) || [];
 
+	const csrfToken = await getCsrfToken(headers());
+
 	await connectToDatabase();
+	
+	const currentUser = await getServerCurrentUser();
 
-	const shareWithAdminSetting = await findSettingByName(SHARE_WITH_ADMIN_SETTING);
+	if (!currentUser) {
+		redirect('/signin');
+	}
 
-	const rolesWhiteList: ('admin' | 'owner')[] = shareWithAdminSetting && shareWithAdminSetting.value ? [ 'owner', 'admin' ] : [ 'owner' ];
+	const hasUserSettingsAccess = await hasSettingsAccess(currentUser);
 
-	await setServerAuthGuard({
-		rolesWhiteList,
-		redirect: '/', 
-	});
-
-	//  className="px-0 lg:px-2 bg-transparent flex-row lg:flex-col !justify-start w-full overflow-x-scroll lg:overflow-x-auto lg:min-w-[220px] items-start !gap-0 text-slate-900"
+	if (!hasUserSettingsAccess) {
+		redirect('/');
+	}
 
 	return (
 		<>
-			<PageTitle><Settings /> Settings</PageTitle>
-			<div className="flex flex-col lg:flex-row gap-4">
+			<SettingsHeader />
+			<div className="flex flex-col lg:flex-row gap-4 w-full">
 				<Tabs
-					className="h-full"
+					className="h-full max-w-full"
 					defaultValue={ subpath || 'access' }
 					orientation="vertical"
 				>
-					<TabsList className="bg-transparent flex-row lg:flex-col !justify-start h-full lg:overflow-x-auto lg:min-w-[220px] items-start !gap-0">
+					<TabsList className="bg-transparent flex-row lg:flex-col !justify-start h-full overflow-x-scroll w-full no-scrollbar lg:overflow-x-auto lg:min-w-[220px] items-start !gap-0">
 						<TabsTrigger
 							className="gap-2 items-center w-full justify-start"
 							value="access"
@@ -89,22 +96,25 @@ const SettingsLayout = async ({ children }: SettingsLayoutProps) => {
 						</TabsTrigger>
 						<TabsTrigger
 							className="gap-2 items-center w-full justify-start"
-							value="email"
+							value="website"
 							variant="secondary"
 							disabled
 						><Globe size="16" /> Website
 						</TabsTrigger>
 						<TabsTrigger
 							className="gap-2 items-center w-full justify-start"
-							value="email"
+							value="branding"
 							variant="secondary"
-							disabled
-						><Star size="16" /> Branding
+							asChild
+						>
+							<Link href="/settings/branding"><Star size="16" /> Branding</Link>
 						</TabsTrigger>
 					</TabsList>
 				</Tabs>
 				<SettingsProvider>
-					{ children }
+					<CsrfProvider csrfToken={ csrfToken }>
+						{ children }
+					</CsrfProvider>
 				</SettingsProvider>
 			</div>
 		</>

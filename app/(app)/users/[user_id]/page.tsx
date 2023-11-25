@@ -1,19 +1,22 @@
-import { ChevronLeft, User } from 'lucide-react';
+import { User, Users } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import PageTitle from '@/components/layout/Header/PageTitle';
-import BackButton from '@/components/ui/Button/BackButton';
-import { updateFileURL } from '@/database/file/file.repository';
+import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
+import PageHeader from '@/components/layout/PageHeader';
+import PageHeaderTitle from '@/components/layout/PageHeader/PageHeaderTitle';
+import SidebarToggleButton from '@/components/layout/Sidebar/SidebarToggleButton';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb';
+import CsrfProvider from '@/context/csrf/csrf.provider';
+import UserProvider from '@/context/users/user/user.provider';
 import { findUserById } from '@/database/user/user.repository';
-import { getFieldSignedURL } from '@/lib/bucket';
 import { getCsrfToken } from '@/lib/csrf';
+import { UserPopulatedSchema } from '@/schemas/user/populated.schema';
 
-import UsersProvider from '../_context/users/users.provider';
-
-const DynamicEditUserForm = dynamic(() => import('../_components/EditUserForm'));
-const DynamicMenu = dynamic(() => import('./_components/Menu'));
+const UserHeader = dynamic(() => import('./_components/UserHeader'));
+const UserForm = dynamic(() => import('../_components/UserForm'));
 
 type EditUserPageProps = {
 	params: {
@@ -37,36 +40,49 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
 		redirect('/users');
 	}
 
-	if (userData.photo && userData.photo.url_expiration_date && userData.photo.url_expiration_date < new Date()) {
-		const photoUrl = await getFieldSignedURL(userData.photo.key, 24 * 60 * 60);
-		const updatedFile = await updateFileURL({
-			id: userData.photo.id,
-			url: photoUrl,
-		});
-		userData.photo = updatedFile;
-	}
+	userData.photo = await renewFileExpiration(userData.photo);
+
+	const parsedUserData = UserPopulatedSchema.parse(userData);
+
 	return (
 		<>
-			<PageTitle><User /> Edit user</PageTitle>
-			<UsersProvider>
-				<div className="grid gird-cols-1 lg:grid-cols-3">
-					<div className="col-span-2 flex flex-col gap-8">
-						<div className="flex justify-between items-center">
-							<BackButton className="mb-0">
-								<ChevronLeft /> Back
-							</BackButton>
-							<DynamicMenu
-								csrfToken={ csrfToken }
-								userData={ userData }
-							/>
+			<PageHeader>
+				<SidebarToggleButton />
+				<PageHeaderTitle>
+					<User /> 
+					{ parsedUserData.first_name && parsedUserData.last_name ? `${ parsedUserData.first_name } ${ parsedUserData.last_name }` : parsedUserData.username ? parsedUserData.username : parsedUserData.email }
+				</PageHeaderTitle>
+			</PageHeader>
+			<Breadcrumb className="mb-4 hidden md:block">
+				<BreadcrumbItem>
+					<BreadcrumbLink
+						as={ Link }
+						className="flex items-center gap-2"
+						href="/users"
+					>
+						<Users className="w-4 h-4" />
+						Users
+					</BreadcrumbLink>
+				</BreadcrumbItem>
+				<BreadcrumbItem isCurrentPage>
+					<BreadcrumbLink
+						as={ Link }
+						href={ `/users/${ parsedUserData.id }` }
+					>
+						{ parsedUserData.first_name && parsedUserData.last_name ? `${ parsedUserData.first_name } ${ parsedUserData.last_name }` : parsedUserData.username ? parsedUserData.username : parsedUserData.email }
+					</BreadcrumbLink>
+				</BreadcrumbItem>
+			</Breadcrumb>
+			<CsrfProvider csrfToken={ csrfToken }>
+				<UserProvider user={ parsedUserData }>
+					<div className="grid gird-cols-1 lg:grid-cols-3">
+						<div className="col-span-2 space-y-8">
+							<UserHeader />
+							<UserForm />
 						</div>
-						<DynamicEditUserForm
-							csrfToken={ csrfToken }
-							user={ userData }
-						/>
 					</div>
-				</div>
-			</UsersProvider>
+				</UserProvider>
+			</CsrfProvider>
 		</>
 	);
 };

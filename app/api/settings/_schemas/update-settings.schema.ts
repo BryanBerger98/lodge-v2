@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
-import { SettingTypes } from '@/types/setting.type';
+import { SettingDataType, SettingName } from '@/schemas/setting';
 
 export const UpdateSettingsSchema = z.object({
 	settings: z.array(z.object({
-		name: z.coerce.string().nonempty('Required.'),
+		name: z.nativeEnum(SettingName),
 		value: z.any(),
-		data_type: z.enum(SettingTypes),
+		data_type: z.nativeEnum(SettingDataType),
 		id: z.string().optional(),
 	})).default([]), 
 });

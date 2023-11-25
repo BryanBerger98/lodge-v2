@@ -2,10 +2,10 @@ import { useSearchParams } from 'next/navigation';
 import useSWR from 'swr';
 
 import fetcher from '@/lib/fetcher';
-import { IUserPopulated } from '@/types/user.type';
+import { UserPopulated } from '@/schemas/user/populated.schema';
 
 export type FetchUsersResponse = {
-	users: IUserPopulated[],
+	users: UserPopulated[],
 	count: number,
 	total: number,
 };

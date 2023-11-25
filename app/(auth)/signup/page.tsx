@@ -2,55 +2,91 @@ import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
+import CsrfProvider from '@/context/csrf/csrf.provider';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
-import { APPLE_AUTH_SETTING, GOOGLE_AUTH_SETTING, NEW_USERS_SIGNUP_SETTING, PASSWORD_LOWERCASE_MIN_SETTING, PASSWORD_MIN_LENGTH_SETTING, PASSWORD_NUMBERS_MIN_SETTING, PASSWORD_SYMBOLS_MIN_SETTING, PASSWORD_UNIQUE_CHARS_SETTING, PASSWORD_UPPERCASE_MIN_SETTING, USER_VERIFY_EMAIL_SETTING, findDefaultSettingByName } from '@/utils/settings';
+import { SettingName, UnregisteredSettingBooleanPopulatedSchema, UnregisteredSettingNumberPopulatedSchema } from '@/schemas/setting';
+import { getServerCurrentUser } from '@/utils/auth';
 
+import SignUpProvider from './_context/provider';
 
-const DynamicSignUpForm = dynamic(() => import('./_components/SignUpForm'));
+const PasswordSignUpForm = dynamic(() => import('./_components/PasswordSignUpForm'));
+const SignUpCard = dynamic(() => import('./_components/SignUpCard'));
+const SignUpForm = dynamic(() => import('./_components/SignUpForm'));
+const MagicEmailSent = dynamic(() => import('./_components/MagicLinkEmailSent'));
 
 const SignUpPage = async () => {
+
 	const csrfToken = await getCsrfToken(headers());
 
 	await connectToDatabase();
 
-	const newUserSignUpSetting = await findSettingByName(NEW_USERS_SIGNUP_SETTING);
+	const currentUser = await getServerCurrentUser();
+
+	if (currentUser) {
+		redirect('/');
+	}
+
+	const newUserSignUpSettingData = await findSettingByName(SettingName.NEW_USERS_SIGNUP);
+	const newUserSignUpSetting = UnregisteredSettingBooleanPopulatedSchema.parse(newUserSignUpSettingData);
 	
 	if (newUserSignUpSetting && newUserSignUpSetting.data_type === 'boolean' && !newUserSignUpSetting.value) {
 		redirect('/signin');
 	}
 
-	const userVerifyEmailSetting = await findSettingByName(USER_VERIFY_EMAIL_SETTING);
+	const userVerifyEmailSettingData = await findSettingByName(SettingName.USER_VERIFY_EMAIL);
+	const userVerifyEmailSetting = UnregisteredSettingBooleanPopulatedSchema.parse(userVerifyEmailSettingData);
 
-	const passwordLowercaseMinSetting = await findSettingByName(PASSWORD_LOWERCASE_MIN_SETTING);
-	const passwordUppercaseMinSetting = await findSettingByName(PASSWORD_UPPERCASE_MIN_SETTING);
-	const passwordNumbersMinSetting = await findSettingByName(PASSWORD_NUMBERS_MIN_SETTING);
-	const passwordSymbolsMinSetting = await findSettingByName(PASSWORD_SYMBOLS_MIN_SETTING);
-	const passwordMinLengthSetting = await findSettingByName(PASSWORD_MIN_LENGTH_SETTING);
-	const passwordUniqueCharsSetting = await findSettingByName(PASSWORD_UNIQUE_CHARS_SETTING);
+	const magicLinkSignInSettingData = await findSettingByName(SettingName.MAGIC_LINK_SIGNIN);
+	const magicLinkSignInSetting = UnregisteredSettingBooleanPopulatedSchema.parse(magicLinkSignInSettingData);
+	const credentialsSignInSettingData = await findSettingByName(SettingName.CREDENTIALS_SIGNIN);
+	const credentialsSignInSetting = UnregisteredSettingBooleanPopulatedSchema.parse(credentialsSignInSettingData);
 
-	const googleAuthSetting = await findSettingByName(GOOGLE_AUTH_SETTING);
-	const defaultGoogleAuthSetting = await findDefaultSettingByName(GOOGLE_AUTH_SETTING);
-	const appleAuthSetting = await findSettingByName(APPLE_AUTH_SETTING);
-	const defaultAppleAuthSetting = await findDefaultSettingByName(APPLE_AUTH_SETTING);
+	const passwordLowercaseMinSettingData = await findSettingByName(SettingName.PASSWORD_LOWERCASE_MIN);
+	const passwordLowercaseMinSetting = UnregisteredSettingNumberPopulatedSchema.parse(passwordLowercaseMinSettingData);
+	const passwordUppercaseMinSettingData = await findSettingByName(SettingName.PASSWORD_UPPERCASE_MIN);
+	const passwordUppercaseMinSetting = UnregisteredSettingNumberPopulatedSchema.parse(passwordUppercaseMinSettingData);
+	const passwordNumbersMinSettingData = await findSettingByName(SettingName.PASSWORD_NUMBERS_MIN);
+	const passwordNumbersMinSetting = UnregisteredSettingNumberPopulatedSchema.parse(passwordNumbersMinSettingData);
+	const passwordSymbolsMinSettingData = await findSettingByName(SettingName.PASSWORD_SYMBOLS_MIN);
+	const passwordSymbolsMinSetting = UnregisteredSettingNumberPopulatedSchema.parse(passwordSymbolsMinSettingData);
+	const passwordMinLengthSettingData = await findSettingByName(SettingName.PASSWORD_MIN_LENGTH);
+	const passwordMinLengthSetting = UnregisteredSettingNumberPopulatedSchema.parse(passwordMinLengthSettingData);
+	const passwordUniqueCharsSettingData = await findSettingByName(SettingName.PASSWORD_UNIQUE_CHARS);
+	const passwordUniqueCharsSetting = UnregisteredSettingBooleanPopulatedSchema.parse(passwordUniqueCharsSettingData);
+
+	const googleAuthSettingData = await findSettingByName(SettingName.GOOGLE_AUTH);
+	const googleAuthSetting = UnregisteredSettingBooleanPopulatedSchema.parse(googleAuthSettingData);
+	const appleAuthSettingData = await findSettingByName(SettingName.APPLE_AUTH);
+	const appleAuthSetting = UnregisteredSettingBooleanPopulatedSchema.parse(appleAuthSettingData);
 
 	return (
 		<div className="min-h-screen flex justify-center items-center">
-			<DynamicSignUpForm
-				appleAuthSetting={ appleAuthSetting || defaultAppleAuthSetting || null }
-				csrfToken={ csrfToken }
-				googleAuthSetting={ googleAuthSetting || defaultGoogleAuthSetting || null }
-				passwordRules={ {
-					uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,
-					lowercase_min: passwordLowercaseMinSetting?.value !== undefined && passwordLowercaseMinSetting?.data_type === 'number' ? passwordLowercaseMinSetting?.value : 0,
-					numbers_min: passwordNumbersMinSetting?.value !== undefined && passwordNumbersMinSetting?.data_type === 'number' ? passwordNumbersMinSetting?.value : 0,
-					symbols_min: passwordSymbolsMinSetting?.value !== undefined && passwordSymbolsMinSetting?.data_type === 'number' ? passwordSymbolsMinSetting?.value : 0,
-					min_length: passwordMinLengthSetting?.value !== undefined && passwordMinLengthSetting?.data_type === 'number' ? passwordMinLengthSetting?.value : 8,
-					should_contain_unique_chars: passwordUniqueCharsSetting?.value !== undefined && passwordUniqueCharsSetting?.data_type === 'boolean' ? passwordUniqueCharsSetting?.value : false,
-				} }
-				userVerifyEmailSetting={ userVerifyEmailSetting }
-			/>
+			<CsrfProvider csrfToken={ csrfToken }>
+				<SignUpProvider>
+					<SignUpCard>
+						<SignUpForm
+							appleAuthSetting={ appleAuthSetting }
+							googleAuthSetting={ googleAuthSetting }
+						/>
+						<PasswordSignUpForm
+							credentialsSignInSetting={ credentialsSignInSetting }
+							magicLinkSignUpSetting={ magicLinkSignInSetting }
+							passwordRules={ {
+								uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,
+								lowercase_min: passwordLowercaseMinSetting?.value !== undefined && passwordLowercaseMinSetting?.data_type === 'number' ? passwordLowercaseMinSetting?.value : 0,
+								numbers_min: passwordNumbersMinSetting?.value !== undefined && passwordNumbersMinSetting?.data_type === 'number' ? passwordNumbersMinSetting?.value : 0,
+								symbols_min: passwordSymbolsMinSetting?.value !== undefined && passwordSymbolsMinSetting?.data_type === 'number' ? passwordSymbolsMinSetting?.value : 0,
+								min_length: passwordMinLengthSetting?.value !== undefined && passwordMinLengthSetting?.data_type === 'number' ? passwordMinLengthSetting?.value : 8,
+								should_contain_unique_chars: passwordUniqueCharsSetting?.value !== undefined && passwordUniqueCharsSetting?.data_type === 'boolean' ? passwordUniqueCharsSetting?.value : false,
+							} }
+							userVerifyEmailSetting={ userVerifyEmailSetting }
+						/>
+						<MagicEmailSent />
+					</SignUpCard>
+				</SignUpProvider>
+			</CsrfProvider>
 		</div>
 	);
 };

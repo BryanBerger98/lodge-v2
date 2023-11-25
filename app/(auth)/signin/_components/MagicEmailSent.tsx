@@ -6,15 +6,16 @@ import { Button } from '@/components/ui/button';
 import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
-import { useSignInContext } from './SignInCard';
+import { SignInStep } from '../_context';
+import { useSignIn } from '../_context/useSignIn';
 
 const MagicEmailSent = () => {
 
-	const { step, setStep, email } = useSignInContext();
+	const { step, setStep, email } = useSignIn();
 
-	const handleGoBack = () => setStep('password');
+	const handleGoBack = () => setStep(SignInStep.PASSWORD);
 
-	if (step !== 'magic-email-sent') {
+	if (step !== SignInStep.MAGIC_EMAIL_SENT) {
 		return null;
 	}	
 

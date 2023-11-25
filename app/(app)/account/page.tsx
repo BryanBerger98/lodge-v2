@@ -1,115 +1,55 @@
+'use client';
+
 import { User } from 'lucide-react';
-import dynamic from 'next/dynamic';
-import { headers } from 'next/headers';
-import Link from 'next/link';
 
-import { Button } from '@/components/ui/button';
+import ButtonList from '@/components/ui/Button/ButtonList';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { findSettingByName } from '@/database/setting/setting.repository';
-import { getCsrfToken } from '@/lib/csrf';
-import { connectToDatabase } from '@/lib/database';
-import { setServerAuthGuard } from '@/utils/auth';
-import { PASSWORD_LOWERCASE_MIN_SETTING, PASSWORD_MIN_LENGTH_SETTING, PASSWORD_NUMBERS_MIN_SETTING, PASSWORD_SYMBOLS_MIN_SETTING, PASSWORD_UNIQUE_CHARS_SETTING, PASSWORD_UPPERCASE_MIN_SETTING, USER_ACCOUNT_DELETION_SETTING } from '@/utils/settings';
+import { Heading2 } from '@/components/ui/Typography/heading';
+import { Paragraph } from '@/components/ui/Typography/text';
+import useAuth from '@/context/auth/useAuth';
 
-const PageTitle = dynamic(() => import('@/components/layout/Header/PageTitle'));
-const DynamicSignOutButton = dynamic(() => import('./_components/SignOutButton'), { ssr: false });
-const DynamicDeleteAccountButton = dynamic(() => import('./_components/DeleteAccountButton'), { ssr: false });
-const DynamicUpdateUsernameForm = dynamic(() => import('./_components/UpdateUsernameForm'), { ssr: false });
-const DynamicUpdatePhoneNumberForm = dynamic(() => import('./_components/UpdatePhoneNumberForm'), { ssr: false });
-const DynamicUpdateAvatarForm = dynamic(() => import('./_components/UpdateAvatarForm'), { ssr: false });
-const DynamicUpdateEmailForm = dynamic(() => import('./_components/UpdateEmailForm'), { ssr: false });
-const DynamicUpdatePasswordForm = dynamic(() => import('./_components/UpdatePasswordForm'), { ssr: false });
+import BirthDateButton from './_components/profile/BirthDateButton';
+import EmailButton from './_components/profile/EmailButton';
+import GenderButton from './_components/profile/GenderButton';
+import NameButton from './_components/profile/NameButton';
+import PhoneNumberButton from './_components/profile/PhoneNumberButton';
+import ProfilePicture from './_components/profile/ProfilePicture';
+import UsernameButton from './_components/profile/UsernameButton';
 
-const AccountPage = async () => {
+const AccountPage = () => {
 
-	const csrfToken = await getCsrfToken(headers());
-
-	await connectToDatabase();
-
-	const { user: currentUser } = await setServerAuthGuard();
-
-	const userAccountDeletionSetting = await findSettingByName(USER_ACCOUNT_DELETION_SETTING);
-
-	const canDeleteAccount = userAccountDeletionSetting && userAccountDeletionSetting.data_type === 'boolean' && userAccountDeletionSetting.value;
-
-	const passwordLowercaseMinSetting = await findSettingByName(PASSWORD_LOWERCASE_MIN_SETTING);
-	const passwordUppercaseMinSetting = await findSettingByName(PASSWORD_UPPERCASE_MIN_SETTING);
-	const passwordNumbersMinSetting = await findSettingByName(PASSWORD_NUMBERS_MIN_SETTING);
-	const passwordSymbolsMinSetting = await findSettingByName(PASSWORD_SYMBOLS_MIN_SETTING);
-	const passwordMinLengthSetting = await findSettingByName(PASSWORD_MIN_LENGTH_SETTING);
-	const passwordUniqueCharsSetting = await findSettingByName(PASSWORD_UNIQUE_CHARS_SETTING);
+	const { currentUser } = useAuth();
 
 	return (
 		<>
-			<PageTitle><User /> Account</PageTitle>
-			<div className="grid grid-cols-1 xl:grid-cols-3">
-				<div className="xl:col-span-2 flex flex-col gap-y-8 mb-8">
-					<DynamicUpdateAvatarForm csrfToken={ csrfToken } />
-					<DynamicUpdateUsernameForm csrfToken={ csrfToken } />
-					<DynamicUpdatePhoneNumberForm csrfToken={ csrfToken } />
-					{
-						currentUser.provider_data === 'email' ?
-							<DynamicUpdateEmailForm csrfToken={ csrfToken } />
-							: null
-					}
-					{
-						!currentUser.has_password ?
-							<Card>
-								<CardHeader>
-									<CardTitle>Password</CardTitle>
-									<CardDescription>
-										Setup a password.
-									</CardDescription>
-								</CardHeader>
-								<CardContent>
-									<span className="text-base">To setup a password you need to follow the </span>
-									<Button
-										className="px-0 text-base text-blue-500"
-										variant="link"
-										asChild
-									>
-										<Link href="/forgot-password">forgot password</Link>
-									</Button>
-									<span> process.</span>
-								</CardContent>
-							</Card>
-							: <DynamicUpdatePasswordForm
-								csrfToken={ csrfToken }
-								passwordRules={ {
-									uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,
-									lowercase_min: passwordLowercaseMinSetting?.value !== undefined && passwordLowercaseMinSetting?.data_type === 'number' ? passwordLowercaseMinSetting?.value : 0,
-									numbers_min: passwordNumbersMinSetting?.value !== undefined && passwordNumbersMinSetting?.data_type === 'number' ? passwordNumbersMinSetting?.value : 0,
-									symbols_min: passwordSymbolsMinSetting?.value !== undefined && passwordSymbolsMinSetting?.data_type === 'number' ? passwordSymbolsMinSetting?.value : 0,
-									min_length: passwordMinLengthSetting?.value !== undefined && passwordMinLengthSetting?.data_type === 'number' ? passwordMinLengthSetting?.value : 8,
-									should_contain_unique_chars: passwordUniqueCharsSetting?.value !== undefined && passwordUniqueCharsSetting?.data_type === 'boolean' ? passwordUniqueCharsSetting?.value : false,
-								} }
-							  />
-					}
-					{
-						currentUser.provider_data === 'google' ?
-							<Card>
-								<CardHeader>
-									<CardTitle>Signed in with Google</CardTitle>
-									<CardDescription>
-										You created your account using Google authentication. You cannot change your email address.
-									</CardDescription>
-								</CardHeader>
-								<CardContent>
-									Signed in as <span className="font-bold">{ currentUser.email }</span>.
-								</CardContent>
-							</Card>
-							: null
-					}
-				</div>
-			</div>
-			<div className="flex gap-4">
-				<DynamicSignOutButton />
-				{
-					canDeleteAccount && currentUser.role !== 'owner' ?
-						<DynamicDeleteAccountButton csrfToken={ csrfToken } />
-						: null
-				}
-			</div>
+			<Heading2 className="flex gap-2 items-center"><User /> Profile</Heading2>
+			<Card>
+				<CardHeader>
+					<CardTitle>Personal informations</CardTitle>
+					<CardDescription>Manage your personal informations.</CardDescription>
+				</CardHeader>
+				<CardContent className="flex flex-col gap-8 items-center">
+					<div className="flex flex-col gap-4 items-center">
+						<ProfilePicture />
+						<div className="text-center">
+							<Paragraph variant="large">{ currentUser?.first_name } { currentUser?.last_name }</Paragraph>
+							<Paragraph
+								className="capitalize"
+								variant="muted"
+							>{ currentUser?.role }
+							</Paragraph>
+						</div>
+					</div>
+					<ButtonList className="w-full">
+						<NameButton />
+						<UsernameButton />
+						<GenderButton />
+						<BirthDateButton />
+						<EmailButton />
+						<PhoneNumberButton />
+					</ButtonList>
+				</CardContent>
+			</Card>
 		</>
 	);
 };

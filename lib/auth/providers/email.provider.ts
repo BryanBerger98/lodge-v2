@@ -1,10 +1,15 @@
 import Email from 'next-auth/providers/email';
 
-import { findUserByEmail } from '@/database/user/user.repository';
+import { findSettingByName } from '@/database/setting/setting.repository';
+import { createUser, findUserByEmail } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
+import { AuthenticationProvider } from '@/schemas/authentication-provider';
+import { Role } from '@/schemas/role.schema';
+import { SettingName } from '@/schemas/setting';
+import { buildApiError } from '@/utils/api/error';
+import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
+import { StatusCode } from '@/utils/api/http-status';
 import { sendMagicLinkSignInEmail } from '@/utils/email';
-import { buildError } from '@/utils/error';
-import { ACCOUNT_DISABLED_ERROR, INTERNAL_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
 
 const EmailProvider = Email({
 	sendVerificationRequest: async ({ url, identifier }) => {
@@ -13,18 +18,29 @@ const EmailProvider = Email({
 			const user = await findUserByEmail(identifier);
 
 			if (!user) {
-				throw buildError({
-					code: USER_NOT_FOUND_ERROR,
-					message: 'User not found.',
-					status: 404,
+				const newUserSignUpSetting = await findSettingByName(SettingName.NEW_USERS_SIGNUP);
+				const defaultUserRoleSetting = await findSettingByName(SettingName.DEFAULT_USER_ROLE);
+			
+				if ((newUserSignUpSetting && !newUserSignUpSetting.value) || (defaultUserRoleSetting && !defaultUserRoleSetting.value)) {
+					throw buildApiError({ status: StatusCode.FORBIDDEN });
+				}
+				const createdUser = await createUser({
+					email: identifier,
+					has_password: false,
+					is_disabled: false,
+					role: defaultUserRoleSetting?.value ? (defaultUserRoleSetting.value as Role) : Role.USER,
+					provider_data: AuthenticationProvider.EMAIL,
+					photo: null,
+					created_by: null,
 				});
+				await sendMagicLinkSignInEmail(createdUser, url);
+				return;
 			}
 
 			if (user.is_disabled) {
-				throw buildError({
-					code: ACCOUNT_DISABLED_ERROR,
-					message: 'Account disabled.',
-					status: 403,
+				throw buildApiError({
+					code: ApiErrorCode.ACCOUNT_DISABLED,
+					status: StatusCode.UNAUTHORIZED,
 				});
 			}
 
@@ -32,12 +48,7 @@ const EmailProvider = Email({
 			return;
 		} catch (error: any) {
 			console.error(error);
-			throw buildError({
-				code: INTERNAL_ERROR,
-				message: error.message || 'An error occured.',
-				status: 500,
-				data: error,
-			});
+			throw error;
 		}
 	},
 });

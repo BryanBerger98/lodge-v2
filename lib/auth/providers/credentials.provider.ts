@@ -2,10 +2,11 @@ import Credentials from 'next-auth/providers/credentials';
 
 import { findUserWithPasswordByEmail, updateUser } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
-import { IUserPopulatedWithPassword } from '@/types/user.type';
+import { UserPopulatedWithPassword } from '@/schemas/user/populated.schema';
 import { Optional } from '@/types/utils';
-import { buildError } from '@/utils/error';
-import { ACCOUNT_DISABLED_ERROR, INTERNAL_ERROR, MISSING_CREDENTIALS_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
+import { buildApiError } from '@/utils/api/error';
+import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
+import { StatusCode } from '@/utils/api/http-status';
 import { verifyPassword } from '@/utils/password.util';
 
 const CredentialsProvider = Credentials({
@@ -25,38 +26,41 @@ const CredentialsProvider = Credentials({
 			await connectToDatabase();
 
 			if (!credentials) {
-				throw buildError({
-					code: MISSING_CREDENTIALS_ERROR,
-					message: 'Credentials are missing.',
-					status: 422,
+				throw buildApiError({
+					code: ApiErrorCode.MISSING_CREDENTIALS,
+					status: StatusCode.UNPROCESSABLE_ENTITY,
 				});
 			}
 
 			const user = await findUserWithPasswordByEmail(credentials.email.toLowerCase().trim());
 
 			if (!user) {
-				throw buildError({
-					code: USER_NOT_FOUND_ERROR,
-					message: 'User not found.',
-					status: 404,
+				throw buildApiError({
+					code: ApiErrorCode.USER_NOT_FOUND,
+					status: StatusCode.NOT_FOUND,
 				});
 			}
 
 			if (user.is_disabled) {
-				throw buildError({
-					code: ACCOUNT_DISABLED_ERROR,
-					message: 'Account disabled.',
-					status: 403,
+				throw buildApiError({
+					code: ApiErrorCode.ACCOUNT_DISABLED,
+					status: StatusCode.UNAUTHORIZED,
+				});
+			}
+
+			if (!user.password) {
+				throw buildApiError({
+					code: ApiErrorCode.WRONG_AUTH_METHOD,
+					status: StatusCode.CONFLICT,
 				});
 			}
 
 			const isPasswordValid = await verifyPassword(credentials.password, user.password);
 
 			if (!isPasswordValid) {
-				throw buildError({
-					code: WRONG_PASSWORD_ERROR,
-					message: 'Wrong Password',
-					status: 401,
+				throw buildApiError({
+					code: ApiErrorCode.WRONG_PASSWORD,
+					status: StatusCode.UNAUTHORIZED,
 				});
 			}
 
@@ -64,21 +68,16 @@ const CredentialsProvider = Credentials({
 				id: user.id,
 				updated_by: user.id,
 				last_login_date: new Date(), 
-			}, { newDocument: true });
+			});
 
-			const sanitizedUser: Optional<IUserPopulatedWithPassword, 'password'> = updatedUser ? updatedUser : user;
+			const sanitizedUser: Optional<UserPopulatedWithPassword, 'password'> = updatedUser ? updatedUser : user;
 
 			delete sanitizedUser.password;
 
 			return sanitizedUser;
 		} catch (error: any) {
 			console.error(error);
-			throw buildError({
-				code: INTERNAL_ERROR,
-				message: error.message || 'An error occured.',
-				status: 500,
-				data: error,
-			});
+			throw error;
 		}
 	},
 });

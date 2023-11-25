@@ -1,8 +1,15 @@
 import { type ClassValue, clsx } from 'clsx';
+import { Children, ReactNode, isValidElement } from 'react';
 import { twMerge } from 'tailwind-merge';
  
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
+}
+
+export function getValidChildren(children: ReactNode) {
+	return Children
+		.toArray(children)
+		.filter((child) => isValidElement(child)) as React.ReactElement[];
 }
 
 export type ScreenType = 'mobile' | 'tablet' | 'laptop' | 'desktop';
@@ -14,7 +21,7 @@ export type BreakPoint = {
 	screen: ScreenType;
 };
 
-export const BREAKPOINTS: BreakPoint[] = [
+export const BREAKPOINTS = [
 	{
 		size: 'xs',
 		min: 0,
@@ -50,16 +57,16 @@ export const BREAKPOINTS: BreakPoint[] = [
 		min: 1536,
 		screen: 'desktop', 
 	},
-];
+] as const;
 
 
 export const getBreakPoint = (windowWidth: number) => {
 	const [ xsBreakPoint ] = BREAKPOINTS;
 	return BREAKPOINTS.find(breakpoint => {
-		if (breakpoint.max && windowWidth <= breakpoint.max && breakpoint.min && windowWidth >= breakpoint.min) {
+		if ('max' in breakpoint && windowWidth <= breakpoint.max && breakpoint.min && windowWidth >= breakpoint.min) {
 			return true;
 		}
-		if (!breakpoint.max && breakpoint.min && windowWidth >= breakpoint.min) {
+		if (!('max' in breakpoint) && breakpoint.min && windowWidth >= breakpoint.min) {
 			return true;
 		}
 		return false;

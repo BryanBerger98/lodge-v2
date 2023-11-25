@@ -1,126 +1,113 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { ZodError } from 'zod';
+import { NextResponse } from 'next/server';
 
 import { findSettingByName, updateSetting } from '@/database/setting/setting.repository';
-import { findOwnerUser, findUserById, updateUser } from '@/database/user/user.repository';
+import { findOwnerUser, findUserById, findUsers, updateUser } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
+import { Role } from '@/schemas/role.schema';
+import { SettingDataType, SettingName } from '@/schemas/setting';
+import { routeHandler } from '@/utils/api';
+import { buildApiError } from '@/utils/api/error';
+import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
+import { StatusCode } from '@/utils/api/http-status';
 import { authenticateUserWithPassword, setServerAuthGuard } from '@/utils/auth';
-import { buildError, sendError } from '@/utils/error';
-import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
-import { OWNER_SETTING, SHARE_WITH_ADMIN_SETTING } from '@/utils/settings';
 
 import { UpdateShareSettingsSchema } from './_schemas/update-share-settings.schema';
 
-export const GET = async () => {
-	try {
-		await connectToDatabase();
+export const GET = routeHandler(async () => {
+	await connectToDatabase();
 
-		await setServerAuthGuard({ rolesWhiteList: [ 'owner' ] });
+	await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER ] });
 
-		const shareWithAdminSetting = await findSettingByName(SHARE_WITH_ADMIN_SETTING);
-		const ownerSetting = await findSettingByName(OWNER_SETTING);
+	const shareWithAdminSetting = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
+	const ownerSetting = await findSettingByName(SettingName.OWNER);
+	const shareWithAdminUsersListSetting = shareWithAdminSetting && shareWithAdminSetting.value === 'share_admin_selection' ? await findSettingByName(SettingName.SHARE_WITH_ADMIN_USERS_LIST) : null;
+	const adminUsers = shareWithAdminUsersListSetting ? await findUsers({
+		role: Role.ADMIN,
+		_id: { $in: shareWithAdminUsersListSetting.value }, 
+	}) : [];
 
-		const ownerUser = await findOwnerUser();
+	const ownerUser = await findOwnerUser();
 
-		if (!ownerUser) {
-			return sendError(buildError({
-				code: USER_NOT_FOUND_ERROR,
-				message: 'User not found.',
-				status: 404,
-			}));
-		}
-
-		return NextResponse.json({
-			settings: {
-				shareWithAdmin: shareWithAdminSetting ?? {
-					name: SHARE_WITH_ADMIN_SETTING,
-					value: false,
-					data_type: 'boolean',
-				},
-				owner: ownerSetting ?? {
-					name: OWNER_SETTING,
-					value: ownerUser.id,
-					data_type: 'objectId',
-				},
-			},
-			ownerUser,
+	if (!ownerUser) {
+		throw buildApiError({
+			code: ApiErrorCode.USER_NOT_FOUND,
+			status: StatusCode.NOT_FOUND,
 		});
-	} catch (error: any) {
-		console.error(error);
-		return sendError(buildError({
-			code: INTERNAL_ERROR,
-			message: error.message || 'An error occured.',
-			status: 500,
-			data: error,
-		}));
 	}
-};
 
-export const PUT = async (request: NextRequest) => {
-	try {
+	return NextResponse.json({
+		settings: {
+			shareWithAdmin: shareWithAdminSetting ?? {
+				name: SettingName.SHARE_WITH_ADMIN,
+				value: false,
+				data_type: SettingDataType.BOOLEAN,
+			},
+			owner: ownerSetting ?? {
+				name: SettingName.OWNER,
+				value: ownerUser.id,
+				data_type: SettingDataType.OBJECT_ID,
+			},
+			shareWithAdminUsersListSetting: shareWithAdminUsersListSetting ?? {
+				name: SettingName.SHARE_WITH_ADMIN_USERS_LIST,
+				value: [],
+				data_type: SettingDataType.ARRAY_OF_OBJECT_IDS,
+			},
+		},
+		ownerUser,
+		selectedAdminUsers: adminUsers,
+	});
+});
 
-		await connectToDatabase();
+export const PUT = routeHandler(async (request) => {
 
-		const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ 'owner' ] });
+	await connectToDatabase();
 
-		const body = await request.json();
+	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER ] });
 
-		const { settings: settingsToUpdate, password } = UpdateShareSettingsSchema.parse(body);
+	const body = await request.json();
 
-		if (settingsToUpdate.length === 0) {
-			return NextResponse.json({ message: 'Nothing to update.' });
-		}
+	const { settings: settingsToUpdate, password } = UpdateShareSettingsSchema.parse(body);
 
-		await authenticateUserWithPassword(currentUser, password);
-
-		const ownerSetting = settingsToUpdate.find(setting => setting.name === OWNER_SETTING);
-
-		if (ownerSetting?.value) {
-			const prevOwnerUser = await findOwnerUser();
-			const newOwnerUser = await findUserById(ownerSetting.value);
-			if (!prevOwnerUser || !newOwnerUser) {
-				return sendError(buildError({
-					code: USER_NOT_FOUND_ERROR,
-					message: 'User not found.',
-					status: 404,
-				}));
-			}
-			await updateUser({
-				id: prevOwnerUser?.id,
-				updated_by: currentUser.id,
-				role: 'admin',
-			});
-			await updateUser({
-				id: newOwnerUser.id,
-				updated_by: currentUser.id,
-				role: 'owner',
-			});
-		}
-
-		for (const setting of settingsToUpdate) {
-			await updateSetting({
-				...setting,
-				updated_by: currentUser.id,
-			}, { upsert: true });
-		}
-
-		return NextResponse.json({ message: 'Updated.' });
-		
-	} catch (error: any) {
-		console.error(error);
-		if (error.name && error.name === 'ZodError') {
-			return sendError(buildError({
-				code: INVALID_INPUT_ERROR,
-				message: 'Invalid input.',
-				status: 422,
-				data: error as ZodError,
-			}));
-		}
-		return sendError(buildError({
-			code: error.code || INTERNAL_ERROR,
-			message: error.message || 'An error occured.',
-			status: 500,
-			data: error,
-		}));
+	if (settingsToUpdate.length === 0) {
+		return NextResponse.json({ message: 'Nothing to update.' });
 	}
-};
+
+	await authenticateUserWithPassword(currentUser, password);
+
+	const ownerSetting = settingsToUpdate.find(setting => setting.name === SettingName.OWNER);
+
+	if (ownerSetting?.value) {
+		const prevOwnerUser = await findOwnerUser();
+		const newOwnerUser = await findUserById(ownerSetting.value);
+		if (!prevOwnerUser || !newOwnerUser) {
+			throw buildApiError({
+				code: ApiErrorCode.USER_NOT_FOUND,
+				status: StatusCode.NOT_FOUND,
+			});
+		}
+		await updateUser({
+			id: prevOwnerUser?.id,
+			updated_by: currentUser.id,
+			role: Role.ADMIN,
+		});
+		await updateUser({
+			id: newOwnerUser.id,
+			updated_by: currentUser.id,
+			role: Role.OWNER,
+		});
+	}
+
+	for (const setting of settingsToUpdate) {
+		await updateSetting({
+			...setting,
+			data_type: setting.data_type,
+			updated_by: currentUser.id,
+		}, {
+			upsert: true,
+			newDocument: true, 
+		});
+	}
+
+	return NextResponse.json({ message: 'Updated.' });
+
+});

@@ -1,88 +1,75 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { ZodError, z } from 'zod';
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
 
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { findUserWithPasswordById, updateUserPassword } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
+import { SettingName } from '@/schemas/setting';
+import { routeHandler } from '@/utils/api';
+import { buildApiError } from '@/utils/api/error';
+import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
+import { StatusCode } from '@/utils/api/http-status';
 import { setServerAuthGuard } from '@/utils/auth';
-import { buildError, sendError } from '@/utils/error';
-import { INTERNAL_ERROR, INVALID_INPUT_ERROR, USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from '@/utils/error/error-codes';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules, hashPassword, verifyPassword } from '@/utils/password.util';
-import { PASSWORD_LOWERCASE_MIN_SETTING, PASSWORD_MIN_LENGTH_SETTING, PASSWORD_NUMBERS_MIN_SETTING, PASSWORD_SYMBOLS_MIN_SETTING, PASSWORD_UNIQUE_CHARS_SETTING, PASSWORD_UPPERCASE_MIN_SETTING } from '@/utils/settings';
 
-export const PUT = async (request: NextRequest) => {
+export const PUT = routeHandler(async (request) => {
 
-	try {
+	await connectToDatabase();
 
-		await connectToDatabase();
+	const body = await request.json();
 
-		const body = await request.json();
+	const passwordLowercaseMinSetting = await findSettingByName(SettingName.PASSWORD_LOWERCASE_MIN);
+	const passwordUppercaseMinSetting = await findSettingByName(SettingName.PASSWORD_UPPERCASE_MIN);
+	const passwordNumbersMinSetting = await findSettingByName(SettingName.PASSWORD_NUMBERS_MIN);
+	const passwordSymbolsMinSetting = await findSettingByName(SettingName.PASSWORD_SYMBOLS_MIN);
+	const passwordMinLengthSetting = await findSettingByName(SettingName.PASSWORD_MIN_LENGTH);
+	const passwordUniqueCharsSetting = await findSettingByName(SettingName.PASSWORD_UNIQUE_CHARS);
 
-		const passwordLowercaseMinSetting = await findSettingByName(PASSWORD_LOWERCASE_MIN_SETTING);
-		const passwordUppercaseMinSetting = await findSettingByName(PASSWORD_UPPERCASE_MIN_SETTING);
-		const passwordNumbersMinSetting = await findSettingByName(PASSWORD_NUMBERS_MIN_SETTING);
-		const passwordSymbolsMinSetting = await findSettingByName(PASSWORD_SYMBOLS_MIN_SETTING);
-		const passwordMinLengthSetting = await findSettingByName(PASSWORD_MIN_LENGTH_SETTING);
-		const passwordUniqueCharsSetting = await findSettingByName(PASSWORD_UNIQUE_CHARS_SETTING);
+	const passwordRules = {
+		uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,
+		lowercase_min: passwordLowercaseMinSetting?.value !== undefined && passwordLowercaseMinSetting?.data_type === 'number' ? passwordLowercaseMinSetting?.value : 0,
+		numbers_min: passwordNumbersMinSetting?.value !== undefined && passwordNumbersMinSetting?.data_type === 'number' ? passwordNumbersMinSetting?.value : 0,
+		symbols_min: passwordSymbolsMinSetting?.value !== undefined && passwordSymbolsMinSetting?.data_type === 'number' ? passwordSymbolsMinSetting?.value : 0,
+		min_length: passwordMinLengthSetting?.value !== undefined && passwordMinLengthSetting?.data_type === 'number' ? passwordMinLengthSetting?.value : 8,
+		should_contain_unique_chars: passwordUniqueCharsSetting?.value !== undefined && passwordUniqueCharsSetting?.data_type === 'boolean' ? passwordUniqueCharsSetting?.value : false,
+	};
 
-		const passwordRules = {
-			uppercase_min: passwordUppercaseMinSetting?.value !== undefined && passwordUppercaseMinSetting?.data_type === 'number' ? passwordUppercaseMinSetting?.value : 0,
-			lowercase_min: passwordLowercaseMinSetting?.value !== undefined && passwordLowercaseMinSetting?.data_type === 'number' ? passwordLowercaseMinSetting?.value : 0,
-			numbers_min: passwordNumbersMinSetting?.value !== undefined && passwordNumbersMinSetting?.data_type === 'number' ? passwordNumbersMinSetting?.value : 0,
-			symbols_min: passwordSymbolsMinSetting?.value !== undefined && passwordSymbolsMinSetting?.data_type === 'number' ? passwordSymbolsMinSetting?.value : 0,
-			min_length: passwordMinLengthSetting?.value !== undefined && passwordMinLengthSetting?.data_type === 'number' ? passwordMinLengthSetting?.value : 8,
-			should_contain_unique_chars: passwordUniqueCharsSetting?.value !== undefined && passwordUniqueCharsSetting?.data_type === 'boolean' ? passwordUniqueCharsSetting?.value : false,
-		};
+	const UpdateUserPasswordSchema = z.object({
+		password: z.string().min(1, 'Required.'),
+		newPassword: z.string().min(passwordRules.min_length, `At least ${ passwordRules.min_length } characters.`).regex(getValidationRegexFromPasswordRules(passwordRules), { message: getErrorMessageFromPasswordRules(passwordRules) }),
+	});
 
-		const UpdateUserPasswordSchema = z.object({
-			password: z.string().min(1, 'Required.'),
-			newPassword: z.string().min(passwordRules.min_length, `At least ${ passwordRules.min_length } characters.`).regex(getValidationRegexFromPasswordRules(passwordRules), { message: getErrorMessageFromPasswordRules(passwordRules) }),
+	const { password, newPassword } = UpdateUserPasswordSchema.parse(body);
+
+	const { user: currentUser } = await setServerAuthGuard();
+
+	const userData = await findUserWithPasswordById(currentUser.id);
+
+	if (!userData) {
+		throw buildApiError({
+			code: ApiErrorCode.USER_NOT_FOUND,
+			status: StatusCode.NOT_FOUND,
 		});
-
-		const { password, newPassword } = UpdateUserPasswordSchema.parse(body);
-
-		const { user: currentUser } = await setServerAuthGuard();
-
-		const userData = await findUserWithPasswordById(currentUser.id);
-
-		if (!userData) {
-			throw buildError({
-				code: USER_NOT_FOUND_ERROR,
-				message: 'User not found.',
-				status: 404,
-			});
-		}
-
-		const isPasswordValid = await verifyPassword(password, userData.password);
-
-		if (!isPasswordValid) {
-			throw buildError({
-				message: 'Wrong password.',
-				code: WRONG_PASSWORD_ERROR,
-				status: 401,
-			});
-		}
-
-		const hashedPassword = await hashPassword(newPassword);
-		await updateUserPassword(userData.id, hashedPassword, currentUser.id);
-
-		return NextResponse.json({ message: 'Updated.' });
-	} catch (error: any) {
-		console.error(error);
-		if (error.name && error.name === 'ZodError') {
-			return sendError(buildError({
-				code: INVALID_INPUT_ERROR,
-				message: 'Invalid input.',
-				status: 422,
-				data: error as ZodError,
-			}));
-		}
-		return sendError(buildError({
-			code: error.code || INTERNAL_ERROR,
-			message: error.message || 'An error occured.',
-			status: error.status || 500,
-			data: error,
-		}));
 	}
 
-};
+	if (!userData.password) {
+		throw buildApiError({
+			code: ApiErrorCode.WRONG_AUTH_METHOD,
+			status: StatusCode.CONFLICT,
+		});
+	}
+
+	const isPasswordValid = await verifyPassword(password, userData.password);
+
+	if (!isPasswordValid) {
+		throw buildApiError({
+			code: ApiErrorCode.WRONG_PASSWORD,
+			status: StatusCode.UNAUTHORIZED,
+		});
+	}
+
+	const hashedPassword = await hashPassword(newPassword);
+	await updateUserPassword(userData.id, hashedPassword, currentUser.id);
+
+	return NextResponse.json({ message: 'Updated.' });
+});

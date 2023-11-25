@@ -12,22 +12,22 @@ import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { ISetting, UnregisteredSetting } from '@/types/setting.type';
+import { UnregisteredSettingBooleanPopulated } from '@/schemas/setting';
 
 import AppleAuthButton from '../../_components/ProvidersButtons/AppleAuthButton';
 import GoogleAuthButton from '../../_components/ProvidersButtons/GoogleAuthButton';
-
-import { useSignInContext } from './SignInCard';
+import { SignInStep } from '../_context';
+import { useSignIn } from '../_context/useSignIn';
 
 type EmailSignInFormProps = {
-	newUserSignUpSetting: ISetting | UnregisteredSetting | null;
-	googleAuthSetting: ISetting | UnregisteredSetting | null;
-	appleAuthSetting: ISetting | UnregisteredSetting | null;
+	newUserSignUpSetting: UnregisteredSettingBooleanPopulated | null;
+	googleAuthSetting: UnregisteredSettingBooleanPopulated | null;
+	appleAuthSetting: UnregisteredSettingBooleanPopulated | null;
 };
 
 const EmailSignInForm = ({ newUserSignUpSetting, googleAuthSetting, appleAuthSetting } :EmailSignInFormProps) => {
 	
-	const { isLoading, step, setStep, setEmail, email } = useSignInContext();
+	const { isLoading, step, setStep, setEmail, email } = useSignIn();
 
 	const emailSignInFormSchema = z.object({ email: z.string().email('Please, provide a valid email address.').min(1, 'Required.') });
 
@@ -39,10 +39,10 @@ const EmailSignInForm = ({ newUserSignUpSetting, googleAuthSetting, appleAuthSet
 
 	const handleSubmitEmailSignInForm = (values: z.infer<typeof emailSignInFormSchema>) => {
 		setEmail(values.email);
-		setStep('password');
+		setStep(SignInStep.PASSWORD);
 	};
 
-	if (step !== 'email') {
+	if (step !== SignInStep.EMAIL) {
 		return null;
 	}
 

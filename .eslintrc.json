@@ -189,13 +189,7 @@
 				"react/jsx-boolean-value": "warn",
 				"react/hook-use-state": "warn",
 				"react/jsx-fragments": "warn",
-				"react/jsx-handler-names": [
-					"warn",
-					{
-						"checkLocalVariables": true,
-						"checkInlineFunction": true
-					}
-				],
+				"react/jsx-handler-names": "off",
 				"react/jsx-pascal-case": "warn",
 				"react/jsx-no-leaked-render": "error",
 				"react/jsx-no-constructed-context-values": "error",
@@ -240,7 +234,7 @@
 				"react/prop-types": "off",
 				"react/no-unused-prop-types": "warn",
 				"react/forbid-prop-types": "warn",
-				"react/boolean-prop-naming": ["error", { "rule": "^(is|has|with)[A-Z]([A-Za-z0-9]?)+", "validateNested": true }],
+				"react/boolean-prop-naming": ["error", { "rule": "^(is|has|with|as|enable|disable)[A-Z]([A-Za-z0-9]?)+", "validateNested": true }],
 				"react/jsx-max-props-per-line": ["warn", { "maximum": 1 }],
 				"react/jsx-first-prop-new-line": ["warn", "multiline"],
 				"react/jsx-props-no-spreading": "off",
@@ -266,12 +260,15 @@
 				"@typescript-eslint/no-unused-vars": "warn",
 				"@typescript-eslint/object-curly-spacing": ["warn", "always"],
 				"@typescript-eslint/no-explicit-any": "off",
-				"@typescript-eslint/ban-types": ["error", {
-					"types": {
-						"{}": false
-					},
-					"extendDefaults": true
-				}]
+				"@typescript-eslint/ban-types": [
+					"error",
+					{
+						"types": {
+							"{}": false
+						},
+						"extendDefaults": true
+					}
+				]
 			},
 			"settings": {
 				"import/extensions": [".tsx", ".ts"],

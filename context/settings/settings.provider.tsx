@@ -3,24 +3,24 @@
 import { ReactNode, useCallback, useEffect, useMemo, useReducer } from 'react';
 
 import useFetchSettings from '@/hooks/settings/useFetchSettings';
-import { IUpdateSetting, ISetting } from '@/types/setting.type';
+import { SettingName, SettingPopulated, UnregisteredSettingPopulated, UpdateUnregisteredSettingPopulated } from '@/schemas/setting';
 import { LoadingStateError, LoadingState } from '@/types/utils/loading.type';
-import { DEFAULT_SETTINGS } from '@/utils/settings';
+import { findDefaultSettingByName, InferUnregisteredSettingPopulatedArray, SettingNameType } from '@/utils/settings';
+import { DEFAULT_SETTINGS } from '@/utils/settings/default-settings.util';
 
 import { SetSettingsStatePayload, SETTINGS_ERROR_ACTION, SETTINGS_IDLE_ACTION, SETTINGS_PENDING_ACTION, SETTINGS_SET_STATE_ACTION, SETTINGS_UPDATE_ACTION } from './settings.actions';
 import settingsReducer, { SettingsState } from './settings.reducer';
 
-import SettingsContext from '.';
+import SettingsContext, { SettingsContextValues } from '.';
 
 const INITIAL_STATE: SettingsState = {
 	settings: DEFAULT_SETTINGS,
 	loading: 'idle',
 };
 
-
 type SettingsProviderProps = {
 	children: ReactNode;
-	settings?: ISetting[],
+	settings?: UnregisteredSettingPopulated[] | SettingPopulated[],
 }
 
 const SettingsProvider = ({ settings: initialSettingsState = [], children }: SettingsProviderProps) => {
@@ -32,7 +32,7 @@ const SettingsProvider = ({ settings: initialSettingsState = [], children }: Set
 
 	const { refetch, data, isLoading, error } = useFetchSettings();
 
-	const updateSettings = useCallback((...settingssToUpdate: IUpdateSetting[]) => {
+	const updateSettings = useCallback((...settingssToUpdate: UpdateUnregisteredSettingPopulated[]) => {
 		dispatch({
 			type: SETTINGS_UPDATE_ACTION,
 			payload: settingssToUpdate,
@@ -63,8 +63,16 @@ const SettingsProvider = ({ settings: initialSettingsState = [], children }: Set
 		}
 	}, []);
 
-	const getSetting = useCallback((name: string) => {
-		return state.settings.find(setting => setting.name === name);
+	const getSetting = useCallback(<T extends SettingName>(name: T): UnregisteredSettingPopulated<SettingNameType<T>> | undefined => {
+		const settingFromState: UnregisteredSettingPopulated<SettingNameType<T>> | undefined = state.settings.find(setting => setting.name === name) as UnregisteredSettingPopulated<SettingNameType<T>> | undefined;
+		if (settingFromState) return settingFromState;
+		const defaultSetting = findDefaultSettingByName(name);
+		return defaultSetting as UnregisteredSettingPopulated<SettingNameType<T>> | undefined;
+	}, [ state ]);
+
+	const getSettings = useCallback(<T extends ReadonlyArray<SettingName>>(...names: T): InferUnregisteredSettingPopulatedArray<T> => {
+		return names.map(name => getSetting(name)) as any;
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ state ]);
 
 	useEffect(() => {
@@ -82,13 +90,14 @@ const SettingsProvider = ({ settings: initialSettingsState = [], children }: Set
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ isLoading, error, data ]);
 
-	const contextValues = useMemo(() => ({
+	const contextValues: SettingsContextValues = useMemo(() => ({
 		...state,
 		setSettingsState,
 		updateSettings,
 		setLoadingState,
 		refetchSettings: refetch,
 		getSetting,
+		getSettings,
 	}), [
 		state,
 		setSettingsState,
@@ -96,6 +105,7 @@ const SettingsProvider = ({ settings: initialSettingsState = [], children }: Set
 		setLoadingState,
 		refetch,
 		getSetting,
+		getSettings,
 	]);
 
 	return(

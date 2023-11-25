@@ -2,7 +2,7 @@ import { createTransport } from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
-import { isProductionEnv } from '@/utils/env.util';
+import { isProductionEnv, Env } from '@/utils/env.util';
 
 export type MailOptions = Mail.Options;
 export { SMTPTransport };
@@ -17,7 +17,7 @@ const options: SMTPTransport.Options = {
 	tls: { rejectUnauthorized: false },
 };
 
-if (!isProductionEnv(process.env.ENVIRONMENT)) {
+if (!isProductionEnv(Env.ENVIRONMENT)) {
 	options.secure = false;
 }
 

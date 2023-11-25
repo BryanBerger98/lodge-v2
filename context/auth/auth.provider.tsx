@@ -4,11 +4,12 @@ import { usePathname, useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
+import { UserPopulated } from '@/schemas/user/populated.schema';
 import { getCurrentLoggedInUser } from '@/services/auth.service';
-import { IUserPopulated } from '@/types/user.type';
 import { LoadingState } from '@/types/utils/loading.type';
-import { ApiError } from '@/utils/error';
-import { USER_NOT_FOUND_ERROR } from '@/utils/error/error-codes';
+import { ApiError } from '@/utils/api/error';
+import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
+import { getErrorMessage } from '@/utils/api/error/error-messages.util';
 import { Permission } from '@/utils/roles';
 
 import AuthContext from '.';
@@ -21,11 +22,12 @@ const UNAUTH_WHITELIST_PATHNAMES = [
 
 type AuthProviderProps = {
 	children: ReactNode;
+	currentUser?: UserPopulated | null;
 };
 
-const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
+const AuthProvider: FC<AuthProviderProps> = ({ children, currentUser: initialCurrentUser = null }) => {
 
-	const [ currentUser, setCurrentUser ] = useState<IUserPopulated | null>(null);
+	const [ currentUser, setCurrentUser ] = useState<UserPopulated | null>(initialCurrentUser);
 	const [ loading, setLoading ] = useState<LoadingState>('idle');
 	const [ error, setError ] = useState<string | null>(null);
 
@@ -54,7 +56,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 				})
 				.catch(error => {
 					const apiError = error as ApiError<unknown>;
-					if (apiError.code === USER_NOT_FOUND_ERROR) {
+					if (apiError.code === ApiErrorCode.USER_NOT_FOUND) {
 						signOut()
 							.catch(error => {
 								console.error(error);
@@ -64,7 +66,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 					} else {
 						console.error(apiError);
 						setLoading('error');
-						setError(apiError.message);
+						setError(getErrorMessage(apiError));
 					}
 				});
 		}
@@ -88,7 +90,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 		}
 	}, [ setCurrentUser ]);
 
-	const updateCurrentUser = useCallback(async (user: IUserPopulated) => {
+	const updateCurrentUser = useCallback(async (user: UserPopulated) => {
 		setCurrentUser({
 			...currentUser,
 			...user,

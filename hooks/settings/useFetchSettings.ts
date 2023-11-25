@@ -1,10 +1,10 @@
 import useSWR from 'swr';
 
 import fetcher from '@/lib/fetcher';
-import { ISetting } from '@/types/setting.type';
+import { SettingPopulated } from '@/schemas/setting';
 
 export type FetchSettingsResponse = {
-	settings: ISetting[],
+	settings: SettingPopulated[],
 };
 
 const useFetchSettings = () => {

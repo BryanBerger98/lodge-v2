@@ -1,8 +1,22 @@
 import { S3Client, GetObjectCommand, DeleteObjectCommand, PutObjectCommand, DeleteObjectsCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-import { IFile } from '@/types/file.type';
+import { IFile } from '@/schemas/file';
 import { generateUniqueNameFromFileName } from '@/utils/file.util';
+
+export enum DEFAULT_URL_EXPIRATION {
+	PROFILE_PICTURE = 7 * 24 * 60 * 60,
+};
+
+/**
+ * Generate an expiration date from a number of seconds
+ * @param expiration 
+ * @returns 
+ */
+export const generateExpirationDate = (expiration: number) => {
+	const MILLISECONDS = 1000;
+	return new Date(new Date().getTime() + (expiration + MILLISECONDS));
+};
 
 const config = {
 	credentials: {
@@ -22,7 +36,7 @@ export const getFileFromKey = async (file: IFile) => {
 	});
 	const res = await bucket.send(command);
 	const fileBuffer = await res.Body?.transformToByteArray();
-	return fileBuffer ? `data:${ file.mimetype };base64,${ Buffer.from(fileBuffer).toString('base64') }` : null;
+	return fileBuffer ? `data:${ file.mime_type };base64,${ Buffer.from(fileBuffer).toString('base64') }` : null;
 };
 
 export const getMultipleFiles = (files: IFile[]) => {
@@ -34,7 +48,7 @@ export const getMultipleFiles = (files: IFile[]) => {
 		const fileData = await bucket.send(command);
 		const fileBuffer = await fileData.Body?.transformToByteArray();
 		return {
-			fileString: fileBuffer ? `data:${ file.mimetype };base64,${ Buffer.from(fileBuffer).toString('base64') }` : null,
+			fileString: fileBuffer ? `data:${ file.mime_type };base64,${ Buffer.from(fileBuffer).toString('base64') }` : null,
 			key: file.key,
 		};
 	});
@@ -86,7 +100,7 @@ export const uploadImageToS3 = async (file: Blob, folderPath = ''): Promise<stri
 	return `${ folderPath }${ generatedFileName }`;
 };
 
-export const getFieldSignedURL = async (key: string, expires = 60 * 60 * 24 * 7) => {
+export const gitFileSignedURL = async (key: string, expires?: number) => {
 	const command = new GetObjectCommand({
 		Bucket: process.env.BUCKET_NAME as string,
 		Key: key, 
