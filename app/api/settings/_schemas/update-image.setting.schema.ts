@@ -7,5 +7,5 @@ export const UpdateImageSettingSchema = z.object({
 		[ SettingName.BRAND_LOGO ]: SettingName.BRAND_LOGO,
 		[ SettingName.BRAND_FAVICON ]: SettingName.BRAND_FAVICON,
 	}),
-	value: z.union([ z.instanceof(File), z.instanceof(Blob), z.null() ]),
+	value: z.union([ z.instanceof(Blob), z.null() ]),
 });

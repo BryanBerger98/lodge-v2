@@ -1,4 +1,4 @@
-type ConvertibleObject = Record<string, string | boolean | number | Date | Blob | File | null | undefined >;
+type ConvertibleObject = Record<string, string | boolean | number | Date | Blob | null | undefined >;
 
 const parseValue = (value: ConvertibleObject[keyof ConvertibleObject]) => {
 	if (value === null) {
@@ -7,7 +7,7 @@ const parseValue = (value: ConvertibleObject[keyof ConvertibleObject]) => {
 	if (value instanceof Date) {
 		return value.toISOString();
 	}
-	if ((value instanceof File) || (value instanceof Blob)) {
+	if (value instanceof Blob) {
 		return value;
 	}
 	switch (typeof value) {

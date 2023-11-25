@@ -61,7 +61,7 @@ export const updateSettings = async (settings: UnregisteredSetting[], options: F
 	}
 };
 
-export const updateImageSetting = async (setting: z.infer<typeof UpdateImageSettingSchema>, options: FetcherOptionsWithCsrf): Promise<{ message: string }> => {
+export const updateImageSetting = async (setting: z.infer<typeof UpdateImageSettingSchema>, options: FetcherOptionsWithCsrf): Promise<SettingPopulated | null> => {
 	try {
 		const formData = objectToFormData({ ...setting });
 		const data = await fetcher('/api/settings/image', {
@@ -69,7 +69,7 @@ export const updateImageSetting = async (setting: z.infer<typeof UpdateImageSett
 			body: formData,
 			...options,
 		});
-		return z.object({ message: z.string() }).parse(data);
+		return SettingPopulatedSchema.or(z.null()).parse(data);
 	} catch (error) {
 		throw error;
 	}
