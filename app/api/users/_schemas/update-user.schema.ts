@@ -9,7 +9,7 @@ export const UpdateUserSchema = z.object({
 	phone_number: z.coerce.string().optional(),
 	role: z.nativeEnum(Role).optional(),
 	is_disabled: z.enum([ 'true', 'false' ]).transform(value => value === 'true').optional(),
-	avatar: z.string().or(z.instanceof(File)).optional(),
+	avatar: z.string().or(z.instanceof(Blob)).optional(),
 	first_name: z.coerce.string({ required_error: 'Required.' }).min(1, 'Required.'),
 	last_name: z.coerce.string({ required_error: 'Required.' }).min(1, 'Required.'),
 	birth_date: z.coerce.date().optional(),

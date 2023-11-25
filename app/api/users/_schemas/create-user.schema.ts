@@ -4,7 +4,7 @@ import { Role } from '@/schemas/role.schema';
 import { Gender } from '@/schemas/user/gender.schema';
 
 export const CreateUserSchema = z.object({
-	avatar: z.string().or(z.instanceof(File)).optional(),
+	avatar: z.string().or(z.instanceof(Blob)).optional(),
 	username: z.coerce.string().optional(),
 	first_name: z.coerce.string({ required_error: 'Required.' }).min(1, 'Required.'),
 	last_name: z.coerce.string({ required_error: 'Required.' }).min(1, 'Required.'),

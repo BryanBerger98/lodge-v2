@@ -23,7 +23,7 @@ export const generateUniqueNameFromFileName = (filename: string): Promise<string
 	});
 };
 
-export const convertFileRequestObjetToModel = (fileObj: File | Blob, fileData: { key: string, url: string, expiration_date?: Date }): Omit<IFile, 'id' | 'created_by' | 'created_at' | 'updated_at' | 'updated_by'> => {
+export const convertFileRequestObjetToModel = (fileObj: Blob, fileData: { key: string, url: string, expiration_date?: Date }): Omit<IFile, 'id' | 'created_by' | 'created_at' | 'updated_at' | 'updated_by'> => {
 	const fileMimeType = MimeTypeSchema.parse(fileObj.type);
 	return {
 		original_name: fileObj.name,

@@ -5,13 +5,12 @@ import { ChangeEventHandler, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useToast } from '@/components/ui/use-toast';
 import useCsrf from '@/context/csrf/useCsrf';
 import useSettings from '@/context/settings/useSettings';
+import useErrorToast from '@/hooks/error/useErrorToast';
 import { SettingName } from '@/schemas/setting';
 import { deleteImageSetting, updateImageSetting } from '@/services/settings.service';
 import { ApiError } from '@/utils/api/error';
-import { getErrorMessage } from '@/utils/api/error/error-messages.util';
 
 type BrandLogoFormDialogProps = {
 	isOpen: boolean;
@@ -34,7 +33,7 @@ const BrandLogoFormDialog = ({ isOpen }: BrandLogoFormDialogProps) => {
 
 	const brandLogoSetting = getSetting(SettingName.BRAND_LOGO);
 
-	const { toast } = useToast();
+	const { triggerErrorToast } = useErrorToast();
 
 	const handleClose = () => {
 		const params = new URLSearchParams(searchParams);
@@ -54,12 +53,7 @@ const BrandLogoFormDialog = ({ isOpen }: BrandLogoFormDialogProps) => {
 			refetchSettings();
 			handleClose();
 		} catch (error) {
-			const apiError = error as ApiError<unknown>;
-			toast({
-				title: 'Error',
-				description: getErrorMessage(apiError),
-				variant: 'destructive',
-			});
+			triggerErrorToast(error as ApiError<unknown>);
 		} finally {
 			setIsLoading(false);
 		}
@@ -81,12 +75,7 @@ const BrandLogoFormDialog = ({ isOpen }: BrandLogoFormDialogProps) => {
 			refetchSettings();
 			handleClose();
 		} catch (error) {
-			const apiError = error as ApiError<unknown>;
-			toast({
-				title: 'Error',
-				description: getErrorMessage(apiError),
-				variant: 'destructive',
-			});
+			triggerErrorToast(error as ApiError<unknown>);
 		} finally {
 			setIsDeletionLoading(false);
 		}
