@@ -10,8 +10,8 @@ export const UpdateUserSchema = z.object({
 	role: z.nativeEnum(Role).optional(),
 	is_disabled: z.enum([ 'true', 'false' ]).transform(value => value === 'true').optional(),
 	avatar: z.string().or(z.instanceof(Blob)).optional(),
-	first_name: z.coerce.string({ required_error: 'Required.' }).min(1, 'Required.'),
-	last_name: z.coerce.string({ required_error: 'Required.' }).min(1, 'Required.'),
+	first_name: z.coerce.string({ required_error: 'Required.' }).optional(),
+	last_name: z.coerce.string({ required_error: 'Required.' }).optional(),
 	birth_date: z.coerce.date().optional(),
 	gender: z.nativeEnum(Gender).optional(),
 });
