@@ -2,7 +2,7 @@ import { AlertTriangle } from 'lucide-react';
 
 import ButtonList from '@/components/ui/Button/ButtonList';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heading4 } from '@/components/ui/Typography/heading';
+import { Heading2 } from '@/components/ui/Typography/heading';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
 import { Role } from '@/schemas/role.schema';
@@ -24,7 +24,7 @@ const AccountDangerZonePage = async () => {
 
 	return (
 		<>
-			<Heading4 className="gap-2 flex items-center text-destructive"><AlertTriangle size="16" />Danger zone</Heading4>
+			<Heading2 className="flex gap-2 items-center text-destructive"><AlertTriangle /> Danger zone</Heading2>
 			<Card>
 				<CardHeader>
 					<CardTitle className="text-destructive">Danger zone</CardTitle>

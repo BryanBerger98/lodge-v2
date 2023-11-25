@@ -148,7 +148,7 @@ const Menu = () => {
 					>
 						<span className="sr-only">Open menu</span>
 						<MoreHorizontal size="16" />
-						Actions
+						<span className="hidden md:inline">Actions</span>
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">

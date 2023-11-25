@@ -1,17 +1,19 @@
-import { Database, Globe, KeyRound, Mail, Settings, Star, Unlock, Unplug, Users } from 'lucide-react';
+import { Database, Globe, KeyRound, Mail, Star, Unlock, Unplug, Users } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ReactNode } from 'react';
 
 import { hasSettingsAccess } from '@/app/_utils/settings/has-settings-access';
-import PageTitle from '@/components/layout/Header/PageTitle';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import CsrfProvider from '@/context/csrf/csrf.provider';
 import SettingsProvider from '@/context/settings/settings.provider';
 import { getCsrfToken } from '@/lib/csrf';
 import { connectToDatabase } from '@/lib/database';
 import { getServerCurrentUser } from '@/utils/auth';
+
+const SettingsHeader = dynamic(() => import('./_components/SettingsHeader'));
 
 type SettingsLayoutProps = {
 	children: ReactNode;
@@ -39,14 +41,14 @@ const SettingsLayout = async ({ children }: SettingsLayoutProps) => {
 
 	return (
 		<>
-			<PageTitle><Settings /> Settings</PageTitle>
-			<div className="flex flex-col lg:flex-row gap-4">
+			<SettingsHeader />
+			<div className="flex flex-col lg:flex-row gap-4 w-full">
 				<Tabs
-					className="h-full"
+					className="h-full max-w-full"
 					defaultValue={ subpath || 'access' }
 					orientation="vertical"
 				>
-					<TabsList className="bg-transparent flex-row lg:flex-col !justify-start h-full lg:overflow-x-auto lg:min-w-[220px] items-start !gap-0">
+					<TabsList className="bg-transparent flex-row lg:flex-col !justify-start h-full overflow-x-scroll w-full no-scrollbar lg:overflow-x-auto lg:min-w-[220px] items-start !gap-0">
 						<TabsTrigger
 							className="gap-2 items-center w-full justify-start"
 							value="access"

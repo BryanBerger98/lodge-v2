@@ -6,7 +6,10 @@ import { z } from 'zod';
 
 import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
 import { FetchUsersSchema } from '@/app/api/users/_schemas/fetch-users.schema';
-import PageTitle from '@/components/layout/Header/PageTitle';
+import PageHeader from '@/components/layout/PageHeader';
+import PageHeaderTitle from '@/components/layout/PageHeader/PageHeaderTitle';
+import SidebarToggleButton from '@/components/layout/Sidebar/SidebarToggleButton';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import CsrfProvider from '@/context/csrf/csrf.provider';
@@ -73,14 +76,33 @@ const UsersPage = async ({ searchParams }: UsersPageProps) => {
 				total={ totalUsers }
 				users={ parsedUsers }
 			>
-				<PageTitle
-					headerButton={ {
-						asChild: true,
-						variant: 'ghost',
-						children: <Link href="/users/new"><Plus /></Link>,
-					} }
-				><Users /> Users
-				</PageTitle>
+				<PageHeader>
+					<SidebarToggleButton />
+					<PageHeaderTitle>
+						<Users /> Users
+					</PageHeaderTitle>
+					<Button
+						className="absolute right-2 top-2 bottom-2 p-0 h-10 w-10"
+						variant="ghost"
+						asChild
+					>
+						<Link href="/users/new">
+							<Plus />
+						</Link>
+					</Button>
+				</PageHeader>
+				<Breadcrumb className="mb-4 hidden md:block">
+					<BreadcrumbItem>
+						<BreadcrumbLink
+							as={ Link }
+							className="flex items-center gap-2"
+							href="/users"
+						>
+							<Users className="w-4 h-4" />
+							Users
+						</BreadcrumbLink>
+					</BreadcrumbItem>
+				</Breadcrumb>
 				<div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 					<Card>
 						<CardHeader>

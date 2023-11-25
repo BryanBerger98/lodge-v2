@@ -1,11 +1,14 @@
-import { ChevronLeft, User } from 'lucide-react';
+import { User, Users } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
-import PageTitle from '@/components/layout/Header/PageTitle';
-import BackButton from '@/components/ui/Button/BackButton';
+import PageHeader from '@/components/layout/PageHeader';
+import PageHeaderTitle from '@/components/layout/PageHeader/PageHeaderTitle';
+import SidebarToggleButton from '@/components/layout/Sidebar/SidebarToggleButton';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb';
 import CsrfProvider from '@/context/csrf/csrf.provider';
 import UserProvider from '@/context/users/user/user.provider';
 import { findUserById } from '@/database/user/user.repository';
@@ -43,14 +46,37 @@ const EditUserPage = async ({ params }: EditUserPageProps) => {
 
 	return (
 		<>
-			<PageTitle><User /> Edit user</PageTitle>
+			<PageHeader>
+				<SidebarToggleButton />
+				<PageHeaderTitle>
+					<User /> 
+					{ parsedUserData.first_name && parsedUserData.last_name ? `${ parsedUserData.first_name } ${ parsedUserData.last_name }` : parsedUserData.username ? parsedUserData.username : parsedUserData.email }
+				</PageHeaderTitle>
+			</PageHeader>
+			<Breadcrumb className="mb-4 hidden md:block">
+				<BreadcrumbItem>
+					<BreadcrumbLink
+						as={ Link }
+						className="flex items-center gap-2"
+						href="/users"
+					>
+						<Users className="w-4 h-4" />
+						Users
+					</BreadcrumbLink>
+				</BreadcrumbItem>
+				<BreadcrumbItem isCurrentPage>
+					<BreadcrumbLink
+						as={ Link }
+						href={ `/users/${ parsedUserData.id }` }
+					>
+						{ parsedUserData.first_name && parsedUserData.last_name ? `${ parsedUserData.first_name } ${ parsedUserData.last_name }` : parsedUserData.username ? parsedUserData.username : parsedUserData.email }
+					</BreadcrumbLink>
+				</BreadcrumbItem>
+			</Breadcrumb>
 			<CsrfProvider csrfToken={ csrfToken }>
 				<UserProvider user={ parsedUserData }>
 					<div className="grid gird-cols-1 lg:grid-cols-3">
 						<div className="col-span-2 space-y-8">
-							<BackButton className="mb-0">
-								<ChevronLeft /> Back
-							</BackButton>
 							<UserHeader />
 							<UserForm />
 						</div>

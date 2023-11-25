@@ -9,7 +9,7 @@ const BrandSettingsForm = dynamic(() => import('./_components/BrandSettingsForm'
 const BrandingSettingsPage = () => {
 
 	return (
-		<div className="flex flex-col gap-8 mt-0 w-1/2">
+		<div className="flex flex-col gap-8 lg:w-1/2">
 			<Heading2 className="flex gap-2 items-center"><Star /> Branding settings</Heading2>
 			<BrandSettingsForm />
 		</div>

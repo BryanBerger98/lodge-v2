@@ -2,7 +2,7 @@ import dynamic from 'next/dynamic';
 import { redirect } from 'next/navigation';
 import { ReactNode } from 'react';
 
-import HeaderProvider from '@/components/layout/Header';
+import SidebarProvider from '@/components/layout/Sidebar/SidebarProvider';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
 import { UnregisteredSettingBooleanPopulatedSchema, UnregisteredSettingImagePopulatedSchema, UnregisteredSettingStringPopulatedSchema } from '@/schemas/setting';
@@ -45,16 +45,16 @@ const AppLayout = async ({ children }: AppLayoutProps) => {
 	const hasUserSettingsAccess = await hasSettingsAccess(currentUser);
 
 	return (
-		<HeaderProvider>
-			<Sidebar
-				brandName={ bandName }
-				hasSettingsAccess={ hasUserSettingsAccess }
-				logoUrl={ brandLogo }
-			/>
-			<div className="ml-0 md:ml-[200px] container !w-auto p-4 lg:p-8">
+		<SidebarProvider
+			brandName={ bandName }
+			hasSettingsAccess={ hasUserSettingsAccess }
+			logoUrl={ brandLogo }
+		>
+			<Sidebar/>
+			<div className="ml-0 md:ml-[248px] p-4 lg:p-8">
 				{ children }
 			</div>
-		</HeaderProvider>
+		</SidebarProvider>
 	);
 };
 

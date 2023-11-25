@@ -2,7 +2,7 @@ import { Lock } from 'lucide-react';
 
 import ButtonList from '@/components/ui/Button/ButtonList';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heading4 } from '@/components/ui/Typography/heading';
+import { Heading2 } from '@/components/ui/Typography/heading';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { connectToDatabase } from '@/lib/database';
 import { SettingName, UnregisteredSettingBooleanPopulatedSchema, UnregisteredSettingNumberPopulatedSchema } from '@/schemas/setting';
@@ -32,7 +32,7 @@ const AccountSecurityPage = async () => {
 
 	return (
 		<>
-			<Heading4 className="gap-2 flex items-center"><Lock size="16" />Security</Heading4>
+			<Heading2 className="flex gap-2 items-center"><Lock /> Security</Heading2>
 			<Card>
 				<CardHeader>
 					<CardTitle>Authentication</CardTitle>

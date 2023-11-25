@@ -23,7 +23,7 @@ const UsersSettingsPage = async () => {
 	const userAccountDeletionSetting = UnregisteredSettingBooleanPopulatedSchema.parse(userAccountDeletionSettingData);
 
 	return (
-		<div className="w-1/2 flex flex-col gap-8 mt-0">
+		<div className="lg:w-1/2 flex flex-col gap-8">
 			<Heading2 className="flex gap-2 items-center"><Users /> Users settings</Heading2>
 			<div className="space-y-4">
 				<Paragraph variant="lead">Accounts settings</Paragraph>
