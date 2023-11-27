@@ -1,12 +1,12 @@
 import { Reducer } from 'react';
 
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 import { LoadingState } from '@/types/utils/loading.type';
 
 import { USERS_ACTION, UsersReducerAction } from './users.actions';
 
 export type UsersState = {
-	users: UserPopulated[];
+	users: IUserPopulated[];
 	total: number;
 	loading: LoadingState;
 	error?: string;

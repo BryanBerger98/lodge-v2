@@ -9,4 +9,4 @@ export const FilePopulatedSchema = FileSchema.extend({
 	updated_by: UserSchema.nullable(),
 });
 
-export type IFilePopulated = z.infer<typeof FilePopulatedSchema>;
+export interface IFilePopulated extends z.infer<typeof FilePopulatedSchema> {};

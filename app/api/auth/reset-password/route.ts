@@ -6,7 +6,7 @@ import { createToken, deleteTokenById, getTokenFromTargetId, getTokenFromTokenSt
 import { findUserByEmail, findUserById, updateUserPassword } from '@/database/user/user.repository';
 import { generateToken, verifyToken } from '@/lib/jwt';
 import { SettingName } from '@/schemas/setting';
-import { Token, TokenAction } from '@/schemas/token.schema';
+import { IToken, TokenAction } from '@/schemas/token.schema';
 import { Optional } from '@/types/utils';
 import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
@@ -63,7 +63,7 @@ export const POST = routeHandler(async (request) => {
 
 	await sendResetPasswordEmail(userData, savedToken);
 
-	const safeTokenData: Optional<Token, 'token'> = savedToken;
+	const safeTokenData: Optional<IToken, 'token'> = savedToken;
 	delete safeTokenData.token;
 
 	return NextResponse.json(safeTokenData);

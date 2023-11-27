@@ -2,7 +2,7 @@ import Credentials from 'next-auth/providers/credentials';
 
 import { findUserWithPasswordByEmail, updateUser } from '@/database/user/user.repository';
 import { connectToDatabase } from '@/lib/database';
-import { UserPopulatedWithPassword } from '@/schemas/user/populated.schema';
+import { IUserPopulatedWithPassword } from '@/schemas/user/populated.schema';
 import { Optional } from '@/types/utils';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
@@ -70,7 +70,7 @@ const CredentialsProvider = Credentials({
 				last_login_date: new Date(), 
 			});
 
-			const sanitizedUser: Optional<UserPopulatedWithPassword, 'password'> = updatedUser ? updatedUser : user;
+			const sanitizedUser: Optional<IUserPopulatedWithPassword, 'password'> = updatedUser ? updatedUser : user;
 
 			delete sanitizedUser.password;
 

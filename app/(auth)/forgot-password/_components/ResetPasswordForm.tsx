@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { object, string, z } from 'zod';
 
-import PasswordValidationCheckList from '@/components/features/auth/PasswordValidationCheckList';
+import PasswordValidationCheckList from '@/app/(auth)/_components/PasswordValidationCheckList';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';

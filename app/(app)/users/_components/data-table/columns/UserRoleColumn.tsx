@@ -2,10 +2,10 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import { Badge } from '@/components/ui/badge';
 import ColumnHeadSort from '@/components/ui/DataTable/Columns/ColumnHeadSort';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
 
-const UserRoleColumn: ColumnDef<UserPopulated> = {
+const UserRoleColumn: ColumnDef<IUserPopulated> = {
 	id: 'role',
 	accessorKey: 'role',
 	header: ({ column }) => <ColumnHeadSort column={ column }>Role</ColumnHeadSort>,

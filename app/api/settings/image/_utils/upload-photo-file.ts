@@ -2,13 +2,13 @@ import { createFile, deleteFileById, findFileById } from '@/database/file/file.r
 import { DEFAULT_URL_EXPIRATION, deleteFileFromKey, gitFileSignedURL, uploadImageToS3 } from '@/lib/bucket';
 import { ImageMimeTypeSchema } from '@/schemas/file/mime-type.schema';
 import { Setting, SettingDataType, SettingPopulated, UnregisteredSetting, UnregisteredSettingPopulated } from '@/schemas/setting';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
 import { StatusCode } from '@/utils/api/http-status';
 import { AUTHORIZED_IMAGE_MIME_TYPES, AUTHORIZED_IMAGE_SIZE, convertFileRequestObjetToModel } from '@/utils/file.util';
 
-export const uploadPhotoFile = async (currentUser: UserPopulated, photoFile?: Blob | null, setting?: SettingPopulated | Setting | UnregisteredSetting | UnregisteredSettingPopulated | null) => {
+export const uploadPhotoFile = async (currentUser: IUserPopulated, photoFile?: Blob | null, setting?: SettingPopulated | Setting | UnregisteredSetting | UnregisteredSettingPopulated | null) => {
 	try {
 		if (!setting || setting.data_type !== SettingDataType.IMAGE) {
 			throw buildApiError({

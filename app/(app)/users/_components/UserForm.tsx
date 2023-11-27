@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Save } from 'lucide-react';
 import { useRouter } from 'next-nprogress-bar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -15,12 +15,12 @@ import useCsrf from '@/context/csrf/useCsrf';
 import useUser from '@/context/users/user/useUser';
 import useErrorToast from '@/hooks/error/useErrorToast';
 import { Role } from '@/schemas/role.schema';
+import { Gender } from '@/schemas/user/gender.schema';
 import { createUser, updateUser } from '@/services/users.service';
 import { ApiError } from '@/utils/api/error';
 
 import UserAccessRightsFormBlock, { UserAccessRightsFormBlockSchema } from './form-blocks/UserAccessRightsFormBlock';
 import UserPersonalInformationsFormBlock, { UserPersonalInformationsFormBlockSchema } from './form-blocks/UserPersonalInformationsFormBlock';
-
 
 const UserFormSchema = z.object({}).merge(UserPersonalInformationsFormBlockSchema).merge(UserAccessRightsFormBlockSchema).merge(ProfilePhotoFieldSchema);
 
@@ -40,18 +40,34 @@ const UserForm = () => {
 		resolver: zodResolver(UserFormSchema),
 		mode: 'onSubmit',
 		defaultValues: {
-			email: user?.email,
-			first_name: user?.first_name || undefined,
-			last_name: user?.last_name || undefined,
-			phone_number: user?.phone_number,
+			email: user?.email || '',
+			first_name: user?.first_name || '',
+			last_name: user?.last_name || '',
+			phone_number: user?.phone_number || '',
 			role: user?.role || Role.USER,
 			is_disabled: user?.is_disabled || false,
-			username: user?.username || undefined,
+			username: user?.username || '',
 			birth_date: user?.birth_date || undefined,
 			avatar: user?.photo?.url,
-			gender: user?.gender,
+			gender: user?.gender || Gender.UNSPECIFIED,
 		},
 	});
+
+	useEffect(() => {
+		if (user) {
+			form.setValue('email', user.email);
+			form.setValue('first_name', user.first_name || '');
+			form.setValue('last_name', user.last_name || '');
+			form.setValue('phone_number', user.phone_number);
+			form.setValue('role', user.role);
+			form.setValue('is_disabled', user.is_disabled);
+			form.setValue('username', user.username || '');
+			form.setValue('birth_date', user.birth_date || undefined);
+			form.setValue('avatar', user.photo?.url);
+			form.setValue('gender', user.gender || Gender.UNSPECIFIED);
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ user ]);
 
 	const handleSubmit = async (values: UserFormValues) => {
 		try {
@@ -108,8 +124,8 @@ const UserForm = () => {
 					</CardContent>
 				</Card>
 				<div className="flex justify-end">
-					<Button>
-						{ isLoading ? <Loader2 className="w4 h-4 animate-spin" /> : <Save className="w4 h-4" /> }
+					<Button disabled={ isLoading }>
+						{ isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" /> }
 						Save
 					</Button>
 				</div>

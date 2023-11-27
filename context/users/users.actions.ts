@@ -1,4 +1,4 @@
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
 import { UsersState } from './users.reducer';
 
@@ -16,7 +16,7 @@ type SetUsersStateAction = {
 	payload: SetUsersStatePayload;
 }
 
-export type UpdateUsersPayload = (Partial<UserPopulated> & { id: string })[];
+export type UpdateUsersPayload = (Partial<IUserPopulated> & { id: string })[];
 type UpdateUsersAction = {
 	type: USERS_ACTION.UPDATE;
 	payload: UpdateUsersPayload;

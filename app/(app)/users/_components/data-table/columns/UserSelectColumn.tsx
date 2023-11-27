@@ -2,9 +2,9 @@ import { CheckedState } from '@radix-ui/react-checkbox';
 import { ColumnDef } from '@tanstack/react-table';
 
 import { Checkbox } from '@/components/ui/checkbox';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
-const UserSelectColumn: ColumnDef<UserPopulated> = {
+const UserSelectColumn: ColumnDef<IUserPopulated> = {
 	id: 'select',
 	header: ({ table }) => {
 		const handleCheckedChange = (value: CheckedState) => table.toggleAllPageRowsSelected(!!value);

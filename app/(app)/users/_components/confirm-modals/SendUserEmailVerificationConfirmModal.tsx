@@ -5,13 +5,13 @@ import { useState } from 'react';
 import ConfirmModal from '@/components/ui/Modal/ConfirmModal';
 import useCsrf from '@/context/csrf/useCsrf';
 import useErrorToast from '@/hooks/error/useErrorToast';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 import { sendVerificationTokenToUser } from '@/services/users.service';
 import { ApiError } from '@/utils/api/error';
 
 type SendUserEmailVerificationConfirmModalProps = {
-	user: UserPopulated;
-	onChange: ({ openState, user }: { openState: boolean, user: UserPopulated | null }) => void;
+	user: IUserPopulated;
+	onChange: ({ openState, user }: { openState: boolean, user: IUserPopulated | null }) => void;
 	isOpen: boolean;
 };
 

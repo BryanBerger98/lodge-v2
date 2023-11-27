@@ -2,9 +2,9 @@ import jwt from 'jsonwebtoken';
 
 import { TokenAction } from '@/schemas/token.schema';
 import { User } from '@/schemas/user';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
-export const generateToken = (user: User | UserPopulated, expirationDate: Date | number, action: TokenAction) => {
+export const generateToken = (user: User | IUserPopulated, expirationDate: Date | number, action: TokenAction) => {
 	const { JWT_SECRET } = process.env;
 	if (!JWT_SECRET) {
 		throw new Error('No secret provided for JWT.');

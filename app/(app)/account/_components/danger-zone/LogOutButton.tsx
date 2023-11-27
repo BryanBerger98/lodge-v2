@@ -5,7 +5,7 @@ import { signOut } from 'next-auth/react';
 import { useState } from 'react';
 
 import ButtonItem from '@/components/ui/Button/ButtonList/ButtonItem';
-import DialogConfirm from '@/components/ui/Dialog/DialogConfirm';
+import ConfirmModal from '@/components/ui/Modal/ConfirmModal';
 import useErrorToast from '@/hooks/error/useErrorToast';
 import { ApiError } from '@/utils/api/error';
 
@@ -51,7 +51,7 @@ const LogOutButton = () => {
 			>
 				Log out
 			</ButtonItem>
-			<DialogConfirm
+			<ConfirmModal
 				description="Are you sure you want to log out ?"
 				isLoading={ isLoading }
 				open={ isDialogConfirmOpen }

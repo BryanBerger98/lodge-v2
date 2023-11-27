@@ -8,7 +8,7 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import useUser from '@/context/users/user/useUser';
 import { Role } from '@/schemas/role.schema';
 
-import Menu from './Menu';
+import UserHeaderMenu from './UserHeaderMenu';
 
 const UserHeader = () => {
 
@@ -50,7 +50,7 @@ const UserHeader = () => {
 					</div>
 				</div>
 				<div className="ml-auto mb-auto self-start flex gap-4">
-					<Menu />
+					<UserHeaderMenu />
 				</div>
 			</CardHeader>
 		</Card>

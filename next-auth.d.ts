@@ -3,18 +3,18 @@ import type { AdapterUser as NextAuthAdapterUser, Adapter as NextAuthAdapter } f
 import { JWT } from 'next-auth/jwt';
 
 import { Role } from './schemas/role.schema';
-import { UserPopulated } from './schemas/user/populated.schema';
+import { IUserPopulated } from './schemas/user/populated.schema';
 
 declare module 'next-auth' {
   /**
    * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
    */
 
-	interface User extends UserPopulated {}
+	interface User extends IUserPopulated {}
 
 	interface Session {
 		user: User
-		token: JWT & UserPopulated & {
+		token: JWT & IUserPopulated & {
 			action?: TokenAction;
 		}
 	}
@@ -22,7 +22,7 @@ declare module 'next-auth' {
 
 declare module 'next-auth/jwt' {
 	/** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
-	interface JWT extends UserPopulated {
+	interface JWT extends IUserPopulated {
 		action?: TokenAction;
 	}
 }

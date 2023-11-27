@@ -7,14 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Role } from '@/schemas/role.schema';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 import { fetchUsers } from '@/services/users.service';
 import { cn } from '@/utils/ui.util';
 
 type SearchSelectUsersModalProps = {
 	isOpen: boolean;
-	onOpenChange: (event: { openState: boolean, selected: UserPopulated[] }) => void;
-	alreadySelected?: UserPopulated[];
+	onOpenChange: (event: { openState: boolean, selected: IUserPopulated[] }) => void;
+	alreadySelected?: IUserPopulated[];
 	roles?: Role[];
 	title?: ReactNode;
 	description?: ReactNode;
@@ -24,8 +24,8 @@ type SearchSelectUsersModalProps = {
 
 const SearchSelectUsersModal = ({ isOpen, onOpenChange, alreadySelected, roles = [ Role.ADMIN, Role.USER, Role.OWNER ], title = 'Search users', description = 'Search and select one or multiple users.', noResultsText = 'No user found.', searchPlaceholder = 'Search...' }: SearchSelectUsersModalProps) => {
 
-	const [ selected, setSelected ] = useState<UserPopulated[]>([]);
-	const [ options, setOptions ] = useState<UserPopulated[]>([]);
+	const [ selected, setSelected ] = useState<IUserPopulated[]>([]);
+	const [ options, setOptions ] = useState<IUserPopulated[]>([]);
 	const [ isLoading, setIsLoading ] = useState(false);
 
 	const handleOpenChange = (openState: boolean) => {
@@ -51,7 +51,7 @@ const SearchSelectUsersModal = ({ isOpen, onOpenChange, alreadySelected, roles =
 		}
 	};
 
-	const handleSelect = (option: UserPopulated) => () => {
+	const handleSelect = (option: IUserPopulated) => () => {
 		if (selected.find(el => el.id.toString() === option.id.toString())) {
 			setSelected((prevSelected) => prevSelected.filter((prevOption) => prevOption.id !== option.id));
 		} else {
@@ -177,7 +177,7 @@ const SearchSelectUsersModal = ({ isOpen, onOpenChange, alreadySelected, roles =
 						onClick={ handleValidate }
 					>
 						<Check size="16" />
-						Valider
+						Validate
 					</Button>
 				</DialogFooter>
 			</DialogContent>

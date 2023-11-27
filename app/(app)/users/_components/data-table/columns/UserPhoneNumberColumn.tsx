@@ -2,9 +2,9 @@ import { ColumnDef } from '@tanstack/react-table';
 import { parsePhoneNumber } from 'react-phone-number-input';
 
 import ColumnHeadSort from '@/components/ui/DataTable/Columns/ColumnHeadSort';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
-const UserPhoneNumberColumn: ColumnDef<UserPopulated> = {
+const UserPhoneNumberColumn: ColumnDef<IUserPopulated> = {
 	id: 'phone_number',
 	accessorKey: 'phone_number',
 	header: ({ column }) => <ColumnHeadSort column={ column }>Phone</ColumnHeadSort>,
