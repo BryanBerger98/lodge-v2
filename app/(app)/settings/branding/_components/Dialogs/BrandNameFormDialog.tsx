@@ -11,13 +11,12 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/components/ui/use-toast';
 import useCsrf from '@/context/csrf/useCsrf';
 import useSettings from '@/context/settings/useSettings';
+import useErrorToast from '@/hooks/error/useErrorToast';
 import { SettingDataType, SettingName } from '@/schemas/setting';
 import { updateSettings } from '@/services/settings.service';
 import { ApiError } from '@/utils/api/error';
-import { getErrorMessage } from '@/utils/api/error/error-messages.util';
 
 type BrandNameFormDialogProps = {
 	isOpen: boolean;
@@ -38,7 +37,7 @@ const BrandNameFormDialog = ({ isOpen }: BrandNameFormDialogProps) => {
 
 	const brandNameSetting = getSetting(SettingName.BRAND_NAME);
 
-	const { toast } = useToast();
+	const { triggerErrorToast } = useErrorToast();
 
 	const form = useForm<z.infer<typeof brandNameFormSchema>>({
 		resolver: zodResolver(brandNameFormSchema),
@@ -77,12 +76,7 @@ const BrandNameFormDialog = ({ isOpen }: BrandNameFormDialogProps) => {
 			refetchSettings();
 			handleClose();
 		} catch (error) {
-			const apiError = error as ApiError<unknown>;
-			toast({
-				title: 'Error',
-				description: getErrorMessage(apiError),
-				variant: 'destructive',
-			});
+			triggerErrorToast(error as ApiError<unknown>, form);
 		} finally {
 			setIsLoading(false);
 		}

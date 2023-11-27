@@ -20,7 +20,7 @@ const DeleteMultipleUserAccountsConfirmModal = ({ users, isOpen, onChange }: Del
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 
 	const { csrfToken } = useCsrf();
-	const { triggerErrorToast } = useErrorToast({ logError: true });
+	const { triggerErrorToast } = useErrorToast();
 
 	const handleConfirm = async ({ openState, isConfirmed }: { openState: boolean, isConfirmed: boolean }) => {
 		if (!isConfirmed) return onChange({
