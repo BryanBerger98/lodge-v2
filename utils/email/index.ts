@@ -1,9 +1,9 @@
 import { render } from '@react-email/render';
 
 import { MailOptions, SMTPTransport, sendMail } from '@/lib/mailer';
-import { Token } from '@/schemas/token.schema';
+import { IToken } from '@/schemas/token.schema';
 import { User } from '@/schemas/user';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
 import EmailVerification from './templates/EmailVerification';
 import MagicLinkSignIn from './templates/MagicLinkSignIn';
@@ -32,7 +32,7 @@ export const sendEmail = async (to: string, cc: string[], bcc: string[], subject
 	}
 };
 
-export const sendMagicLinkSignInEmail = (user: User | UserPopulated, url: string) => {
+export const sendMagicLinkSignInEmail = (user: User | IUserPopulated, url: string) => {
 	return new Promise((resolve, reject) => {
 		const htmlBody = render(MagicLinkSignIn({
 			url,
@@ -45,7 +45,7 @@ export const sendMagicLinkSignInEmail = (user: User | UserPopulated, url: string
 	});
 };
 
-export const sendAccountVerificationEmail = (user: User | UserPopulated, token: Token) => {
+export const sendAccountVerificationEmail = (user: User | IUserPopulated, token: IToken) => {
 	return new Promise((resolve, reject) => {
 		const tokenLink = `${ process.env.FRONT_URL }/verify-email/${ token.token }`;
 		const htmlBody = render(EmailVerification({
@@ -60,7 +60,7 @@ export const sendAccountVerificationEmail = (user: User | UserPopulated, token: 
 	});
 };
 
-export const sendResetPasswordEmail = (user: User | UserPopulated, token: Token) => {
+export const sendResetPasswordEmail = (user: User | IUserPopulated, token: IToken) => {
 	return new Promise((resolve, reject) => {
 		const tokenLink = `${ process.env.FRONT_URL }/forgot-password/${ token.token }`;
 		const htmlBody = render(ResetPassword({
@@ -75,7 +75,7 @@ export const sendResetPasswordEmail = (user: User | UserPopulated, token: Token)
 	});
 };
 
-export const sendNewEmailConfirmationEmail = (user: User | UserPopulated, token: Token) => {
+export const sendNewEmailConfirmationEmail = (user: User | IUserPopulated, token: IToken) => {
 	return new Promise((resolve, reject) => {
 		if (!user.new_email) {
 			reject(new Error('User does not have a new email address.'));

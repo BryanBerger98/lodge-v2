@@ -6,7 +6,7 @@ import authOptions from '@/lib/auth';
 import { connectToDatabase } from '@/lib/database';
 import { Role } from '@/schemas/role.schema';
 import { User } from '@/schemas/user';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
 import { buildApiError } from '../api/error';
 import { ApiErrorCode } from '../api/error/error-codes.util';
@@ -18,7 +18,7 @@ export interface ProtectionOptions {
 	redirect?: boolean | string;
 }
 
-export const getServerCurrentUser = async (): Promise<UserPopulated | null> => {
+export const getServerCurrentUser = async (): Promise<IUserPopulated | null> => {
 	const session = await getServerSession(authOptions);
 	const currentUser = session?.user;
 
@@ -76,7 +76,7 @@ export const setServerAuthGuard = async (options?: ProtectionOptions) => {
 	};
 };
 
-export const authenticateUserWithPassword = async (userToAuthenticate: User | UserPopulated, password?: string) => {
+export const authenticateUserWithPassword = async (userToAuthenticate: User | IUserPopulated, password?: string) => {
 	try {
 		if (!password) {
 			throw buildApiError({

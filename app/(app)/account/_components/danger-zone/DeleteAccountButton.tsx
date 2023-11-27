@@ -4,7 +4,7 @@ import { Trash2 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
 
-import PasswordModal from '@/components/features/auth/PasswordModal';
+import PasswordModal from '@/app/_components/modals/auth/PasswordModal';
 import ButtonItem from '@/components/ui/Button/ButtonList/ButtonItem';
 import useCsrf from '@/context/csrf/useCsrf';
 import useErrorToast from '@/hooks/error/useErrorToast';

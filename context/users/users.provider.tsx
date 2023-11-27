@@ -3,7 +3,7 @@
 import { ReactNode, useCallback, useEffect, useMemo, useReducer } from 'react';
 
 import useFetchUsers from '@/hooks/users/useFetchUsers';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 import { LoadingState, LoadingStateError } from '@/types/utils/loading.type';
 
 import { SetUsersStatePayload, USERS_ACTION } from './users.actions';
@@ -19,7 +19,7 @@ const INITIAL_STATE: UsersState = {
 
 type UsersProviderProps = {
 	children: ReactNode;
-	users?: UserPopulated[],
+	users?: IUserPopulated[],
 	total?: number,
 }
 
@@ -33,7 +33,7 @@ const UsersProvider = ({ users: initialUsersState = [], total = 0, children }: U
 
 	const { refetch, routeParams, data, isLoading, error } = useFetchUsers();
 
-	const updateUsers = useCallback((...usersToUpdate: (Partial<UserPopulated> & { id: string })[]) => {
+	const updateUsers = useCallback((...usersToUpdate: (Partial<IUserPopulated> & { id: string })[]) => {
 		dispatch({
 			type: USERS_ACTION.UPDATE,
 			payload: usersToUpdate,

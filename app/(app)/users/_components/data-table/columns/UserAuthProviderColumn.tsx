@@ -6,7 +6,7 @@ import GoogleIcon from '@/components/icons/google';
 import ColumnHeadSort from '@/components/ui/DataTable/Columns/ColumnHeadSort';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AuthenticationProvider } from '@/schemas/authentication-provider';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
 const getProviderIcon = (provider: AuthenticationProvider) => {
 	switch (provider) {
@@ -21,7 +21,7 @@ const getProviderIcon = (provider: AuthenticationProvider) => {
 	}
 };
 
-const UserAuthProviderColumn: ColumnDef<UserPopulated> = {
+const UserAuthProviderColumn: ColumnDef<IUserPopulated> = {
 	id: 'provider_data',
 	accessorKey: 'provider_data',
 	header: ({ column }) => <ColumnHeadSort column={ column }>Provider</ColumnHeadSort>,

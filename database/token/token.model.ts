@@ -1,8 +1,8 @@
 import { Schema, model, Types, Model, models } from 'mongoose';
 
-import { Token } from '@/schemas/token.schema';
+import { IToken } from '@/schemas/token.schema';
 
-interface ITokenDocument extends Omit<Token, 'target_id' | 'created_by'> {
+interface ITokenDocument extends Omit<IToken, 'target_id' | 'created_by'> {
 	target_id: Types.ObjectId;
 	created_by: Types.ObjectId | null;
 }

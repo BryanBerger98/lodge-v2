@@ -60,12 +60,10 @@ const AccountLayout = async ({ children }: AccountLayoutProps) => {
 						</TabsTrigger>
 					</TabsList>
 				</Tabs>
-				<div className="flex-1 grid grid-cols-1 xl:grid-cols-3">
-					<div className="col-span-1 xl:col-span-2 space-y-8">
-						<CsrfProvider csrfToken={ csrfToken }>
-							{ children }
-						</CsrfProvider>
-					</div>
+				<div className="w-full xl:w-1/2 2xl:w-2/5 space-y-8">
+					<CsrfProvider csrfToken={ csrfToken }>
+						{ children }
+					</CsrfProvider>
 				</div>
 			</div>
 		</AuthProvider>

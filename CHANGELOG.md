@@ -1,3 +1,31 @@
+# [1.11.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.10.0...v1.11.0) (2023-11-25)
+
+
+### Bug Fixes
+
+* **auth:** handle password less accounts ([#211](https://github.com/BryanBerger98/lodge-v2/issues/211)) ([6e95783](https://github.com/BryanBerger98/lodge-v2/commit/6e957839e47efdb3db8e393f5db7bdaad49934f4))
+* fix aws file signed url generation ([#215](https://github.com/BryanBerger98/lodge-v2/issues/215)) ([f7e0ff5](https://github.com/BryanBerger98/lodge-v2/commit/f7e0ff5ace464dfc639de40fe8e0bdc64b50aabd))
+* fix server side instance of file invocation ([#235](https://github.com/BryanBerger98/lodge-v2/issues/235)) ([05bb97d](https://github.com/BryanBerger98/lodge-v2/commit/05bb97d7e329d1c9d0c99626625303aa8a92f32d))
+* fix user provider ([4d2535d](https://github.com/BryanBerger98/lodge-v2/commit/4d2535d598250a58e36d458eba07919ed9bcdcf3))
+* fix user update schema ([5ca23e8](https://github.com/BryanBerger98/lodge-v2/commit/5ca23e882a2c6b774f9600af8d60e01db3e3d874))
+
+
+### Features
+
+* **account:** redesign account page ([#210](https://github.com/BryanBerger98/lodge-v2/issues/210)) ([57b0e9e](https://github.com/BryanBerger98/lodge-v2/commit/57b0e9e8e5ec2a67b6b560eed98c5b3ed9cff58a))
+* **account:** user account page redesign ([#206](https://github.com/BryanBerger98/lodge-v2/issues/206)) ([ff91a59](https://github.com/BryanBerger98/lodge-v2/commit/ff91a59246ee6fb8894a9d43c8bd679ebff19518))
+* **auth:** add user confirmation link on email update ([#232](https://github.com/BryanBerger98/lodge-v2/issues/232)) ([61b1ef3](https://github.com/BryanBerger98/lodge-v2/commit/61b1ef3e6abb6ff0d99859da19d720b208761951))
+* **components/ui:** add breadcrumb component ([#233](https://github.com/BryanBerger98/lodge-v2/issues/233)) ([abac46e](https://github.com/BryanBerger98/lodge-v2/commit/abac46ece3966e047cbffdeea7ed1427279c3dc4))
+* **files:** register signed file urls in database ([#193](https://github.com/BryanBerger98/lodge-v2/issues/193)) ([dda723b](https://github.com/BryanBerger98/lodge-v2/commit/dda723b66b143ffcb7b81f7e27f28d25640a6e55))
+* release v1.11.0 ([#236](https://github.com/BryanBerger98/lodge-v2/issues/236)) ([b7fc372](https://github.com/BryanBerger98/lodge-v2/commit/b7fc372229d947d9d2c6b5280e360517725a50b7))
+* **settings:** add admin users selection on share settings ([#224](https://github.com/BryanBerger98/lodge-v2/issues/224)) ([0342668](https://github.com/BryanBerger98/lodge-v2/commit/0342668b6c764e9a41703c6f08a2e33e6dbc5b03))
+* **settings:** add branding settings ([#196](https://github.com/BryanBerger98/lodge-v2/issues/196)) ([eff1dfd](https://github.com/BryanBerger98/lodge-v2/commit/eff1dfd8ff736974ebd8cdc4638204642d906832))
+* **settings:** change users settings design and add default role setting ([#225](https://github.com/BryanBerger98/lodge-v2/issues/225)) ([e9a4433](https://github.com/BryanBerger98/lodge-v2/commit/e9a44334fa0c4eb5a80c027e64b80a2255ad7535))
+* **settings:** update auth settings design and add setting for credentials authentication ([#226](https://github.com/BryanBerger98/lodge-v2/issues/226)) ([a59186d](https://github.com/BryanBerger98/lodge-v2/commit/a59186d6e828451f6e8040d0531244ae348fce9f))
+* update ui with new page header, breadcrumb and sidebar ([#234](https://github.com/BryanBerger98/lodge-v2/issues/234)) ([1f8d19b](https://github.com/BryanBerger98/lodge-v2/commit/1f8d19bcfc9ef8a64a312de34a8c747443fa1963))
+* **users:** fix types of users profile pictures ([001c73b](https://github.com/BryanBerger98/lodge-v2/commit/001c73b46ebbca257d3c5b7dea36f5b0d563c41f))
+* **users:** update create user form design ([#223](https://github.com/BryanBerger98/lodge-v2/issues/223)) ([b05854d](https://github.com/BryanBerger98/lodge-v2/commit/b05854da4e1659caa2f33ac58fa13858a9b48d47))
+
 # [1.10.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.9.0...v1.10.0) (2023-09-30)
 
 

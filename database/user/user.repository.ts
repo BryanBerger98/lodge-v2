@@ -3,8 +3,8 @@ import { FilterQuery } from 'mongoose';
 
 import { newId, QueryOptions } from '@/lib/database';
 import clientPromise from '@/lib/mongodb';
-import { User, UserWithPassword } from '@/schemas/user';
-import { UserPopulated, UserPopulatedWithPassword } from '@/schemas/user/populated.schema';
+import { User, IUserWithPassword } from '@/schemas/user';
+import { IUserPopulated, IUserPopulatedWithPassword } from '@/schemas/user/populated.schema';
 import { Optional } from '@/types/utils';
 import { Env } from '@/utils/env.util';
 
@@ -14,7 +14,7 @@ import { populateUser } from './utils/populate-user';
 
 export interface UserDocument extends User, Document {}
 
-export const findUsers = async (searchRequest: FilterQuery<IUserWithPasswordDocument>, options?: QueryOptions<User>): Promise<UserPopulated[]> => {
+export const findUsers = async (searchRequest: FilterQuery<IUserWithPasswordDocument>, options?: QueryOptions<User>): Promise<IUserPopulated[]> => {
 	try {
 		const users = await UserModel.find(searchRequest, { password: 0 })
 			.populate(populateUser)
@@ -55,7 +55,7 @@ export const findUserByEmail = async (email: string): Promise<User | null> => {
 	}
 };
 
-export const findPopulatedUserByEmail = async (email: string): Promise<UserPopulated | null> => {
+export const findPopulatedUserByEmail = async (email: string): Promise<IUserPopulated | null> => {
 	try {
 		const serializedEmail = email.toLowerCase().trim();
 		const document = await UserModel.findOne({ email: serializedEmail }).populate(populateUser);
@@ -65,7 +65,7 @@ export const findPopulatedUserByEmail = async (email: string): Promise<UserPopul
 	}
 };
 
-export const findUserWithPasswordByEmail = async (email: string): Promise<UserPopulatedWithPassword | null> => {
+export const findUserWithPasswordByEmail = async (email: string): Promise<IUserPopulatedWithPassword | null> => {
 	try {
 		const serializedEmail = email.toLowerCase().trim();
 		const document = await UserModel.findOne({ email: serializedEmail }).populate(populateUser);
@@ -75,7 +75,7 @@ export const findUserWithPasswordByEmail = async (email: string): Promise<UserPo
 	}
 };
 
-export const findUserById = async (user_id: string): Promise<UserPopulated | null> => {
+export const findUserById = async (user_id: string): Promise<IUserPopulated | null> => {
 	try {
 		const document = await UserModel
 			.findById(newId(user_id), { password: 0 })
@@ -87,7 +87,7 @@ export const findUserById = async (user_id: string): Promise<UserPopulated | nul
 	}
 };
 
-export const findUserWithPasswordById = async (user_id: string): Promise<UserWithPassword | null> => {
+export const findUserWithPasswordById = async (user_id: string): Promise<IUserWithPassword | null> => {
 	try {
 		const user = await UserModel.findById(newId(user_id));
 		return user?.toJSON() || null;
@@ -96,7 +96,7 @@ export const findUserWithPasswordById = async (user_id: string): Promise<UserWit
 	}
 };
 
-export const createUser = async (userData: CreateUserDTO): Promise<UserPopulated> => {
+export const createUser = async (userData: CreateUserDTO): Promise<IUserPopulated> => {
 	try {
 		const createdDocument = await UserModel.create({ ...userData });
 		const document = await createdDocument.populate(populateUser);
@@ -106,7 +106,7 @@ export const createUser = async (userData: CreateUserDTO): Promise<UserPopulated
 	}
 };
 
-export const updateUser = async (userToUpdate: UpdateUserDTO): Promise<UserPopulated | null> => {
+export const updateUser = async (userToUpdate: UpdateUserDTO): Promise<IUserPopulated | null> => {
 	try {
 		await UserModel.findByIdAndUpdate(newId(userToUpdate.id), {
 			$set: {
@@ -140,7 +140,7 @@ export const updateUserPassword = async (user_id: string, newHashedPassword: str
 export const deleteUserById = async (user_id: string): Promise<User | null> => {
 	try {
 		const deletedUserDoc = await UserModel.findByIdAndDelete(newId(user_id));
-		const deletedUser: Optional<UserWithPassword, 'password'> | null = deletedUserDoc?.toJSON() || null;
+		const deletedUser: Optional<IUserWithPassword, 'password'> | null = deletedUserDoc?.toJSON() || null;
 		if (deletedUser) {
 			delete deletedUser.password;
 		}

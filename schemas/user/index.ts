@@ -28,7 +28,7 @@ export const UserSchema = z.object({
 	last_login_date: z.coerce.date().nullable(),
 	has_password: z.coerce.boolean(),
 });
-export type User = z.infer<typeof UserSchema>;
+export interface User extends z.infer<typeof UserSchema> {};
 
 export const UserWithPasswordSchema = UserSchema.extend({ password: z.string().min(1, 'Cannot be empty.').nullable() });
-export type UserWithPassword = z.infer<typeof UserWithPasswordSchema>;
+export interface IUserWithPassword extends z.infer<typeof UserWithPasswordSchema> {};

@@ -6,12 +6,12 @@ import { UpdateMultipleUsersSchema } from '@/app/api/users/_schemas/update-multi
 import { UpdateUserSchema } from '@/app/api/users/_schemas/update-user.schema';
 import fetcher, { FetcherOptions, FetcherOptionsWithCsrf } from '@/lib/fetcher';
 import { Role } from '@/schemas/role.schema';
-import { SafeToken, SafeTokenSchema } from '@/schemas/token.schema';
-import { UserPopulated, UserPopulatedSchema } from '@/schemas/user/populated.schema';
+import { ISafeToken, SafeTokenSchema } from '@/schemas/token.schema';
+import { IUserPopulated, UserPopulatedSchema } from '@/schemas/user/populated.schema';
 import { objectToFormData } from '@/utils/object.utils';
 import { buildQueryUrl } from '@/utils/url.util';
 
-export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema>, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
+export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema>, options: FetcherOptionsWithCsrf): Promise<IUserPopulated> => {
 	try {
 		const data = await fetcher('/api/users', {
 			method: 'POST',
@@ -24,7 +24,7 @@ export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema>,
 	}
 };
 
-export const updateUser = async (userToUpdate: z.infer<typeof UpdateUserSchema> & { id: string }, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
+export const updateUser = async (userToUpdate: z.infer<typeof UpdateUserSchema> & { id: string }, options: FetcherOptionsWithCsrf): Promise<IUserPopulated> => {
 	try {
 		const data = await fetcher(`/api/users/${ userToUpdate.id }`, {
 			method: 'PUT',
@@ -59,7 +59,7 @@ export type FetchUsersOptions = {
 	roles?: Role[];
 } & FetcherOptions;
 
-export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: UserPopulated[], total: number, count: number }> => {
+export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: IUserPopulated[], total: number, count: number }> => {
 	const { sort = [], skip, limit, search, roles = [], ...restOptions } = options ? options : {
 		sort: [],
 		skip: undefined,
@@ -89,7 +89,7 @@ export const fetchUsers = async (options?: FetchUsersOptions): Promise<{ users: 
 	}
 };
 
-export const fetchUserById = async (user_id: string, options?: FetcherOptions): Promise<UserPopulated> => {
+export const fetchUserById = async (user_id: string, options?: FetcherOptions): Promise<IUserPopulated> => {
 	try {
 		const data = await fetcher(`/api/users/${ user_id }`, options);
 		return UserPopulatedSchema.parse(data);
@@ -122,7 +122,7 @@ export const deleteMultipleUsers = async (user_ids: (string)[], options: Fetcher
 	}
 };
 
-export const sendResetPasswordTokenToUser = async (user_id: string, options: FetcherOptionsWithCsrf): Promise<SafeToken> => {
+export const sendResetPasswordTokenToUser = async (user_id: string, options: FetcherOptionsWithCsrf): Promise<ISafeToken> => {
 	try {
 		const data = await fetcher(`/api/users/${ user_id }/reset-password`, {
 			method: 'POST',
@@ -134,7 +134,7 @@ export const sendResetPasswordTokenToUser = async (user_id: string, options: Fet
 	}
 };
 
-export const sendVerificationTokenToUser = async (user_id: string, options: FetcherOptionsWithCsrf): Promise<SafeToken> => {
+export const sendVerificationTokenToUser = async (user_id: string, options: FetcherOptionsWithCsrf): Promise<ISafeToken> => {
 	try {
 		const data = await fetcher(`/api/users/${ user_id }/verify-email`, {
 			method: 'POST',

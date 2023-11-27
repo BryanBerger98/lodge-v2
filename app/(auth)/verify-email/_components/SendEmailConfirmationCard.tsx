@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { SafeToken } from '@/schemas/token.schema';
+import { ISafeToken } from '@/schemas/token.schema';
 import { getSentEmailVerificationToken, sendEmailVerificationToken } from '@/services/auth.service';
 import { ApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
@@ -19,7 +19,7 @@ type SendEmailConfirmationCardProps = {
 
 const SendEmailConfirmationCard = ({ csrfToken }: SendEmailConfirmationCardProps) => {
 
-	const [ emailVerificationTokenData, setEmailVerificationTokenData ] = useState<SafeToken | null>(null);
+	const [ emailVerificationTokenData, setEmailVerificationTokenData ] = useState<ISafeToken | null>(null);
 	const [ resendEmailCountDown, setResendEmailCountDown ] = useState(0);
 	const [ isLoading, setIsLoading ] = useState(false);
 	const [ error, setError ] = useState('');

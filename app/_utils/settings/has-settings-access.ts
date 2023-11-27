@@ -2,9 +2,9 @@ import { findSettingByName } from '@/database/setting/setting.repository';
 import { findUsers } from '@/database/user/user.repository';
 import { Role } from '@/schemas/role.schema';
 import { SettingName, UnregisteredSettingStringPopulatedSchema } from '@/schemas/setting';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
-export const hasSettingsAccess = async (currentUser: UserPopulated) => {
+export const hasSettingsAccess = async (currentUser: IUserPopulated) => {
 	if (currentUser.role === Role.OWNER) return true;
 
 	const shareWithAdminSettingData = await findSettingByName(SettingName.SHARE_WITH_ADMIN);

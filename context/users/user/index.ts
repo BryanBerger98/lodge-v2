@@ -2,14 +2,14 @@
 
 import { Dispatch, SetStateAction, createContext } from 'react';
 
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
 type UserContextValues = {
-	user: UserPopulated | null;
-	setUser: Dispatch<SetStateAction<UserPopulated | null>>;
+	user: IUserPopulated | null;
+	setUser: Dispatch<SetStateAction<IUserPopulated | null>>;
 	isLoading: boolean;
 	setIsLoading: Dispatch<SetStateAction<boolean>>;
-	refetchUser: (id?: string) => Promise<UserPopulated | null | undefined>;
+	refetchUser: (id?: string) => Promise<IUserPopulated | null | undefined>;
 }
 
 const UserContext = createContext<UserContextValues | null>(null);

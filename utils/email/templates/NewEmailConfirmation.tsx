@@ -8,10 +8,10 @@ import { Text } from '@react-email/text';
 import * as React from 'react';
 
 import { User } from '@/schemas/user';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
 type NewEmailConfirmationProps = {
-	user: Partial<User | UserPopulated>;
+	user: Partial<User | IUserPopulated>;
 	tokenLink: string;
 	appName?: string;
 };

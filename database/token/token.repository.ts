@@ -1,10 +1,10 @@
 import { newId } from '@/lib/database';
-import { Token, TokenAction } from '@/schemas/token.schema';
+import { IToken, TokenAction } from '@/schemas/token.schema';
 
 import { CreateTokenDTO } from './token.dto';
 import TokenModel from './token.model';
 
-export const createToken = async (tokenToCreate: CreateTokenDTO): Promise<Token> => {
+export const createToken = async (tokenToCreate: CreateTokenDTO): Promise<IToken> => {
 	try {
 		const createdToken = await TokenModel.create({
 			...tokenToCreate,
@@ -28,7 +28,7 @@ type GetTokenFromTargetIdFilter = {
 	expiration_date?: Date,
 }
 
-export const getTokenFromTargetId = async (target_id: string, filter?: GetTokenFromTargetIdFilter): Promise<Token | null> => {
+export const getTokenFromTargetId = async (target_id: string, filter?: GetTokenFromTargetIdFilter): Promise<IToken | null> => {
 	try {
 		const foundToken = await TokenModel.findOne({
 			target_id: newId(target_id),
@@ -52,7 +52,7 @@ type GetTokenFromCreatedByFilter = {
 	expiration_date?: Date,
 }
 
-export const getTokenFromCreatedBy = async (created_by: string, filter?: GetTokenFromCreatedByFilter): Promise<Token | null> => {
+export const getTokenFromCreatedBy = async (created_by: string, filter?: GetTokenFromCreatedByFilter): Promise<IToken | null> => {
 	try {
 		const foundToken = await TokenModel.findOne({
 			created_by: newId(created_by),
@@ -69,7 +69,7 @@ export const getTokenFromCreatedBy = async (created_by: string, filter?: GetToke
 	}
 };
 
-export const getTokenFromTokenString = async (token: string): Promise<Token | null> => {
+export const getTokenFromTokenString = async (token: string): Promise<IToken | null> => {
 	try {
 		const foundToken = await TokenModel.findOne({ token });
 		return foundToken?.toJSON({
@@ -82,7 +82,7 @@ export const getTokenFromTokenString = async (token: string): Promise<Token | nu
 	}
 };
 
-export const deleteTokenById = async (token_id: string): Promise<Token | null> => {
+export const deleteTokenById = async (token_id: string): Promise<IToken | null> => {
 	try {
 		const deletedToken = await TokenModel.findByIdAndDelete(newId(token_id));
 		return deletedToken?.toJSON() || null;

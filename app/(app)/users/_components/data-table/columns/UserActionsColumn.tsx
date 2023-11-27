@@ -1,10 +1,10 @@
 import { ColumnDef } from '@tanstack/react-table';
 
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
 import UserActionsCell from '../cells/UserActionsCell';
 
-const UserActionsColumn: ColumnDef<UserPopulated> = {
+const UserActionsColumn: ColumnDef<IUserPopulated> = {
 	id: 'actions',
 	enableHiding: false,
 	cell: ({ row }) => <UserActionsCell rowData={ row.original } />,
