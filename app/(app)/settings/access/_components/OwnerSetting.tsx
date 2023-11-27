@@ -3,7 +3,7 @@
 import { ChevronsUpDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import PasswordModal from '@/components/features/auth/PasswordModal';
+import PasswordModal from '@/app/_components/modals/auth/PasswordModal';
 import SearchSelect, { SelectOption } from '@/components/forms/Select/SearchSelect';
 import { Button } from '@/components/ui/button';
 import useAuth from '@/context/auth/useAuth';

@@ -13,7 +13,7 @@ import DataTablePreviousButton from '@/components/ui/DataTable/DataTablePrevious
 import DataTableSearch from '@/components/ui/DataTable/DataTableSearch';
 import useUsers from '@/context/users/useUsers';
 import useUpdateEffect from '@/hooks/utils/useUpdateEffect';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 import { getSortingFromURLParams } from '@/utils/table.utils';
 
 import { COLUMN_NAMES, columns } from './columns';
@@ -41,7 +41,7 @@ const UsersDataTable = () => {
 	const handleChangeSorting: OnChangeFn<SortingState> = setSorting;
 	const handleChangePagination: OnChangeFn<PaginationState> = setPagination;
 
-	const handleClickCell = (cell: Cell<UserPopulated, unknown>) => {
+	const handleClickCell = (cell: Cell<IUserPopulated, unknown>) => {
 		if (cell.column.id !== 'actions' && cell.column.id !== 'select') {
 			router.push(`/users/${ cell.row.original.id }`);
 		}

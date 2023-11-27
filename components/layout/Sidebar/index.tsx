@@ -4,7 +4,7 @@ import { Home, Settings, Users, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import CurrentUserAvatar from '@/components/features/users/CurrentUserAvatar';
+import CurrentUserAvatar from '@/app/_components/CurrentUserAvatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import useAuth from '@/context/auth/useAuth';

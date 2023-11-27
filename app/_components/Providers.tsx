@@ -5,7 +5,7 @@ import { SessionProvider } from 'next-auth/react';
 import { ReactNode, useState } from 'react';
 
 import RefreshTokenHandler from '@/components/utils/auth/RefetchTokenHandler';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
 const AuthProvider = dynamic(() => import('@/context/auth/auth.provider'));
 const CsrfProvider = dynamic(() => import('@/context/csrf/csrf.provider'));
@@ -13,7 +13,7 @@ const CsrfProvider = dynamic(() => import('@/context/csrf/csrf.provider'));
 type ProvidersProps = {
 	children: ReactNode;
 	values: {
-		currentUser: UserPopulated | null;
+		currentUser: IUserPopulated | null;
 	},
 };
 

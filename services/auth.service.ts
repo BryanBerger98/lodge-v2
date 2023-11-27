@@ -2,11 +2,11 @@ import { z } from 'zod';
 
 import { UpdateUserAccountSchema } from '@/app/api/auth/account/_schemas/update-user-account.schema';
 import fetcher, { FetcherOptionsWithCsrf } from '@/lib/fetcher';
-import { SafeToken, SafeTokenSchema } from '@/schemas/token.schema';
+import { ISafeToken, SafeTokenSchema } from '@/schemas/token.schema';
 import { User, UserSchema } from '@/schemas/user';
-import { UserPopulated, UserPopulatedSchema } from '@/schemas/user/populated.schema';
+import { IUserPopulated, UserPopulatedSchema } from '@/schemas/user/populated.schema';
 
-export const getCurrentLoggedInUser = async (): Promise<UserPopulated> => {
+export const getCurrentLoggedInUser = async (): Promise<IUserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account');
 		return UserPopulatedSchema.parse(data);
@@ -32,7 +32,7 @@ export const signUpUser = async ({ email, password }: { email: string, password:
 	}
 };
 
-export const getSentEmailVerificationToken = async (): Promise<SafeToken> => {
+export const getSentEmailVerificationToken = async (): Promise<ISafeToken> => {
 	try {
 		const data = await fetcher('/api/auth/verify-email');
 		return SafeTokenSchema.parse(data);
@@ -41,7 +41,7 @@ export const getSentEmailVerificationToken = async (): Promise<SafeToken> => {
 	}
 };
 
-export const sendEmailVerificationToken = async (options: FetcherOptionsWithCsrf): Promise<SafeToken> => {
+export const sendEmailVerificationToken = async (options: FetcherOptionsWithCsrf): Promise<ISafeToken> => {
 	try {
 		const data = await fetcher('/api/auth/verify-email', {
 			method: 'POST',
@@ -53,7 +53,7 @@ export const sendEmailVerificationToken = async (options: FetcherOptionsWithCsrf
 	}
 };
 
-export const verifyUserEmail = async (token: string, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
+export const verifyUserEmail = async (token: string, options: FetcherOptionsWithCsrf): Promise<IUserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/verify-email', {
 			method: 'PUT',
@@ -98,7 +98,7 @@ export const sendResetPasswordToken = async (email: string, options: FetcherOpti
 	}
 };
 
-export const updateAccount = async (valuesToUpdate: z.infer<typeof UpdateUserAccountSchema>, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
+export const updateAccount = async (valuesToUpdate: z.infer<typeof UpdateUserAccountSchema>, options: FetcherOptionsWithCsrf): Promise<IUserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account', {
 			method: 'PUT',
@@ -112,7 +112,7 @@ export const updateAccount = async (valuesToUpdate: z.infer<typeof UpdateUserAcc
 	}
 };
 
-export const updateUserPassword = async ({ password, newPassword }: { password: string, newPassword: string }, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
+export const updateUserPassword = async ({ password, newPassword }: { password: string, newPassword: string }, options: FetcherOptionsWithCsrf): Promise<IUserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account/password', {
 			method: 'PUT',
@@ -129,7 +129,7 @@ export const updateUserPassword = async ({ password, newPassword }: { password: 
 	}
 };
 
-export const updateUserEmail = async ({ email, password }: { email: string, password: string }, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
+export const updateUserEmail = async ({ email, password }: { email: string, password: string }, options: FetcherOptionsWithCsrf): Promise<IUserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account/email', {
 			method: 'POST',
@@ -146,7 +146,7 @@ export const updateUserEmail = async ({ email, password }: { email: string, pass
 	}
 };
 
-export const confirmNewUserEmail = async (token: string, options: FetcherOptionsWithCsrf): Promise<UserPopulated> => {
+export const confirmNewUserEmail = async (token: string, options: FetcherOptionsWithCsrf): Promise<IUserPopulated> => {
 	try {
 		const data = await fetcher('/api/auth/account/email', {
 			method: 'PUT',
@@ -160,7 +160,7 @@ export const confirmNewUserEmail = async (token: string, options: FetcherOptions
 	}
 };
 
-export const updateUserAvatar = async (file: File, options: FetcherOptionsWithCsrf): Promise<UserPopulated | null> => {
+export const updateUserAvatar = async (file: File, options: FetcherOptionsWithCsrf): Promise<IUserPopulated | null> => {
 	try {
 		const formData = new FormData();
 		formData.append('avatar', file);

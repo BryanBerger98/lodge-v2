@@ -3,10 +3,10 @@ import { User } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ColumnHeadSort from '@/components/ui/DataTable/Columns/ColumnHeadSort';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
 
-const UserNameColumn: ColumnDef<UserPopulated> = {
+const UserNameColumn: ColumnDef<IUserPopulated> = {
 	id: 'last_name',
 	accessorKey: 'last_name',
 	header: ({ column }) => <ColumnHeadSort column={ column }>Name</ColumnHeadSort>,

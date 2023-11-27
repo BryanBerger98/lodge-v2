@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import useDataTable from '@/components/ui/DataTable/useDataTable';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import useUsers from '@/context/users/useUsers';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
 import ActivateMultipleUserAccountsConfirmModal from '../confirm-modals/ActivateMultipleUserAccountsConfirmModal';
 import DeleteMultipleUserAccountsConfirmModal from '../confirm-modals/DeleteMultipleUserAccountsConfirmModal';
@@ -13,7 +13,7 @@ import SuspendMultipleUserAccountsConfirmModal from '../confirm-modals/SuspendMu
 
 const UsersDataTableActions = () => {
 
-	const { table } = useDataTable<UserPopulated, unknown>();
+	const { table } = useDataTable<IUserPopulated, unknown>();
 	const selectedUsers = table.getSelectedRowModel().rows.map(row => row.original);
 
 	const { updateUsers, refetchUsers } = useUsers();
@@ -21,7 +21,7 @@ const UsersDataTableActions = () => {
 
 	const handleTriggerAction = (action: 'activate' | 'suspend' | 'reset-password' | 'verify-email' | 'delete') => () => setConfirmModalOpenState(action);
 
-	const handleConfirm = ({ users }: { openState: boolean, users: UserPopulated[] }) => {
+	const handleConfirm = ({ users }: { openState: boolean, users: IUserPopulated[] }) => {
 		if (!users.length) {
 			return setConfirmModalOpenState(null);
 		}

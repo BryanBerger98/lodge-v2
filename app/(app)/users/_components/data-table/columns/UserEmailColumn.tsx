@@ -3,9 +3,9 @@ import { BadgeCheck, BadgeX } from 'lucide-react';
 
 import ColumnHeadSort from '@/components/ui/DataTable/Columns/ColumnHeadSort';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
-const UserEmailColumn: ColumnDef<UserPopulated> = 	{
+const UserEmailColumn: ColumnDef<IUserPopulated> = 	{
 	id: 'email',
 	accessorKey: 'email',
 	header: ({ column }) => <ColumnHeadSort column={ column }>Email</ColumnHeadSort>,

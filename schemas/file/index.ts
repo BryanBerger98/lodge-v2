@@ -17,4 +17,4 @@ export const FileSchema = z.object({
 	created_by: z.coerce.string().min(1, 'Cannot be empty.').nullable(),
 	updated_by: z.coerce.string().min(1, 'Cannot be empty.').nullable(),
 });
-export type IFile = z.infer<typeof FileSchema>;
+export interface IFile extends z.infer<typeof FileSchema> {};

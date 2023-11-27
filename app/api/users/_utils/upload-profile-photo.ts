@@ -2,13 +2,13 @@ import { createFile, deleteFileById, findFileById } from '@/database/file/file.r
 import { DEFAULT_URL_EXPIRATION, deleteFileFromKey, gitFileSignedURL, uploadImageToS3 } from '@/lib/bucket';
 import { ImageMimeTypeSchema } from '@/schemas/file/mime-type.schema';
 import { User } from '@/schemas/user';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
 import { StatusCode } from '@/utils/api/http-status';
 import { AUTHORIZED_IMAGE_MIME_TYPES, AUTHORIZED_IMAGE_SIZE, convertFileRequestObjetToModel } from '@/utils/file.util';
 
-export const uploadProfilePhotoFile = async (currentUser: UserPopulated, photoFile?: Blob | null, user?: User | UserPopulated) => {
+export const uploadProfilePhotoFile = async (currentUser: IUserPopulated, photoFile?: Blob | null, user?: User | IUserPopulated) => {
 	try {
 		if (photoFile) {
 			const fileMimeType = ImageMimeTypeSchema.parse(photoFile.type);

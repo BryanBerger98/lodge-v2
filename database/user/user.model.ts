@@ -3,12 +3,12 @@ import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 
 import { AuthenticationProvider } from '@/schemas/authentication-provider';
 import { Role } from '@/schemas/role.schema';
-import { UserWithPassword } from '@/schemas/user';
+import { IUserWithPassword } from '@/schemas/user';
 import { Gender } from '@/schemas/user/gender.schema';
 
 import FileModel from '../file/file.model';
 
-export interface IUserWithPasswordDocument extends Omit<UserWithPassword, 'created_by' | 'updated_by' | 'photo'> {
+export interface IUserWithPasswordDocument extends Omit<IUserWithPassword, 'created_by' | 'updated_by' | 'photo'> {
 	created_by: Types.ObjectId | null;
 	updated_by: Types.ObjectId | null;
 	photo: Types.ObjectId | null;

@@ -2,18 +2,18 @@
 
 import { PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 import { fetchUserById } from '@/services/users.service';
 
 import UserContext from '.';
 
 type UserProviderProps = {
-	user: UserPopulated | null;
+	user: IUserPopulated | null;
 };
 
 const UserProvider = ({ user: initialUser, children }: PropsWithChildren<UserProviderProps>) => {
 
-	const [ user, setUser ] = useState<UserPopulated | null>(initialUser);
+	const [ user, setUser ] = useState<IUserPopulated | null>(initialUser);
 	const [ isLoading, setIsLoading ] = useState<boolean>(false);
 
 	const fetchUser = useCallback(async (id?: string) => {

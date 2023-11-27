@@ -6,7 +6,7 @@ import { findUserByEmail, findUserById, updateUser } from '@/database/user/user.
 import { connectToDatabase } from '@/lib/database';
 import { generateToken, verifyToken } from '@/lib/jwt';
 import { SettingName } from '@/schemas/setting';
-import { Token, TokenAction } from '@/schemas/token.schema';
+import { IToken, TokenAction } from '@/schemas/token.schema';
 import { Optional } from '@/types/utils';
 import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
@@ -55,7 +55,7 @@ export const GET = routeHandler(async () => {
 		});
 	}
 
-	const safeTokenData: Optional<Token, 'token'> = tokenData;
+	const safeTokenData: Optional<IToken, 'token'> = tokenData;
 	delete safeTokenData.token;
 
 	return NextResponse.json(safeTokenData);
@@ -119,7 +119,7 @@ export const POST = routeHandler(async () => {
 
 	await sendAccountVerificationEmail(userData, savedToken);
 
-	const safeTokenData: Optional<Token, 'token'> = savedToken;
+	const safeTokenData: Optional<IToken, 'token'> = savedToken;
 	delete safeTokenData.token;
 
 	return NextResponse.json(safeTokenData);

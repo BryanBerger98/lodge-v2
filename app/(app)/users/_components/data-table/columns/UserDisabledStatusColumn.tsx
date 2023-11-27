@@ -2,9 +2,9 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import { Badge } from '@/components/ui/badge';
 import ColumnHeadSort from '@/components/ui/DataTable/Columns/ColumnHeadSort';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
-const UserDisabledStatusColumn: ColumnDef<UserPopulated> = {
+const UserDisabledStatusColumn: ColumnDef<IUserPopulated> = {
 	id: 'is_disabled',
 	accessorKey: 'is_disabled',
 	header: ({ column }) => <ColumnHeadSort column={ column }>Status</ColumnHeadSort>,

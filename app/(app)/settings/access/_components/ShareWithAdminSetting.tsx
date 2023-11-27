@@ -3,8 +3,8 @@
 import { Loader2, Plus, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+import PasswordModal from '@/app/_components/modals/auth/PasswordModal';
 import SearchSelectUsersModal from '@/app/_components/modals/users/SearchSelectUsersModal';
-import PasswordModal from '@/components/features/auth/PasswordModal';
 import ButtonList from '@/components/ui/Button/ButtonList';
 import ButtonItem from '@/components/ui/Button/ButtonList/ButtonItem';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -15,7 +15,7 @@ import useSettings from '@/context/settings/useSettings';
 import useErrorToast from '@/hooks/error/useErrorToast';
 import { Role } from '@/schemas/role.schema';
 import { SettingDataType, SettingName, UnregisteredSetting } from '@/schemas/setting';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 import { updateShareSettings } from '@/services/settings.service';
 import { ApiError } from '@/utils/api/error';
 
@@ -35,7 +35,7 @@ const SELECT_OPTIONS = [
 ];
 
 type ShareWithAdminSettingProps = {
-	selectedAdminUsers: UserPopulated[];
+	selectedAdminUsers: IUserPopulated[];
 };
 
 const ShareWithAdminSetting = ({ selectedAdminUsers: initialSelectedAdminUsers }: ShareWithAdminSettingProps) => {
@@ -53,9 +53,9 @@ const ShareWithAdminSetting = ({ selectedAdminUsers: initialSelectedAdminUsers }
 	const shareWithAdminSetting = getSetting(SettingName.SHARE_WITH_ADMIN);
 	const shareWithAdminUsersList = getSetting(SettingName.SHARE_WITH_ADMIN_USERS_LIST);
 
-	const [ alreadySelectedAdminUsers, setAlreadySelectedAdminUsers ] = useState<UserPopulated[]>(initialSelectedAdminUsers);
-	const [ selectedAdminUsers, setSelectedAdminUsers ] = useState<UserPopulated[]>([]);
-	const [ userToRevoke, setUserToRevoke ] = useState<UserPopulated | null>(null);
+	const [ alreadySelectedAdminUsers, setAlreadySelectedAdminUsers ] = useState<IUserPopulated[]>(initialSelectedAdminUsers);
+	const [ selectedAdminUsers, setSelectedAdminUsers ] = useState<IUserPopulated[]>([]);
+	const [ userToRevoke, setUserToRevoke ] = useState<IUserPopulated | null>(null);
 
 	useEffect(() => {
 		setShareSettingSelection(shareWithAdminSetting?.value || 'dont_share');
@@ -71,7 +71,7 @@ const ShareWithAdminSetting = ({ selectedAdminUsers: initialSelectedAdminUsers }
 		}
 	};
 
-	const handleSearchAdminUsersModalOpenChange = ({ openState, selected }: { openState: boolean, selected: UserPopulated[] }) => {
+	const handleSearchAdminUsersModalOpenChange = ({ openState, selected }: { openState: boolean, selected: IUserPopulated[] }) => {
 		setIsSearchAdminUsersModalOpen(openState);
 		setSelectedAdminUsers(selected);
 		if (selected.length > 0) {
@@ -133,7 +133,7 @@ const ShareWithAdminSetting = ({ selectedAdminUsers: initialSelectedAdminUsers }
 		}
 	};
 
-	const handleRevokeAccess = (user: UserPopulated) => () => {
+	const handleRevokeAccess = (user: IUserPopulated) => () => {
 		setUserToRevoke(user);
 		setIsPasswordModalOpen(true);
 	};

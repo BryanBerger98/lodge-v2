@@ -5,13 +5,13 @@ import { useState } from 'react';
 import ConfirmModal from '@/components/ui/Modal/ConfirmModal';
 import useCsrf from '@/context/csrf/useCsrf';
 import useErrorToast from '@/hooks/error/useErrorToast';
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 import { deleteMultipleUsers } from '@/services/users.service';
 import { ApiError } from '@/utils/api/error';
 
 type DeleteMultipleUserAccountsConfirmModalProps = {
-	users: UserPopulated[];
-	onChange: ({ openState, users }: { openState: boolean, users: UserPopulated[] }) => void;
+	users: IUserPopulated[];
+	onChange: ({ openState, users }: { openState: boolean, users: IUserPopulated[] }) => void;
 	isOpen: boolean;
 };
 

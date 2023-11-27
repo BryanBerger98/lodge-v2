@@ -1,38 +1,38 @@
-import { BadgeCheck, Edit, KeyRound, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react';
-import Link from 'next/link';
+import { BadgeCheck, KeyRound, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react';
+import { useRouter } from 'next-nprogress-bar';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import useUsers from '@/context/users/useUsers';
+import useUser from '@/context/users/user/useUser';
 import { IUserPopulated } from '@/schemas/user/populated.schema';
 
-import ActivateUserAccountConfirmModal from '../../confirm-modals/ActivateUserAccountConfirmModal';
-import DeleteUserAccountConfirmModal from '../../confirm-modals/DeleteUserAccountConfirmModal';
-import SendUserEmailVerificationConfirmModal from '../../confirm-modals/SendUserEmailVerificationConfirmModal';
-import SendUserResetPasswordConfirmModal from '../../confirm-modals/SendUserResetPasswordConfirmModal';
-import SuspendUserAccountConfirmModal from '../../confirm-modals/SuspendUserAccountConfirmModal';
+import ActivateUserAccountConfirmModal from '../../_components/confirm-modals/ActivateUserAccountConfirmModal';
+import DeleteUserAccountConfirmModal from '../../_components/confirm-modals/DeleteUserAccountConfirmModal';
+import SendUserEmailVerificationConfirmModal from '../../_components/confirm-modals/SendUserEmailVerificationConfirmModal';
+import SendUserResetPasswordConfirmModal from '../../_components/confirm-modals/SendUserResetPasswordConfirmModal';
+import SuspendUserAccountConfirmModal from '../../_components/confirm-modals/SuspendUserAccountConfirmModal';
 
-type UserActionsCellProps = {
-	rowData: IUserPopulated;
-};
+const UserHeaderMenu = () => {
 
-const UserActionsCell = ({ rowData }: UserActionsCellProps) => {
-
-	const { updateUsers, refetchUsers } = useUsers();
 	const [ confirmModalOpenState, setConfirmModalOpenState ] = useState<'suspend' | 'activate' | 'reset-password' | 'verify-email' | 'delete' | null>(null);
+
+	const { user, setUser } = useUser();
+	const router = useRouter();
+
+	if (!user) return null;
+
 
 	const handleTriggerAction = (action: 'activate' | 'suspend' | 'reset-password' | 'verify-email' | 'delete') => () => setConfirmModalOpenState(action);
 
-	const handleConfirm = ({ user }: { openState: boolean, user: IUserPopulated | null }) => {
-		if (!user) {
+	const handleConfirm = ({ user: updatedUser }: { openState: boolean, user: IUserPopulated | null }) => {
+		if (!updatedUser) {
 			return setConfirmModalOpenState(null);
 		}
 		if (confirmModalOpenState === 'delete') {
-			refetchUsers();
-		} else {
-			updateUsers(user);
+			router.push('/users');
 		}
+		setUser(updatedUser);
 		setConfirmModalOpenState(null);
 	};
 
@@ -43,28 +43,18 @@ const UserActionsCell = ({ rowData }: UserActionsCellProps) => {
 			>
 				<DropdownMenuTrigger asChild>
 					<Button
-						className="h-8 w-8 p-0"
+						className="gap-2 items-center"
 						variant="ghost"
 					>
 						<span className="sr-only">Open menu</span>
-						<MoreHorizontal className="h-4 w-4" />
+						<MoreHorizontal className="w-4 h-4" />
+						<span className="hidden md:inline">Actions</span>
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">
 					<DropdownMenuLabel>Actions</DropdownMenuLabel>
-					<DropdownMenuItem
-						className="gap-2 hover:cursor-pointer"
-						asChild
-					>
-						<Link
-							href={ `/users/${ rowData.id }` }
-						>
-							<Edit size="16" />
-							Edit
-						</Link>
-					</DropdownMenuItem>
 					{
-						!rowData.is_disabled ? (
+						!user.is_disabled ? (
 							<>
 								<DropdownMenuItem
 									className="gap-2 hover:cursor-pointer"
@@ -72,7 +62,7 @@ const UserActionsCell = ({ rowData }: UserActionsCellProps) => {
 								><KeyRound size="16" /> Send reset password link
 								</DropdownMenuItem>
 								{
-									!rowData.has_email_verified ?
+									!user.has_email_verified ?
 										<DropdownMenuItem
 											className="gap-2 hover:cursor-pointer"
 											onClick={ handleTriggerAction('verify-email') }
@@ -85,7 +75,7 @@ const UserActionsCell = ({ rowData }: UserActionsCellProps) => {
 					}
 					<DropdownMenuSeparator />
 					{
-						rowData.is_disabled ?
+						user.is_disabled ?
 							<DropdownMenuItem
 								className="gap-2 hover:cursor-pointer"
 								onClick={ handleTriggerAction('activate') }
@@ -107,31 +97,31 @@ const UserActionsCell = ({ rowData }: UserActionsCellProps) => {
 			</DropdownMenu>
 			<ActivateUserAccountConfirmModal
 				isOpen={ confirmModalOpenState === 'activate' }
-				user={ rowData }
+				user={ user }
 				onChange={ handleConfirm }
 			/>
 			<SuspendUserAccountConfirmModal
 				isOpen={ confirmModalOpenState === 'suspend' }
-				user={ rowData }
+				user={ user }
 				onChange={ handleConfirm }
 			/>
 			<SendUserResetPasswordConfirmModal
 				isOpen={ confirmModalOpenState === 'reset-password' }
-				user={ rowData }
+				user={ user }
 				onChange={ handleConfirm }
 			/>
 			<SendUserEmailVerificationConfirmModal
 				isOpen={ confirmModalOpenState === 'verify-email' }
-				user={ rowData }
+				user={ user }
 				onChange={ handleConfirm }
 			/>
 			<DeleteUserAccountConfirmModal
 				isOpen={ confirmModalOpenState === 'delete' }
-				user={ rowData }
+				user={ user }
 				onChange={ handleConfirm }
 			/>
 		</>
 	);
 };
 
-export default UserActionsCell;
+export default UserHeaderMenu;

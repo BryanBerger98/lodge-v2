@@ -1,6 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table';
 
-import { UserPopulated } from '@/schemas/user/populated.schema';
+import { IUserPopulated } from '@/schemas/user/populated.schema';
 
 import UserActionsColumn from './UserActionsColumn';
 import UserAuthProviderColumn from './UserAuthProviderColumn';
@@ -22,7 +22,7 @@ export const COLUMN_NAMES = {
 	'created_at': 'Created at',
 };
 
-export const columns: ColumnDef<UserPopulated>[] = [
+export const columns: ColumnDef<IUserPopulated>[] = [
 	UserSelectColumn,
 	UserNameColumn,
 	UserEmailColumn,
