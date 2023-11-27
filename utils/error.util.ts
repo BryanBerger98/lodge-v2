@@ -1,8 +1,8 @@
 import { FieldPath, FieldValues, UseFormReturn } from 'react-hook-form';
 import { ZodError, z } from 'zod';
 
-import { ApiError } from '../api/error';
-import { ApiErrorCode } from '../api/error/error-codes.util';
+import { ApiError } from './api/error';
+import { ApiErrorCode } from './api/error/error-codes.util';
 
 export type ValidationError = z.ZodError;
 

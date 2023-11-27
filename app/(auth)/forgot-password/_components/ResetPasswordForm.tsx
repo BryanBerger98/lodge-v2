@@ -19,7 +19,7 @@ import { Separator } from '@/components/ui/separator';
 import { resetUserPassword } from '@/services/auth.service';
 import { ApiError } from '@/utils/api/error';
 import { getErrorMessage } from '@/utils/api/error/error-messages.util';
-import { buildFormError } from '@/utils/error';
+import { buildFormError } from '@/utils/error.util';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules } from '@/utils/password.util';
 
 type ResetPasswordFormProps = {

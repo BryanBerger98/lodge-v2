@@ -1,11 +1,11 @@
-# Equus
+# Lodge
 
 ## Getting Started
 
 First, clone the repository:
 
 ```bash
-git clone git@github.com:Groupe-Carolus/Equus.git
+git clone git@github.com:BryanBerger98/lodge-v2.git
 ```
 
 Install dependencies:
