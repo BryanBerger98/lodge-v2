@@ -17,7 +17,7 @@ import { Separator } from '@/components/ui/separator';
 import { sendResetPasswordToken } from '@/services/auth.service';
 import { ApiError } from '@/utils/api/error';
 import { getErrorMessage } from '@/utils/api/error/error-messages.util';
-import { buildFormError } from '@/utils/error';
+import { buildFormError } from '@/utils/error.util';
 
 type EmailFormProps = {
 	csrfToken: string;
