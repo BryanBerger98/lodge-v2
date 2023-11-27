@@ -6,13 +6,14 @@ import { useState } from 'react';
 
 import GoogleIcon from '@/components/icons/google';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
+import useErrorToast from '@/hooks/error/useErrorToast';
+import { ApiError } from '@/utils/api/error';
 
 const GoogleAuthButton = () => {
 
 	const [ isLoading, setIsLoading ] = useState(false);
 
-	const { toast } = useToast();
+	const { triggerErrorToast } = useErrorToast();
 
 	const handleSignInWithGoogle = async () => {
 		try {
@@ -20,19 +21,14 @@ const GoogleAuthButton = () => {
 			const data = await signIn('google', { callbackUrl: '/' });
 			if (data?.error) {
 				console.error(data.error);
-				toast({
+				triggerErrorToast({
 					title: 'Error',
 					description: 'An error occured.',
-					variant: 'destructive',
 				});
 			}
 		} catch (error: any) {
 			console.error(error);
-			toast({
-				title: 'Error',
-				description: error.message || 'An error occured.',
-				variant: 'destructive',
-			});
+			triggerErrorToast(error as ApiError<unknown>);
 		} finally {
 			setIsLoading(false);
 		}

@@ -17,7 +17,7 @@ const DeleteAccountButton = () => {
 	const [ isPasswordModalOpen, setIsPasswordModalOpen ] = useState<boolean>(false);
 
 	const { csrfToken } = useCsrf();
-	const { triggerErrorToast } = useErrorToast({ logError: true });
+	const { triggerErrorToast } = useErrorToast();
 
 	const handleDeleteAccount = () => setIsPasswordModalOpen(true);
 
