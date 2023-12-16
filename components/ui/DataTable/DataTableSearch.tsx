@@ -12,7 +12,7 @@ const DataTableSearch = ({ defaultSearchValue = '', placeholder, onSearch: handl
 
 	return (
 		<InputSearch
-			className="flex-grow"
+			className="flex-grow lg:flex-grow-0 lg:w-1/2"
 			defaultValue={ defaultSearchValue }
 			inputClassName="max-w-sm"
 			placeholder={ placeholder || 'Search...' }

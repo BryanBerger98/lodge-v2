@@ -2,21 +2,17 @@ import { NextResponse } from 'next/server';
 
 import { findSettingByName, updateSetting } from '@/database/setting/setting.repository';
 import { findOwnerUser, findUserById, findUsers, updateUser } from '@/database/user/user.repository';
-import { connectToDatabase } from '@/lib/database';
 import { Role } from '@/schemas/role.schema';
 import { SettingDataType, SettingName } from '@/schemas/setting';
 import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
 import { StatusCode } from '@/utils/api/http-status';
-import { authenticateUserWithPassword, setServerAuthGuard } from '@/utils/auth';
+import { authenticateUserWithPassword } from '@/utils/auth';
 
 import { UpdateShareSettingsSchema } from './_schemas/update-share-settings.schema';
 
 export const GET = routeHandler(async () => {
-	await connectToDatabase();
-
-	await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER ] });
 
 	const shareWithAdminSetting = await findSettingByName(SettingName.SHARE_WITH_ADMIN);
 	const ownerSetting = await findSettingByName(SettingName.OWNER);
@@ -56,13 +52,12 @@ export const GET = routeHandler(async () => {
 		ownerUser,
 		selectedAdminUsers: adminUsers,
 	});
+}, {
+	authGuard: true,
+	rolesWhiteList: [ Role.OWNER ],
 });
 
-export const PUT = routeHandler(async (request) => {
-
-	await connectToDatabase();
-
-	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER ] });
+export const PUT = routeHandler(async (request, { currentUser }) => {
 
 	const body = await request.json();
 
@@ -110,4 +105,7 @@ export const PUT = routeHandler(async (request) => {
 
 	return NextResponse.json({ message: 'Updated.' });
 
+}, {
+	authGuard: true,
+	rolesWhiteList: [ Role.OWNER ],
 });

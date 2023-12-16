@@ -62,13 +62,13 @@ const UsersDataTable = () => {
 			onPaginationChange={ handleChangePagination }
 			onSortingChange={ handleChangeSorting }
 		>
-			<div className="flex items-center py-4 gap-2">
+			<div className="flex items-center py-4 gap-2 justify-between">
 				<DataTableSearch
 					defaultSearchValue={ routeParams.search || '' }
-					placeholder="Rechercher des clients..."
+					placeholder="Search..."
 					onSearch={ handleSearch }
 				/>
-				<div className="flex gap-2 ml-auto">
+				<div className="flex gap-2">
 					<UsersDataTableActions />
 					<DataTableCustomColumns columnNames={ COLUMN_NAMES } />
 				</div>

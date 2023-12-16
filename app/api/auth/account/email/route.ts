@@ -9,18 +9,15 @@ import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
 import { StatusCode } from '@/utils/api/http-status';
-import { setServerAuthGuard } from '@/utils/auth';
 import { sendNewEmailConfirmationEmail } from '@/utils/email';
 import { verifyPassword } from '@/utils/password.util';
 
 import { UpdateUserEmailSchema } from './_schemas/update-user-email.schema';
 
-export const POST = routeHandler(async (request) => {
+export const POST = routeHandler(async (request, { currentUser }) => {
 
 	const body = await request.json();
 	const { email, password } = UpdateUserEmailSchema.parse(body);
-
-	const { user: currentUser } = await setServerAuthGuard();
 
 	const user = await findUserWithPasswordById(currentUser.id);
 
@@ -109,9 +106,9 @@ export const POST = routeHandler(async (request) => {
 	await sendNewEmailConfirmationEmail(updatedUser, savedToken);
 
 	return NextResponse.json(updatedUser);
-});
+}, { authGuard: true });
 
-export const PUT = routeHandler(async (request) => {
+export const PUT = routeHandler(async (request, { currentUser }) => {
 
 	const confirmUpdateEmailSchema = z.object({ token: z.coerce.string().min(1, 'Required.') });
 
@@ -134,8 +131,6 @@ export const PUT = routeHandler(async (request) => {
 			status: StatusCode.UNAUTHORIZED,
 		});
 	}
-
-	const { user: currentUser } = await setServerAuthGuard();
 
 	const userData = await findUserById(savedToken.target_id);
 
@@ -161,4 +156,4 @@ export const PUT = routeHandler(async (request) => {
 	});
 
 	return NextResponse.json(updatedUser);
-});
+}, { authGuard: true });

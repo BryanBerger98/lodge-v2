@@ -1,7 +1,15 @@
 import mongoose, { Types } from 'mongoose';
 
 export type Id = Types.ObjectId;
-export const newId = (idString?: string | Id) => new Types.ObjectId(idString);
+export const newId = <T extends (string | Id | null | undefined)>(idString?: T): T extends (null | undefined) ? null : Id => {
+	if (typeof idString === 'undefined' || idString === null || idString === undefined) {
+		return null as T extends (null | undefined) ? null : Id;
+	}
+	if (typeof idString === 'string' && idString.length === 0) {
+		throw new Error('Error at newId: cannot create a new id from an empty string.');
+	}
+	return new Types.ObjectId(idString) as T extends (null | undefined) ? null : Id;
+};
 
 export type UpdateQueryOptions = {
 	newDocument?: boolean;

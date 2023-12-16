@@ -2,22 +2,17 @@ import { NextResponse } from 'next/server';
 
 import { hasSettingsAccess } from '@/app/_utils/settings/has-settings-access';
 import { findSettingByName, updateSetting } from '@/database/setting/setting.repository';
-import { connectToDatabase } from '@/lib/database';
 import { Role } from '@/schemas/role.schema';
 import { SettingDataType } from '@/schemas/setting';
 import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
 import { StatusCode } from '@/utils/api/http-status';
-import { setServerAuthGuard } from '@/utils/auth';
 
 import { UpdateImageSettingSchema } from '../_schemas/update-image.setting.schema';
 
 import { uploadPhotoFile } from './_utils/upload-photo-file';
 
-export const PUT = routeHandler(async (request) => {
-	await connectToDatabase();
-
-	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
+export const PUT = routeHandler(async (request, { currentUser }) => {
 
 	const hasUserSettingsAccess = hasSettingsAccess(currentUser);
 
@@ -42,4 +37,7 @@ export const PUT = routeHandler(async (request) => {
 	}, { upsert: true });
 		
 	return NextResponse.json(updatedSetting);
+}, {
+	authGuard: true,
+	rolesWhiteList: [ Role.OWNER, Role.ADMIN ],
 });

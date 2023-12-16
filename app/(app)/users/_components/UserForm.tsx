@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Save } from 'lucide-react';
 import { useRouter } from 'next-nprogress-bar';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -11,12 +11,10 @@ import ProfilePhotoField, { ProfilePhotoFieldSchema } from '@/app/_components/fo
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
-import useCsrf from '@/context/csrf/useCsrf';
 import useUser from '@/context/users/user/useUser';
 import useErrorToast from '@/hooks/error/useErrorToast';
 import { Role } from '@/schemas/role.schema';
 import { Gender } from '@/schemas/user/gender.schema';
-import { createUser, updateUser } from '@/services/users.service';
 import { ApiError } from '@/utils/api/error';
 
 import UserAccessRightsFormBlock, { UserAccessRightsFormBlockSchema } from './form-blocks/UserAccessRightsFormBlock';
@@ -28,12 +26,11 @@ type UserFormValues = z.infer<typeof UserFormSchema>;
 
 const UserForm = () => {
 
-	const [ isLoading, setIsLoading ] = useState(false);
+	const { user, error, updateUser, createUser, isLoading } = useUser();
 
-	const { user, refetchUser } = useUser();
+	console.log('ERROR', error);
 	
 	const router = useRouter();
-	const { csrfToken } = useCsrf();
 	const { triggerErrorToast } = useErrorToast();
 
 	const form = useForm<UserFormValues>({
@@ -71,28 +68,14 @@ const UserForm = () => {
 
 	const handleSubmit = async (values: UserFormValues) => {
 		try {
-			if (!csrfToken) {
-				triggerErrorToast({
-					title: 'Error',
-					description: 'Invalid CSRF token.',
-				});
-				return;
-			}
-			setIsLoading(true);
 			if (user) {
-				await updateUser({
-					id: user.id,
-					...values,
-				}, { csrfToken });
-				await refetchUser();
+				await updateUser(values);
 			} else {
-				await createUser(values, { csrfToken });
+				await createUser(values);
 				router.push('/users');
 			}
 		} catch (error) {
 			triggerErrorToast(error as ApiError<unknown>, form);
-		} finally {
-			setIsLoading(false);
 		}
 	};
 

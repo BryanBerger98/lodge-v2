@@ -4,7 +4,7 @@ import { Role } from '@/schemas/role.schema';
 import { Gender } from '@/schemas/user/gender.schema';
 
 export const UpdateUserSchema = z.object({
-	username: z.coerce.string().optional(),
+	username: z.coerce.string().min(1, 'Required.'),
 	email: z.coerce.string().email('Please, provide a valid email address.').optional(),
 	phone_number: z.coerce.string().optional(),
 	role: z.nativeEnum(Role).optional(),
