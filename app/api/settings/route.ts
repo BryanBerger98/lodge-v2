@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { getEnabledSignInProvidersSettings } from '@/app/_utils/settings/get-enabled-sign-in-providers-settings';
 import { hasSettingsAccess } from '@/app/_utils/settings/has-settings-access';
-import { updateSetting } from '@/database/setting/setting.repository';
+import { findSettings, updateSetting } from '@/database/setting/setting.repository';
 import { Role } from '@/schemas/role.schema';
 import { SettingName } from '@/schemas/setting';
 import { routeHandler } from '@/utils/api';
@@ -10,6 +10,7 @@ import { buildApiError } from '@/utils/api/error';
 import { StatusCode } from '@/utils/api/http-status';
 import { SIGN_IN_SETTINGS_NAMES } from '@/utils/settings';
 
+import { FetchSettingsSchema } from './_schemas/fetch-settings.schema';
 import { UpdateSettingsSchema } from './_schemas/update-settings.schema';
 
 export const PUT = routeHandler(async (request, { currentUser }) => {
@@ -51,4 +52,11 @@ export const PUT = routeHandler(async (request, { currentUser }) => {
 }, {
 	authGuard: true,
 	rolesWhiteList: [ Role.OWNER, Role.ADMIN ],
+});
+
+export const GET = routeHandler(async (_, { searchParams }) => {
+	const { name } = FetchSettingsSchema.parse(searchParams);
+	const query = name && name.length > 0 ? { name: { $in: name } } : {};
+	const settings = await findSettings(query);
+	return NextResponse.json({ settings });
 });

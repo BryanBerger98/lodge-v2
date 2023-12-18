@@ -11,6 +11,7 @@ import { ApiError } from '@/utils/api/error';
 type UserContextValues = {
 	user: IUserPopulated | null;
 	isLoading: boolean;
+	isMutating: boolean;
 	refetchUser: KeyedMutator<IUserPopulated | null>;
 	updateUser: (user: Partial<IUserPopulated>) => Promise<IUserPopulated | null>;
 	createUser: (user: z.infer<typeof CreateUserSchema>) => Promise<IUserPopulated | null>;

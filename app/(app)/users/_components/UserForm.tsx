@@ -26,9 +26,7 @@ type UserFormValues = z.infer<typeof UserFormSchema>;
 
 const UserForm = () => {
 
-	const { user, error, updateUser, createUser, isLoading } = useUser();
-
-	console.log('ERROR', error);
+	const { user, updateUser, createUser, isLoading, isMutating } = useUser();
 	
 	const router = useRouter();
 	const { triggerErrorToast } = useErrorToast();
@@ -107,8 +105,8 @@ const UserForm = () => {
 					</CardContent>
 				</Card>
 				<div className="flex justify-end">
-					<Button disabled={ isLoading }>
-						{ isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" /> }
+					<Button disabled={ isMutating || isLoading }>
+						{ isMutating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" /> }
 						Save
 					</Button>
 				</div>

@@ -23,20 +23,16 @@ type UserProviderProps = {
 const UserProvider = ({ user: initialUser, children }: PropsWithChildren<UserProviderProps>) => {
 
 	const [ userId, setUserId ] = useState(initialUser?.id || null);
+	const [ isMutating, setIsMutating ] = useState(false);
+
 	const { data, error: swrError, isLoading, mutate } = useSWR<IUserPopulated | null>(userId, fetchUserById, { fallbackData: initialUser });
 
-	const { csrfToken } = useCsrf();
+	const { getCsrfToken } = useCsrf();
 	const { triggerErrorToast } = useErrorToast();
 
 	const updateUser = useCallback(async (user: Partial<IUserPopulated>) => {
 		try {
-			if (!csrfToken) {
-				triggerErrorToast({
-					title: 'Error',
-					description: 'Invalid CSRF token.',
-				});
-				return null;
-			}
+			const csrfToken = getCsrfToken();
 			if (!initialUser) {
 				triggerErrorToast({
 					title: 'Error',
@@ -44,6 +40,7 @@ const UserProvider = ({ user: initialUser, children }: PropsWithChildren<UserPro
 				});
 				return null;
 			}
+			setIsMutating(true);
 			const updatedUser = await mutate(updateUserRequest({
 				...user,
 				username: user.username ?? undefined,
@@ -62,42 +59,33 @@ const UserProvider = ({ user: initialUser, children }: PropsWithChildren<UserPro
 				revalidate: false,
 				rollbackOnError: true,
 			});
+			setIsMutating(false);
 			return updatedUser || null;
 		} catch (error) {
-			triggerErrorToast(error as ApiError<unknown>);
-			return null;
+			setIsMutating(false);
+			throw error;
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ csrfToken, initialUser ]);
+	}, [ initialUser ]);
 
 	const createUser = useCallback(async (user: z.infer<typeof CreateUserSchema>) => {
 		try {
-			if (!csrfToken) {
-				triggerErrorToast({
-					title: 'Error',
-					description: 'Invalid CSRF token.',
-				});
-				return null;
-			}
+			const csrfToken = getCsrfToken();
+			setIsMutating(true);
 			const createdUser = await mutate(createUserRequest(user, { csrfToken }));
 			setUserId(createdUser?.id || null);
+			setIsMutating(false);
 			return createdUser || null;
 		} catch (error) {
-			triggerErrorToast(error as ApiError<unknown>);
-			return null;
+			setIsMutating(false);
+			throw error;
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ csrfToken ]);
+	}, []);
 
 	const deleteUser = useCallback(async () => {
 		try {
-			if (!csrfToken) {
-				triggerErrorToast({
-					title: 'Error',
-					description: 'Invalid CSRF token.',
-				});
-				return;
-			}
+			const csrfToken = getCsrfToken();
 			if (!initialUser) {
 				triggerErrorToast({
 					title: 'Error',
@@ -105,15 +93,17 @@ const UserProvider = ({ user: initialUser, children }: PropsWithChildren<UserPro
 				});
 				return;
 			}
+			setIsMutating(true);
 			await deleteUserRequest(initialUser.id, { csrfToken });
 			await mutate(null);
+			setIsMutating(false);
 			return;
 		} catch (error) {
-			triggerErrorToast(error as ApiError<unknown>);
-			return;
+			setIsMutating(false);
+			throw error;
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ csrfToken, initialUser ]);
+	}, [ initialUser ]);
 
 	const contextValue = useMemo(() => ({
 		user: data || null,
@@ -122,9 +112,10 @@ const UserProvider = ({ user: initialUser, children }: PropsWithChildren<UserPro
 		updateUser,
 		createUser,
 		deleteUser,
+		isMutating,
 		isLoading,
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}), [ data, isLoading, swrError ]);
+	}), [ data, isLoading, isMutating, swrError ]);
 
 	return (
 		<UserContext.Provider value={ contextValue }>
