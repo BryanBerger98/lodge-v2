@@ -4,24 +4,18 @@ import { hasSettingsAccess } from '@/app/_utils/settings/has-settings-access';
 import { deleteFileById, findFileById } from '@/database/file/file.repository';
 import { findSettingByName, updateSetting } from '@/database/setting/setting.repository';
 import { deleteFileFromKey } from '@/lib/bucket';
-import { connectToDatabase } from '@/lib/database';
 import { Role } from '@/schemas/role.schema';
 import { SettingDataType } from '@/schemas/setting';
 import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
 import { StatusCode } from '@/utils/api/http-status';
-import { setServerAuthGuard } from '@/utils/auth';
 
 import { DeleteImageSettingSchema } from './_schemas/delete-image-setting.schema';
 
-export const DELETE = routeHandler(async (_, { params }) => {
+export const DELETE = routeHandler(async (_, { params, currentUser }) => {
 
 	const { name } = DeleteImageSettingSchema.parse({ name: params.setting_name });
-
-	await connectToDatabase();
-
-	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
 
 	const hasUserSettingsAccess = hasSettingsAccess(currentUser);
 
@@ -53,6 +47,9 @@ export const DELETE = routeHandler(async (_, { params }) => {
 		value: null,
 		updated_by: currentUser.id,
 	}, { upsert: true });
-		
+
 	return NextResponse.json(updatedSetting);
+}, {
+	authGuard: true,
+	rolesWhiteList: [ Role.OWNER, Role.ADMIN ],
 });

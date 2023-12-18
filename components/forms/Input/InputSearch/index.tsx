@@ -1,9 +1,11 @@
 'use client';
 
+import { SearchIcon } from 'lucide-react';
 import { InputHTMLAttributes, KeyboardEventHandler, ReactNode, useId } from 'react';
 
 import { Input, InputProps } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/utils/ui.util';
 
 type InputSearchProperties = {
 	inputClassName?: string;
@@ -14,7 +16,7 @@ type InputSearchProperties = {
 } & InputProps & InputHTMLAttributes<HTMLInputElement>;
 
 const InputSearch = ({ label = null, className = '', inputClassName = '', labelClassName = '', debounceDelay = 300, onSearch, ...fieldProps }: InputSearchProperties) => {
-	
+
 	const inputId = useId();
 
 	let delay: NodeJS.Timeout;
@@ -36,7 +38,7 @@ const InputSearch = ({ label = null, className = '', inputClassName = '', labelC
 	};
 
 	return (
-		<div className={ `flex flex-col gap-1.5 ${ className }` }>
+		<div className={ `flex flex-col gap-1.5 relative ${ className }` }>
 			{
 				label ?
 					<Label
@@ -48,12 +50,13 @@ const InputSearch = ({ label = null, className = '', inputClassName = '', labelC
 					: null
 			}
 			<Input
-				className={ inputClassName }
+				className={ cn('!w-full !max-w-full', inputClassName) }
 				id={ inputId }
 				{ ...fieldProps }
 				onKeyDown={ handleClearDelay }
 				onKeyUp={ handleSearchValue }
 			/>
+			<SearchIcon className="absolute h-4 w-4 opacity-50 right-3 top-3 bottom-3" />
 		</div>
 	);
 };

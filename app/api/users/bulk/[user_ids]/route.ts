@@ -3,14 +3,13 @@ import { NextResponse } from 'next/server';
 import { deleteMultipleFilesById, findMultipleFilesByKey } from '@/database/file/file.repository';
 import { deleteMultipleUsersById, findUsers } from '@/database/user/user.repository';
 import { deleteMultipleFilesFromKey } from '@/lib/bucket';
-import { connectToDatabase, newId } from '@/lib/database';
+import { newId } from '@/lib/database';
 import { Role } from '@/schemas/role.schema';
 import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
 import { StatusCode } from '@/utils/api/http-status';
 import { filterEmptyValues } from '@/utils/array.util';
-import { setServerAuthGuard } from '@/utils/auth';
 
 export const DELETE = routeHandler(async (_, { params }) => {
 	const { user_ids } = params;
@@ -33,13 +32,9 @@ export const DELETE = routeHandler(async (_, { params }) => {
 		});
 	}
 
-	await connectToDatabase();
-
-	await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
-
 	const usersData = await findUsers({
-		_id: { $in: userIdsArr.map(id => newId(id)) },
-		role: { $ne: 'owner' },
+		_id: { $in: userIdsArr.map(newId) },
+		role: { $ne: Role.OWNER },
 	});
 
 	if (!usersData || usersData.length === 0) {
@@ -64,4 +59,7 @@ export const DELETE = routeHandler(async (_, { params }) => {
 	await deleteMultipleUsersById(userDataIds);
 
 	return NextResponse.json({ message: 'Users deleted.' });
+}, {
+	authGuard: true,
+	rolesWhiteList: [ Role.OWNER, Role.ADMIN ],
 });

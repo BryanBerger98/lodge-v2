@@ -1,5 +1,3 @@
-import { parse } from 'url';
-
 import { NextResponse } from 'next/server';
 
 import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
@@ -10,7 +8,6 @@ import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
 import { ReasonPhrase, StatusCode } from '@/utils/api/http-status';
-import { setServerAuthGuard } from '@/utils/auth';
 import { isFileURLExpired } from '@/utils/file.util';
 import { generatePassword, hashPassword } from '@/utils/password.util';
 
@@ -18,12 +15,9 @@ import { CreateUserSchema } from './_schemas/create-user.schema';
 import { FetchUsersSchema } from './_schemas/fetch-users.schema';
 import { uploadProfilePhotoFile } from './_utils/upload-profile-photo';
 
-export const POST = routeHandler(async (request) => {
-
-	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
+export const POST = routeHandler(async (request, { currentUser }) => {
 
 	const formData = await request.formData();
-
 	const body = Object.fromEntries(formData.entries());
 
 	const { avatar, email, ...values } = CreateUserSchema.parse(body);
@@ -56,14 +50,14 @@ export const POST = routeHandler(async (request) => {
 		status: StatusCode.CREATED,
 		statusText: ReasonPhrase.CREATED, 
 	});
+}, {
+	authGuard: true,
+	rolesWhiteList: [ Role.OWNER, Role.ADMIN ],
 });
 
-export const GET = routeHandler(async (request) => {
-	await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
+export const GET = routeHandler(async (_, { searchParams }) => {
 
-	const queryParams = parse(request.url, true).query;
-
-	const { sort_fields, sort_directions, page_index, page_size, search, roles } = FetchUsersSchema.parse(queryParams);
+	const { sort_fields, sort_directions, page_index, page_size, search, roles } = FetchUsersSchema.parse(searchParams);
 
 	const searchArray = search ? search.trim().split(' ') : [];
 	const searchRegexArray = searchArray.map(string => new RegExp(string, 'i'));
@@ -102,6 +96,8 @@ export const GET = routeHandler(async (request) => {
 		count,
 		total,
 	});
-
+}, {
+	authGuard: true,
+	rolesWhiteList: [ Role.OWNER, Role.ADMIN ],
 });
 

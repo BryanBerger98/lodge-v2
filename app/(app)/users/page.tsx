@@ -2,7 +2,6 @@ import { Plus, UserPlus, Users } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { headers } from 'next/headers';
 import Link from 'next/link';
-import { z } from 'zod';
 
 import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
 import { FetchUsersSchema } from '@/app/api/users/_schemas/fetch-users.schema';
@@ -68,7 +67,7 @@ const UsersPage = async ({ searchParams }: UsersPageProps) => {
 		...searchRequest,
 		has_email_verified: false, 
 	});
-	const parsedUsers = z.array(UserPopulatedSchema).parse(users);
+	const parsedUsers = UserPopulatedSchema.array().parse(users);
 
 	return (
 		<CsrfProvider csrfToken={ csrfToken }>

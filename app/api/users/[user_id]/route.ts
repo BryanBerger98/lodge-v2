@@ -9,7 +9,6 @@ import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
 import { StatusCode } from '@/utils/api/http-status';
-import { setServerAuthGuard } from '@/utils/auth';
 
 import { UpdateUserSchema } from '../_schemas/update-user.schema';
 import { uploadProfilePhotoFile } from '../_utils/upload-profile-photo';
@@ -26,8 +25,6 @@ export const GET = routeHandler(async (_, { params }) => {
 		});
 	}
 
-	await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
-
 	const userData = await findUserById(user_id);
 
 	if (!userData) {
@@ -40,6 +37,9 @@ export const GET = routeHandler(async (_, { params }) => {
 	userData.photo = await renewFileExpiration(userData.photo);
 
 	return NextResponse.json(userData);
+}, {
+	authGuard: true,
+	rolesWhiteList: [ Role.OWNER, Role.ADMIN ],
 });
 
 export const DELETE = routeHandler(async (_, { params }) => {
@@ -52,8 +52,6 @@ export const DELETE = routeHandler(async (_, { params }) => {
 			status: StatusCode.UNPROCESSABLE_ENTITY,
 		});
 	}
-
-	await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
 
 	const userData = await findUserById(user_id);
 
@@ -78,9 +76,12 @@ export const DELETE = routeHandler(async (_, { params }) => {
 	await deleteUserById(userData.id);
 
 	return NextResponse.json({ message: 'User deleted.' });
+}, {
+	authGuard: true,
+	rolesWhiteList: [ Role.OWNER, Role.ADMIN ],
 });
 
-export const PUT = routeHandler(async (request, { params }) => {
+export const PUT = routeHandler(async (request, { params, currentUser }) => {
 
 	const { user_id } = params;
 
@@ -91,8 +92,6 @@ export const PUT = routeHandler(async (request, { params }) => {
 			status: StatusCode.UNPROCESSABLE_ENTITY,
 		});
 	}
-
-	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
 
 	const formData = await request.formData();
 	const body = Object.fromEntries(formData.entries());
@@ -135,4 +134,7 @@ export const PUT = routeHandler(async (request, { params }) => {
 	});
 
 	return NextResponse.json(updatedUser);
+}, {
+	authGuard: true,
+	rolesWhiteList: [ Role.OWNER, Role.ADMIN ],
 });

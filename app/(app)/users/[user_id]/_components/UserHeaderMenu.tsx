@@ -17,7 +17,7 @@ const UserHeaderMenu = () => {
 
 	const [ confirmModalOpenState, setConfirmModalOpenState ] = useState<'suspend' | 'activate' | 'reset-password' | 'verify-email' | 'delete' | null>(null);
 
-	const { user, setUser } = useUser();
+	const { user, refetchUser } = useUser();
 	const router = useRouter();
 
 	if (!user) return null;
@@ -32,7 +32,7 @@ const UserHeaderMenu = () => {
 		if (confirmModalOpenState === 'delete') {
 			router.push('/users');
 		}
-		setUser(updatedUser);
+		refetchUser(updatedUser);
 		setConfirmModalOpenState(null);
 	};
 

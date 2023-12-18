@@ -5,9 +5,9 @@ import { Setting, SettingPopulated, SettingName, SettingDataType } from '@/schem
 import { UnregisteredSettingPopulated } from '@/schemas/setting/unregistered-setting.schema';
 import { SettingNameType, findDefaultSettingByName } from '@/utils/settings';
 
-import { populateSetting } from './populate-setting';
 import { CreateSettingDTO, UpdateSettingDTO } from './setting.dto';
 import SettingModels, { getSettingModel } from './setting.model';
+import { populateSetting } from './utils/populate-setting';
 
 export const findSettingByName = async <T extends SettingName>(name: T): Promise<SettingPopulated<SettingNameType<T>> | UnregisteredSettingPopulated<SettingNameType<T>> | null> => {
 	try {

@@ -8,10 +8,9 @@ import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
 import { StatusCode } from '@/utils/api/http-status';
-import { setServerAuthGuard } from '@/utils/auth';
 import { AUTHORIZED_IMAGE_MIME_TYPES, AUTHORIZED_IMAGE_SIZE, convertFileRequestObjetToModel } from '@/utils/file.util';
 
-export const PUT = routeHandler(async (request) => {
+export const PUT = routeHandler(async (request, { currentUser }) => {
 	const formData = await request.formData();
 	const file = formData.get('avatar') as Blob | null;
 
@@ -37,8 +36,6 @@ export const PUT = routeHandler(async (request) => {
 			status: StatusCode.UNPROCESSABLE_ENTITY,
 		});
 	}
-
-	const { user: currentUser } = await setServerAuthGuard();
 
 	const currentUserData = await findUserById(currentUser.id);
 
@@ -79,4 +76,4 @@ export const PUT = routeHandler(async (request) => {
 	});
 
 	return NextResponse.json(updatedCurrentUser);
-});
+}, { authGuard: true });
