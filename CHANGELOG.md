@@ -1,3 +1,10 @@
+## [1.11.1](https://github.com/BryanBerger98/lodge-v2/compare/v1.11.0...v1.11.1) (2023-12-18)
+
+
+### Bug Fixes
+
+* **users:** fix user context usage in user header menu ([4a3fdfd](https://github.com/BryanBerger98/lodge-v2/commit/4a3fdfd9f6d9960235b8712c8d9563aab282235e))
+
 # [1.11.0](https://github.com/BryanBerger98/lodge-v2/compare/v1.10.0...v1.11.0) (2023-11-25)
 
 
