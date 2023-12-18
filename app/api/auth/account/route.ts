@@ -2,21 +2,14 @@ import { NextResponse } from 'next/server';
 
 import { renewFileExpiration } from '@/app/_utils/file/renew-file-expiration';
 import { findUserById, updateUser } from '@/database/user/user.repository';
-import { connectToDatabase } from '@/lib/database';
 import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
 import { StatusCode } from '@/utils/api/http-status';
-import { setServerAuthGuard } from '@/utils/auth';
 
 import { UpdateUserAccountSchema } from './_schemas/update-user-account.schema';
 
-export const GET = routeHandler(async () => {
-
-	await connectToDatabase();
-
-	const { user: currentUser } = await setServerAuthGuard();
-
+export const GET = routeHandler(async (_, { currentUser }) => {
 	const userData = await findUserById(currentUser.id);
 
 	if (!userData) {
@@ -29,18 +22,12 @@ export const GET = routeHandler(async () => {
 	userData.photo = await renewFileExpiration(userData.photo);
 
 	return NextResponse.json(userData);
-});
+}, { authGuard: true });
 
-export const PUT = routeHandler(async (request) => {
-	await connectToDatabase();
-
+export const PUT = routeHandler(async (request, { currentUser }) => {
 	const body = await request.json();
 
 	const values = UpdateUserAccountSchema.parse(body);
-
-	const { user: currentUser } = await setServerAuthGuard();
-
-	currentUser.id;
 
 	const updatedUser = await updateUser({
 		id: currentUser.id,
@@ -49,4 +36,4 @@ export const PUT = routeHandler(async (request) => {
 	});
 
 	return NextResponse.json(updatedUser);
-});
+}, { authGuard: true });

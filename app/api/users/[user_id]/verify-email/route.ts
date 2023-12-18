@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 
 import { createToken, deleteTokenById, getTokenFromTargetId } from '@/database/token/token.repository';
 import { findUserById } from '@/database/user/user.repository';
-import { connectToDatabase } from '@/lib/database';
 import { generateToken } from '@/lib/jwt';
 import { Role } from '@/schemas/role.schema';
 import { IToken, TokenAction } from '@/schemas/token.schema';
@@ -11,12 +10,9 @@ import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
 import { StatusCode } from '@/utils/api/http-status';
-import { setServerAuthGuard } from '@/utils/auth';
 import { sendAccountVerificationEmail } from '@/utils/email';
 
-export const POST = routeHandler(async (_, { params }) => {
-
-	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
+export const POST = routeHandler(async (_, { params, currentUser }) => {
 
 	const { user_id } = params;
 
@@ -27,8 +23,6 @@ export const POST = routeHandler(async (_, { params }) => {
 			status: StatusCode.UNPROCESSABLE_ENTITY,
 		});
 	}
-
-	await connectToDatabase();
 
 	const userData = await findUserById(user_id);
 
@@ -78,4 +72,7 @@ export const POST = routeHandler(async (_, { params }) => {
 	delete safeTokenData.token;
 
 	return NextResponse.json(safeTokenData);
+}, {
+	authGuard: true,
+	rolesWhiteList: [ Role.OWNER, Role.ADMIN ],
 });

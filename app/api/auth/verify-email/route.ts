@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { createToken, deleteTokenById, getTokenFromTargetId, getTokenFromTokenString } from '@/database/token/token.repository';
 import { findUserByEmail, findUserById, updateUser } from '@/database/user/user.repository';
-import { connectToDatabase } from '@/lib/database';
 import { generateToken, verifyToken } from '@/lib/jwt';
 import { SettingName } from '@/schemas/setting';
 import { IToken, TokenAction } from '@/schemas/token.schema';
@@ -12,20 +11,15 @@ import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
 import { StatusCode } from '@/utils/api/http-status';
-import { setServerAuthGuard } from '@/utils/auth';
 import { sendAccountVerificationEmail } from '@/utils/email';
 
-export const GET = routeHandler(async () => {
-
-	await connectToDatabase();
+export const GET = routeHandler(async (_, { currentUser }) => {
 
 	const userVerifyEmailSetting = await findSettingByName(SettingName.USER_VERIFY_EMAIL);
 
 	if (userVerifyEmailSetting && !userVerifyEmailSetting.value) {
 		throw buildApiError({ status: StatusCode.FORBIDDEN });
 	}
-
-	const { user: currentUser } = await setServerAuthGuard();
 
 	const userData = await findUserById(currentUser.id);
 
@@ -59,18 +53,15 @@ export const GET = routeHandler(async () => {
 	delete safeTokenData.token;
 
 	return NextResponse.json(safeTokenData);
-});
+}, { authGuard: true });
 
-export const POST = routeHandler(async () => {
-	await connectToDatabase();
+export const POST = routeHandler(async (_, { currentUser }) => {
 
 	const userVerifyEmailSetting = await findSettingByName(SettingName.USER_VERIFY_EMAIL);
 
 	if (userVerifyEmailSetting && !userVerifyEmailSetting.value) {
 		throw buildApiError({ status: StatusCode.FORBIDDEN });
 	}
-
-	const { user: currentUser } = await setServerAuthGuard();
 
 	const userData = await findUserById(currentUser.id);
 
@@ -123,10 +114,9 @@ export const POST = routeHandler(async () => {
 	delete safeTokenData.token;
 
 	return NextResponse.json(safeTokenData);
-});
+}, { authGuard: true });
 
-export const PUT = routeHandler(async (request) => {
-	await connectToDatabase();
+export const PUT = routeHandler(async (request, { currentUser }) => {
 
 	const { token } = await request.json();
 
@@ -136,8 +126,6 @@ export const PUT = routeHandler(async (request) => {
 			status: StatusCode.UNAUTHORIZED,
 		});
 	}
-
-	const { user: currentUser } = await setServerAuthGuard();
 
 	const savedToken = await getTokenFromTokenString(token);
 
@@ -191,4 +179,4 @@ export const PUT = routeHandler(async (request) => {
 	});
 
 	return NextResponse.json(updatedUser);
-});
+}, { authGuard: true });

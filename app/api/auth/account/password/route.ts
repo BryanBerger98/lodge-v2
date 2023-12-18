@@ -3,18 +3,14 @@ import { z } from 'zod';
 
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { findUserWithPasswordById, updateUserPassword } from '@/database/user/user.repository';
-import { connectToDatabase } from '@/lib/database';
 import { SettingName } from '@/schemas/setting';
 import { routeHandler } from '@/utils/api';
 import { buildApiError } from '@/utils/api/error';
 import { ApiErrorCode } from '@/utils/api/error/error-codes.util';
 import { StatusCode } from '@/utils/api/http-status';
-import { setServerAuthGuard } from '@/utils/auth';
 import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules, hashPassword, verifyPassword } from '@/utils/password.util';
 
-export const PUT = routeHandler(async (request) => {
-
-	await connectToDatabase();
+export const PUT = routeHandler(async (request, { currentUser }) => {
 
 	const body = await request.json();
 
@@ -40,8 +36,6 @@ export const PUT = routeHandler(async (request) => {
 	});
 
 	const { password, newPassword } = UpdateUserPasswordSchema.parse(body);
-
-	const { user: currentUser } = await setServerAuthGuard();
 
 	const userData = await findUserWithPasswordById(currentUser.id);
 
@@ -72,4 +66,4 @@ export const PUT = routeHandler(async (request) => {
 	await updateUserPassword(userData.id, hashedPassword, currentUser.id);
 
 	return NextResponse.json({ message: 'Updated.' });
-});
+}, { authGuard: true });

@@ -11,7 +11,7 @@ const UsersLayout = async ({ children }: UsersLayoutProps) => {
 
 	await setServerAuthGuard({
 		rolesWhiteList: [ Role.OWNER, Role.ADMIN ],
-		redirect: '/', 
+		redirect: '/',
 	});
 
 	return (

@@ -2,7 +2,7 @@ import { PopulateOptions } from 'mongoose';
 
 import { SettingDataType } from '@/schemas/setting';
 
-import SettingModels from './setting.model';
+import SettingModels from '../setting.model';
 
 export const populateSetting = (settingDataType: SettingDataType): PopulateOptions[] => {
 	const populateArray: PopulateOptions[] = [

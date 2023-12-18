@@ -3,14 +3,10 @@ import { NextResponse } from 'next/server';
 import { findOwnerUser, updateMultipleUsers } from '@/database/user/user.repository';
 import { Role } from '@/schemas/role.schema';
 import { routeHandler } from '@/utils/api';
-import { setServerAuthGuard } from '@/utils/auth';
 
 import { UpdateMultipleUsersSchema } from '../_schemas/update-multiple-users.schema';
 
-
-export const PUT = routeHandler(async (request) => {
-
-	const { user: currentUser } = await setServerAuthGuard({ rolesWhiteList: [ Role.OWNER, Role.ADMIN ] });
+export const PUT = routeHandler(async (request, { currentUser }) => {
 
 	const body = await request.json();
 	const parsedBody = UpdateMultipleUsersSchema.parse(body);
@@ -27,4 +23,7 @@ export const PUT = routeHandler(async (request) => {
 	);
 
 	return NextResponse.json({ modifiedCount });
+}, {
+	authGuard: true,
+	rolesWhiteList: [ Role.OWNER, Role.ADMIN ],
 });

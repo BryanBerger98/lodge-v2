@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { findSettingByName } from '@/database/setting/setting.repository';
 import { createToken } from '@/database/token/token.repository';
 import { createUser, findUserByEmail } from '@/database/user/user.repository';
-import { connectToDatabase } from '@/lib/database';
 import { generateToken } from '@/lib/jwt';
 import { AuthenticationProvider } from '@/schemas/authentication-provider';
 import { Role } from '@/schemas/role.schema';
@@ -20,7 +19,6 @@ import { getErrorMessageFromPasswordRules, getValidationRegexFromPasswordRules, 
 import { SignUpUserSchema } from './_schemas/signup-user.schema';
 
 export const POST = routeHandler(async (request) => {
-	await connectToDatabase();
 
 	const newUserSignUpSetting = await findSettingByName(SettingName.NEW_USERS_SIGNUP);
 	const defaultUserRoleSetting = await findSettingByName(SettingName.DEFAULT_USER_ROLE);

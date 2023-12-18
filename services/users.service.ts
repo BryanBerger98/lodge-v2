@@ -8,7 +8,7 @@ import fetcher, { FetcherOptions, FetcherOptionsWithCsrf } from '@/lib/fetcher';
 import { Role } from '@/schemas/role.schema';
 import { ISafeToken, SafeTokenSchema } from '@/schemas/token.schema';
 import { IUserPopulated, UserPopulatedSchema } from '@/schemas/user/populated.schema';
-import { objectToFormData } from '@/utils/object.utils';
+import { objectToFormData } from '@/utils/object.util';
 import { buildQueryUrl } from '@/utils/url.util';
 
 export const createUser = async (userToCreate: z.infer<typeof CreateUserSchema>, options: FetcherOptionsWithCsrf): Promise<IUserPopulated> => {
